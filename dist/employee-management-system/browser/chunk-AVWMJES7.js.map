@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/errors/server-error/server-error.component.ts"],
+  "sourcesContent": ["import { ChangeDetectionStrategy, Component } from '@angular/core';\nimport { RouterLink } from '@angular/router';\n\n@Component({\n  selector: 'app-server-error',\n  standalone: true,\n  imports: [RouterLink],\n  template: `<main class=\"container py-5 text-center\"><h1>500</h1><p>The server could not complete the request.</p><a class=\"btn btn-primary\" routerLink=\"/\">Go home</a></main>`,\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class ServerErrorComponent {}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;AAUM,IAAO,uBAAP,MAAO,sBAAoB;;qCAApB,uBAAoB;EAAA;yEAApB,uBAAoB,WAAA,CAAA,CAAA,kBAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,QAAA,CAAA,CAAA,GAAA,aAAA,QAAA,aAAA,GAAA,CAAA,cAAA,KAAA,GAAA,OAAA,aAAA,CAAA,GAAA,UAAA,SAAA,8BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;AAHpB,MAAA,yBAAA,GAAA,QAAA,CAAA,EAAyC,GAAA,IAAA;AAAI,MAAA,iBAAA,GAAA,KAAA;AAAG,MAAA,uBAAA;AAAK,MAAA,yBAAA,GAAA,GAAA;AAAG,MAAA,iBAAA,GAAA,4CAAA;AAA0C,MAAA,uBAAA;AAAI,MAAA,yBAAA,GAAA,KAAA,CAAA;AAA0C,MAAA,iBAAA,GAAA,SAAA;AAAO,MAAA,uBAAA,EAAI;;oBAD5J,UAAU,GAAA,eAAA,GAAA,iBAAA,EAAA,CAAA;;;sEAIT,sBAAoB,CAAA;UAPhC;WAAU;MACT,UAAU;MACV,YAAY;MACZ,SAAS,CAAC,UAAU;MACpB,UAAU;MACV,iBAAiB,wBAAwB;KAC1C;;;;6EACY,sBAAoB,EAAA,WAAA,wBAAA,UAAA,kEAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}

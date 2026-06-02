@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/layouts/layout-components/sidebar/sidebar.component.ts"],
+  "sourcesContent": ["\n    :host { display: block; }\n    .sidebar { min-height: 100%; }\n    .nav-link {\n      border-radius: 0.5rem;\n      transition: background-color 0.15s ease, color 0.15s ease;\n    }\n    .nav-link.active {\n      background: var(--bs-primary);\n      color: #fff;\n    }\n    .nav-icon { width: 1.25rem; text-align: center; }\n  "],
+  "mappings": ";AACI;AAAQ,WAAA;;AACR,CAAA;AAAW,cAAA;;AACX,CAAA;AACE,iBAAA;AACA,cAAA,iBAAA,MAAA,IAAA,EAAA,MAAA,MAAA;;AAEF,CAJA,QAIA,CAAA;AACE,cAAA,IAAA;AACA,SAAA;;AAEF,CAAA;AAAY,SAAA;AAAgB,cAAA;;",
+  "names": []
+}

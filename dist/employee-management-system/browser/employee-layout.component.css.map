@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/layouts/employee-layout/employee-layout.component.ts"],
+  "sourcesContent": [".desktop-sidebar { width: var(--app-sidebar-width); }"],
+  "mappings": ";AAAA,CAAA;AAAmB,SAAA,IAAA;;",
+  "names": []
+}

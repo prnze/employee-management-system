@@ -1,0 +1,52 @@
+@use "bootstrap/scss/bootstrap";
+
+:root {
+  --app-sidebar-width: 17rem;
+  --app-bg: #f6f8fb;
+  --app-surface: #ffffff;
+  --app-text: #172033;
+  --app-muted: #657083;
+  --app-border: #dce3ec;
+  --app-brand: #0f6cbd;
+}
+
+[data-bs-theme="dark"] {
+  --app-bg: #111827;
+  --app-surface: #182235;
+  --app-text: #eef2f7;
+  --app-muted: #aab5c4;
+  --app-border: #314158;
+  --app-brand: #6bb8ff;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+.app-page {
+  padding: 1rem;
+}
+
+.surface {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: .5rem;
+}
+
+.skip-link {
+  left: .75rem;
+  position: absolute;
+  top: -4rem;
+  z-index: 1080;
+}
+
+.skip-link:focus {
+  top: .75rem;
+}

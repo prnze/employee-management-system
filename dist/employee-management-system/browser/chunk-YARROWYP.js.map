@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/shared/pipes/phone-format.pipe.ts"],
+  "sourcesContent": ["import { Pipe, PipeTransform } from '@angular/core';\n\n@Pipe({ name: 'phoneFormat', standalone: true })\nexport class PhoneFormatPipe implements PipeTransform {\n  transform(value: string | null | undefined): string {\n    const digits = (value ?? '').replace(/\\D/g, '');\n    return digits.length === 10 ? `+91 ${digits.slice(0, 5)} ${digits.slice(5)}` : value ?? '';\n  }\n}\n"],
+  "mappings": ";;;;;;;AAGM,IAAO,kBAAP,MAAO,iBAAe;EAC1B,UAAU,OAAgC;AACxC,UAAM,UAAU,SAAS,IAAI,QAAQ,OAAO,EAAE;AAC9C,WAAO,OAAO,WAAW,KAAK,OAAO,OAAO,MAAM,GAAG,CAAC,CAAC,IAAI,OAAO,MAAM,CAAC,CAAC,KAAK,SAAS;EAC1F;;qCAJW,kBAAe;EAAA;0FAAf,kBAAe,MAAA,KAAA,CAAA;;;sEAAf,iBAAe,CAAA;UAD3B;WAAK,EAAE,MAAM,eAAe,YAAY,KAAI,CAAE;;;",
+  "names": []
+}

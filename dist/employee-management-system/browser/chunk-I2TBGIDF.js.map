@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/core/constants/storage-keys.constant.ts", "src/app/core/services/storage.service.ts"],
+  "sourcesContent": ["export const STORAGE_KEYS = {\n  accessToken: 'ems.accessToken',\n  accessTokenExpiresAt: 'ems.accessTokenExpiresAt',\n  refreshToken: 'ems.refreshToken',\n  user: 'ems.user',\n  rememberMe: 'ems.rememberMe',\n  theme: 'ems.theme'\n} as const;\n", "import { Injectable } from '@angular/core';\n\n@Injectable({ providedIn: 'root' })\nexport class StorageService {\n  get<T>(key: string, storage: Storage = localStorage): T | null {\n    const value = storage.getItem(key);\n    return value ? (JSON.parse(value) as T) : null;\n  }\n\n  set<T>(key: string, value: T, storage: Storage = localStorage): void {\n    storage.setItem(key, JSON.stringify(value));\n  }\n\n  remove(key: string): void {\n    localStorage.removeItem(key);\n    sessionStorage.removeItem(key);\n  }\n}\n"],
+  "mappings": ";;;;;;;AAAO,IAAM,eAAe;EAC1B,aAAa;EACb,sBAAsB;EACtB,cAAc;EACd,MAAM;EACN,YAAY;EACZ,OAAO;;;;ACHH,IAAO,iBAAP,MAAO,gBAAc;EACzB,IAAO,KAAa,UAAmB,cAAY;AACjD,UAAM,QAAQ,QAAQ,QAAQ,GAAG;AACjC,WAAO,QAAS,KAAK,MAAM,KAAK,IAAU;EAC5C;EAEA,IAAO,KAAa,OAAU,UAAmB,cAAY;AAC3D,YAAQ,QAAQ,KAAK,KAAK,UAAU,KAAK,CAAC;EAC5C;EAEA,OAAO,KAAW;AAChB,iBAAa,WAAW,GAAG;AAC3B,mBAAe,WAAW,GAAG;EAC/B;;qCAbW,iBAAc;EAAA;4EAAd,iBAAc,SAAd,gBAAc,WAAA,YADD,OAAM,CAAA;;;sEACnB,gBAAc,CAAA;UAD1B;WAAW,EAAE,YAAY,OAAM,CAAE;;;",
+  "names": []
+}

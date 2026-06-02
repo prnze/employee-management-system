@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/core/services/toast.service.ts"],
+  "sourcesContent": ["import { Injectable, signal } from '@angular/core';\n\nexport interface ToastMessage {\n  id: string;\n  title: string;\n  message: string;\n  type: 'success' | 'info' | 'warning' | 'danger';\n}\n\n@Injectable({ providedIn: 'root' })\nexport class ToastService {\n  private readonly messagesSignal = signal<ToastMessage[]>([]);\n  readonly messages = this.messagesSignal.asReadonly();\n\n  show(message: Omit<ToastMessage, 'id'>): void {\n    const toast = { ...message, id: crypto.randomUUID() };\n    this.messagesSignal.update((items) => [toast, ...items].slice(0, 5));\n    setTimeout(() => this.dismiss(toast.id), 5000);\n  }\n\n  dismiss(id: string): void {\n    this.messagesSignal.update((items) => items.filter((item) => item.id !== id));\n  }\n}\n"],
+  "mappings": ";;;;;;;;;;;;AAUM,IAAO,eAAP,MAAO,cAAY;EACN,iBAAiB,OAAuB,CAAA,GAAE,GAAA,YAAA,CAAA,EAAA,WAAA,iBAAA,CAAA;;IAAA,CAAA;GAAA;EAClD,WAAW,KAAK,eAAe,WAAU;EAElD,KAAK,SAAiC;AACpC,UAAM,QAAQ,iCAAK,UAAL,EAAc,IAAI,OAAO,WAAU,EAAE;AACnD,SAAK,eAAe,OAAO,CAAC,UAAU,CAAC,OAAO,GAAG,KAAK,EAAE,MAAM,GAAG,CAAC,CAAC;AACnE,eAAW,MAAM,KAAK,QAAQ,MAAM,EAAE,GAAG,GAAI;EAC/C;EAEA,QAAQ,IAAU;AAChB,SAAK,eAAe,OAAO,CAAC,UAAU,MAAM,OAAO,CAAC,SAAS,KAAK,OAAO,EAAE,CAAC;EAC9E;;qCAZW,eAAY;EAAA;4EAAZ,eAAY,SAAZ,cAAY,WAAA,YADC,OAAM,CAAA;;;sEACnB,cAAY,CAAA;UADxB;WAAW,EAAE,YAAY,OAAM,CAAE;;;",
+  "names": []
+}

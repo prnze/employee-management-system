@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/errors/not-found/not-found.component.ts"],
+  "sourcesContent": ["import { ChangeDetectionStrategy, Component } from '@angular/core';\nimport { RouterLink } from '@angular/router';\n\n@Component({\n  selector: 'app-not-found',\n  standalone: true,\n  imports: [RouterLink],\n  template: `<main class=\"container py-5 text-center\"><h1>404</h1><p>The page was not found.</p><a class=\"btn btn-primary\" routerLink=\"/\">Go home</a></main>`,\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class NotFoundComponent {}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;AAUM,IAAO,oBAAP,MAAO,mBAAiB;;qCAAjB,oBAAiB;EAAA;yEAAjB,oBAAiB,WAAA,CAAA,CAAA,eAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,QAAA,CAAA,CAAA,GAAA,aAAA,QAAA,aAAA,GAAA,CAAA,cAAA,KAAA,GAAA,OAAA,aAAA,CAAA,GAAA,UAAA,SAAA,2BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;AAHjB,MAAA,yBAAA,GAAA,QAAA,CAAA,EAAyC,GAAA,IAAA;AAAI,MAAA,iBAAA,GAAA,KAAA;AAAG,MAAA,uBAAA;AAAK,MAAA,yBAAA,GAAA,GAAA;AAAG,MAAA,iBAAA,GAAA,yBAAA;AAAuB,MAAA,uBAAA;AAAI,MAAA,yBAAA,GAAA,KAAA,CAAA;AAA0C,MAAA,iBAAA,GAAA,SAAA;AAAO,MAAA,uBAAA,EAAI;;oBADzI,UAAU,GAAA,eAAA,GAAA,iBAAA,EAAA,CAAA;;;sEAIT,mBAAiB,CAAA;UAP7B;WAAU;MACT,UAAU;MACV,YAAY;MACZ,SAAS,CAAC,UAAU;MACpB,UAAU;MACV,iBAAiB,wBAAwB;KAC1C;;;;6EACY,mBAAiB,EAAA,WAAA,qBAAA,UAAA,4DAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}
