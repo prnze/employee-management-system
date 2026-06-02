@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/errors/forbidden/forbidden.component.ts"],
-  "sourcesContent": ["import { ChangeDetectionStrategy, Component } from '@angular/core';\nimport { RouterLink } from '@angular/router';\n\n@Component({\n  selector: 'app-forbidden',\n  standalone: true,\n  imports: [RouterLink],\n  template: `<main class=\"container py-5 text-center\"><h1>403</h1><p>You do not have permission to access this page.</p><a class=\"btn btn-primary\" routerLink=\"/\">Go home</a></main>`,\n  changeDetection: ChangeDetectionStrategy.OnPush\n})\nexport class ForbiddenComponent {}\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;AAUM,IAAO,qBAAP,MAAO,oBAAkB;;qCAAlB,qBAAkB;EAAA;yEAAlB,qBAAkB,WAAA,CAAA,CAAA,eAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,QAAA,CAAA,CAAA,GAAA,aAAA,QAAA,aAAA,GAAA,CAAA,cAAA,KAAA,GAAA,OAAA,aAAA,CAAA,GAAA,UAAA,SAAA,4BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;AAHlB,MAAA,yBAAA,GAAA,QAAA,CAAA,EAAyC,GAAA,IAAA;AAAI,MAAA,iBAAA,GAAA,KAAA;AAAG,MAAA,uBAAA;AAAK,MAAA,yBAAA,GAAA,GAAA;AAAG,MAAA,iBAAA,GAAA,iDAAA;AAA+C,MAAA,uBAAA;AAAI,MAAA,yBAAA,GAAA,KAAA,CAAA;AAA0C,MAAA,iBAAA,GAAA,SAAA;AAAO,MAAA,uBAAA,EAAI;;oBADjK,UAAU,GAAA,eAAA,GAAA,iBAAA,EAAA,CAAA;;;sEAIT,oBAAkB,CAAA;UAP9B;WAAU;MACT,UAAU;MACV,YAAY;MACZ,SAAS,CAAC,UAAU;MACpB,UAAU;MACV,iBAAiB,wBAAwB;KAC1C;;;;6EACY,oBAAkB,EAAA,WAAA,sBAAA,UAAA,4DAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
-  "names": []
-}

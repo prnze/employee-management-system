@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/admin/roles/roles.component.ts"],
-  "sourcesContent": ["\n    .permission-card {\n      transition: background-color 0.2s ease, border-color 0.2s ease;\n      cursor: default;\n    }\n    .permission-card--granted {\n      background-color: var(--bs-success-bg-subtle);\n      border-color: var(--bs-success-border-subtle) !important;\n    }\n    .permission-card--denied {\n      background-color: var(--bs-body-bg);\n      border-color: var(--bs-border-color) !important;\n    }\n    .form-check-input {\n      cursor: pointer;\n    }\n  "],
-  "mappings": ";AACI,CAAA;AACE,cAAA,iBAAA,KAAA,IAAA,EAAA,aAAA,KAAA;AACA,UAAA;;AAEF,CAAA;AACE,oBAAA,IAAA;AACA,gBAAA,IAAA;;AAEF,CAAA;AACE,oBAAA,IAAA;AACA,gBAAA,IAAA;;AAEF,CAAA;AACE,UAAA;;",
-  "names": []
-}

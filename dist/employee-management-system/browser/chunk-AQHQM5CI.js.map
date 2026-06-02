@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/core/constants/roles.constant.ts"],
-  "sourcesContent": ["export const APP_ROLES = {\n  admin: 'Admin',\n  employee: 'Employee'\n} as const;\n\nexport type AppRole = (typeof APP_ROLES)[keyof typeof APP_ROLES];\n\nexport const ROLE_PERMISSIONS: Record<AppRole, string[]> = {\n  Admin: [\n    'dashboard:view',\n    'employees:read',\n    'employees:create',\n    'employees:update',\n    'employees:delete',\n    'users:manage',\n    'roles:manage',\n    'reports:view',\n    'audit:view',\n    'settings:manage'\n  ],\n  Employee: ['dashboard:view', 'profile:update', 'attendance:view', 'tasks:view', 'notifications:view']\n};\n"],
-  "mappings": ";AAAO,IAAM,YAAY;EACvB,OAAO;EACP,UAAU;;AAKL,IAAM,mBAA8C;EACzD,OAAO;IACL;IACA;IACA;IACA;IACA;IACA;IACA;IACA;IACA;IACA;;EAEF,UAAU,CAAC,kBAAkB,kBAAkB,mBAAmB,cAAc,oBAAoB;;",
-  "names": []
-}

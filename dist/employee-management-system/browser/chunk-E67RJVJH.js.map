@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/shared/validators/match-password.validator.ts", "src/app/shared/validators/password-strength.validator.ts"],
-  "sourcesContent": ["import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';\n\nexport function matchPasswordValidator(passwordKey: string, confirmPasswordKey: string): ValidatorFn {\n  return (control: AbstractControl): ValidationErrors | null => {\n    const password = control.get(passwordKey)?.value;\n    const confirm = control.get(confirmPasswordKey)?.value;\n    return password === confirm ? null : { passwordMismatch: true };\n  };\n}\n", "import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';\n\nexport function passwordStrengthValidator(): ValidatorFn {\n  return (control: AbstractControl<string>): ValidationErrors | null => {\n    const value = control.value ?? '';\n    const strong = /[A-Z]/.test(value) && /[a-z]/.test(value) && /\\d/.test(value) && /[^A-Za-z0-9]/.test(value) && value.length >= 8;\n    return strong ? null : { passwordStrength: true };\n  };\n}\n"],
-  "mappings": ";AAEM,SAAU,uBAAuB,aAAqB,oBAA0B;AACpF,SAAO,CAAC,YAAqD;AAC3D,UAAM,WAAW,QAAQ,IAAI,WAAW,GAAG;AAC3C,UAAM,UAAU,QAAQ,IAAI,kBAAkB,GAAG;AACjD,WAAO,aAAa,UAAU,OAAO,EAAE,kBAAkB,KAAI;EAC/D;AACF;;;ACNM,SAAU,4BAAyB;AACvC,SAAO,CAAC,YAA6D;AACnE,UAAM,QAAQ,QAAQ,SAAS;AAC/B,UAAM,SAAS,QAAQ,KAAK,KAAK,KAAK,QAAQ,KAAK,KAAK,KAAK,KAAK,KAAK,KAAK,KAAK,eAAe,KAAK,KAAK,KAAK,MAAM,UAAU;AAC/H,WAAO,SAAS,OAAO,EAAE,kBAAkB,KAAI;EACjD;AACF;",
-  "names": []
-}

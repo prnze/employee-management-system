@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/features/admin/employees/employee-list/employee-list.component.ts"],
-  "sourcesContent": ["\n    .sort-btn { background: none; border: none; padding: 0; font-weight: 600; cursor: pointer; white-space: nowrap; color: inherit; }\n    .sort-btn:hover { color: var(--bs-primary); }\n    .sort-indicator { font-size: .65rem; opacity: .7; }\n    .sort-stack-badge { font-size: .65rem; }\n    .chip { display: inline-flex; align-items: center; gap: .3rem; padding: .2rem .6rem; border-radius: 2rem;\n            background: var(--bs-primary-bg-subtle); color: var(--bs-primary); border: 1px solid var(--bs-primary-border-subtle); font-size: .8rem; }\n    .chip-close { background: none; border: none; padding: 0; line-height: 1; cursor: pointer; color: inherit; }\n    .row-selected { background: var(--bs-primary-bg-subtle) !important; }\n    .bulk-bar { background: var(--bs-primary); color: #fff; border-radius: .5rem; padding: .5rem 1rem; }\n    .col-visible-toggle { font-size: .75rem; }\n  "],
-  "mappings": ";AACI,CAAA;AAAY,cAAA;AAAkB,UAAA;AAAc,WAAA;AAAY,eAAA;AAAkB,UAAA;AAAiB,eAAA;AAAqB,SAAA;;AAChH,CADA,QACA;AAAkB,SAAA,IAAA;;AAClB,CAAA;AAAkB,aAAA;AAAmB,WAAA;;AACrC,CAAA;AAAoB,aAAA;;AACpB,CAAA;AAAQ,WAAA;AAAsB,eAAA;AAAqB,OAAA;AAAY,WAAA,OAAA;AAAsB,iBAAA;AAC7E,cAAA,IAAA;AAAyC,SAAA,IAAA;AAA0B,UAAA,IAAA,MAAA,IAAA;AAAmD,aAAA;;AAC9H,CAAA;AAAc,cAAA;AAAkB,UAAA;AAAc,WAAA;AAAY,eAAA;AAAgB,UAAA;AAAiB,SAAA;;AAC3F,CAAA;AAAgB,cAAA,IAAA;;AAChB,CAAA;AAAY,cAAA,IAAA;AAA+B,SAAA;AAAa,iBAAA;AAAsB,WAAA,OAAA;;AAC9E,CAAA;AAAsB,aAAA;;",
-  "names": []
-}
