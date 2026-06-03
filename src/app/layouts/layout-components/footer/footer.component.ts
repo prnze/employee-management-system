@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  template: `<footer class="border-top bg-body px-3 py-2 small text-body-secondary">Employee Management System © 2026</footer>`,
+  imports: [TranslatePipe],
+  template: `<footer class="border-top bg-body px-3 py-2 small text-body-secondary">{{ 'FOOTER_TEXT' | translate }}</footer>`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FooterComponent {}

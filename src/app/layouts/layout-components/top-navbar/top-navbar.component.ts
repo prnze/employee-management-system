@@ -1,10 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, computed, inject, ViewChild
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '@core/auth/auth.service';
 import { AuthStateService } from '@core/auth/auth-state.service';
 import { ThemeService } from '@core/services/theme.service';
 import { ToastService } from '@core/services/toast.service';
 import { NotificationService } from '@core/services/notification.service';
+import { LanguageService, SUPPORTED_LANGUAGES } from '@core/services/language.service';
+import { LanguageTransitionComponent } from '@shared/components/language-transition/language-transition.component';
 import { AppNotification } from '@core/models/notification.models';
 import { InitialsPipe } from '@shared/pipes/initials.pipe';
 import { AppDatePipe } from '@shared/pipes/app-date.pipe';
@@ -12,7 +17,7 @@ import { AppDatePipe } from '@shared/pipes/app-date.pipe';
 @Component({
   selector: 'app-top-navbar',
   standalone: true,
-  imports: [InitialsPipe, RouterLink, AppDatePipe],
+  imports: [InitialsPipe, RouterLink, AppDatePipe, TranslatePipe, LanguageTransitionComponent],
   styles: [`
     .bell-btn { position: relative; }
     .unread-badge {
@@ -27,30 +32,57 @@ import { AppDatePipe } from '@shared/pipes/app-date.pipe';
     .notif-item { transition: background 0.15s; }
     .notif-item:hover { background: var(--bs-body-tertiary); }
     .notif-item.unread { border-left: 3px solid var(--bs-primary); }
-    .notif-item.read { border-left: 3px solid transparent; }
-    .priority-dot {
-      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
-    }
+    .notif-item.read   { border-left: 3px solid transparent; }
+    .priority-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .lang-flag { font-size: 1rem; line-height: 1; }
   `],
   template: `
+    <!-- Language transition overlay (sits above everything) -->
+    <app-language-transition #langTransition />
+
     <header class="navbar navbar-expand bg-body border-bottom px-3">
       <button class="btn btn-outline-secondary d-lg-none me-2" type="button"
-        data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-label="Open navigation">☰</button>
+        data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar"
+        [attr.aria-label]="'NAV_NAVIGATION' | translate">☰</button>
 
       <div class="ms-auto d-flex align-items-center gap-2">
+
+        <!-- Language selector -->
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1"
+            type="button" data-bs-toggle="dropdown" aria-expanded="false"
+            [attr.aria-label]="'LANG_SELECT' | translate">
+            <span class="lang-flag">{{ langSvc.currentLanguage().flag }}</span>
+            <span class="d-none d-md-inline small">{{ langSvc.currentLanguage().name }}</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            @for (lang of languages; track lang.code) {
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2"
+                  type="button"
+                  [class.active]="lang.code === langSvc.currentCode()"
+                  (click)="switchLanguage(lang.code)">
+                  <span class="lang-flag">{{ lang.flag }}</span>
+                  <span>{{ lang.code === 'en' ? ('LANG_ENGLISH' | translate) : ('LANG_GERMAN' | translate) }}</span>
+                </button>
+              </li>
+            }
+          </ul>
+        </div>
+
         <!-- Theme toggle -->
-        <button class="btn btn-outline-secondary btn-sm" type="button" aria-label="Toggle theme" (click)="theme.toggle()">
-          {{ theme.theme() === 'light' ? '🌙 Dark' : '☀️ Light' }}
+        <button class="btn btn-outline-secondary btn-sm" type="button"
+          [attr.aria-label]="'LANG_SELECT' | translate"
+          (click)="theme.toggle()">
+          {{ theme.theme() === 'light' ? ('THEME_DARK' | translate) : ('THEME_LIGHT' | translate) }}
         </button>
 
         <!-- Notification bell -->
         <div class="dropdown">
-          <button class="btn btn-outline-secondary btn-sm bell-btn position-relative" type="button"
-            id="notif-dropdown-btn"
-            data-bs-toggle="dropdown" data-bs-auto-close="outside"
-            aria-expanded="false"
-            [attr.aria-label]="'Notifications — ' + notifications.unreadCount() + ' unread'"
-            (click)="onBellClick()">
+          <button class="btn btn-outline-secondary btn-sm bell-btn position-relative"
+            type="button" id="notif-dropdown-btn"
+            data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
+            [attr.aria-label]="('NOTIF_TITLE' | translate) + ' — ' + notifications.unreadCount() + ' ' + ('NOTIF_UNREAD' | translate)">
             🔔
             @if (notifications.unreadCount() > 0) {
               <span class="unread-badge" aria-hidden="true">
@@ -60,27 +92,27 @@ import { AppDatePipe } from '@shared/pipes/app-date.pipe';
           </button>
 
           <div class="dropdown-menu dropdown-menu-end notification-dropdown shadow-sm p-0">
-            <!-- Dropdown header -->
+            <!-- Header -->
             <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
-              <strong class="small">Notifications</strong>
+              <strong class="small">{{ 'NOTIF_TITLE' | translate }}</strong>
               <div class="d-flex gap-2">
                 @if (notifications.unreadCount() > 0) {
                   <button class="btn btn-link btn-sm p-0 small" type="button" (click)="markAllRead()">
-                    Mark all read
+                    {{ 'NOTIF_MARK_ALL' | translate }}
                   </button>
                 }
-                <a class="btn btn-link btn-sm p-0 small" [routerLink]="notificationsRoute()">View all</a>
+                <a class="btn btn-link btn-sm p-0 small" [routerLink]="notificationsRoute()">
+                  {{ 'NOTIF_VIEW_ALL' | translate }}
+                </a>
               </div>
             </div>
 
-            <!-- Preview list (5 most recent) -->
+            <!-- Preview list -->
             @if (previewItems().length > 0) {
               @for (n of previewItems(); track n.id) {
                 <div class="notif-item px-3 py-2 border-bottom d-flex gap-2"
-                  [class.unread]="!n.read"
-                  [class.read]="n.read"
-                  style="cursor:pointer"
-                  (click)="handleNotifClick(n)">
+                  [class.unread]="!n.read" [class.read]="n.read"
+                  style="cursor:pointer" (click)="handleNotifClick(n)">
                   <span class="priority-dot mt-1" [style.background]="priorityColor(n.priority)"></span>
                   <div class="flex-grow-1 min-w-0">
                     <div class="d-flex justify-content-between align-items-start gap-1">
@@ -98,14 +130,14 @@ import { AppDatePipe } from '@shared/pipes/app-date.pipe';
             } @else {
               <div class="px-3 py-5 text-center text-body-secondary">
                 <div class="fs-2 mb-2">🔔</div>
-                <p class="small mb-0">All caught up!</p>
+                <p class="small mb-0">{{ 'NOTIF_ALL_CAUGHT_UP' | translate }}</p>
               </div>
             }
 
             <!-- Footer -->
             <div class="px-3 py-2 text-center border-top">
               <a class="btn btn-outline-primary btn-sm w-100" [routerLink]="notificationsRoute()">
-                View all {{ notifications.all().length }} notifications
+                {{ 'NOTIF_VIEW_ALL' | translate }} ({{ notifications.all().length }})
               </a>
             </div>
           </div>
@@ -119,9 +151,9 @@ import { AppDatePipe } from '@shared/pipes/app-date.pipe';
             {{ authState.user()?.fullName }}
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" routerLink="/account/change-password">🔑 Change password</a></li>
+            <li><a class="dropdown-item" routerLink="/account/change-password">{{ 'AUTH_CHANGE_PASSWORD' | translate }}</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><button class="dropdown-item text-danger" type="button" (click)="logout()">← Logout</button></li>
+            <li><button class="dropdown-item text-danger" type="button" (click)="logout()">{{ 'AUTH_LOGOUT' | translate }}</button></li>
           </ul>
         </div>
       </div>
@@ -133,7 +165,7 @@ import { AppDatePipe } from '@shared/pipes/app-date.pipe';
         <div class="toast show text-bg-{{ toast.type }}" role="status" aria-live="polite">
           <div class="toast-header">
             <strong class="me-auto">{{ toast.title }}</strong>
-            <button type="button" class="btn-close" aria-label="Dismiss" (click)="toasts.dismiss(toast.id)"></button>
+            <button type="button" class="btn-close" [attr.aria-label]="'COMMON_CLOSE' | translate" (click)="toasts.dismiss(toast.id)"></button>
           </div>
           <div class="toast-body">{{ toast.message }}</div>
         </div>
@@ -143,14 +175,18 @@ import { AppDatePipe } from '@shared/pipes/app-date.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TopNavbarComponent {
+  @ViewChild('langTransition') private langTransition!: LanguageTransitionComponent;
+
   readonly authState     = inject(AuthStateService);
   readonly theme         = inject(ThemeService);
   readonly toasts        = inject(ToastService);
   readonly notifications = inject(NotificationService);
+  readonly langSvc       = inject(LanguageService);
   private readonly auth  = inject(AuthService);
   private readonly router = inject(Router);
 
-  /** Show 5 most recent, sorted by priority then time. */
+  readonly languages = SUPPORTED_LANGUAGES;
+
   readonly previewItems = computed(() =>
     [...this.notifications.all()]
       .sort((a, b) =>
@@ -160,13 +196,14 @@ export class TopNavbarComponent {
       .slice(0, 5)
   );
 
-  readonly notificationsRoute = computed(() => {
-    const role = this.authState.role();
-    return role === 'Admin' ? '/admin/notifications' : '/employee/notifications';
-  });
+  readonly notificationsRoute = computed(() =>
+    this.authState.role() === 'Admin' ? '/admin/notifications' : '/employee/notifications'
+  );
 
-  onBellClick(): void {
-    // No-op — dropdown handled by Bootstrap data attributes
+  switchLanguage(code: string): void {
+    if (code === this.langSvc.currentCode()) return;
+    // Trigger diagonal sweep, swap language at midpoint
+    this.langTransition.trigger(() => this.langSvc.setLanguage(code));
   }
 
   handleNotifClick(n: AppNotification): void {
@@ -174,9 +211,8 @@ export class TopNavbarComponent {
     if (n.link) void this.router.navigateByUrl(n.link);
   }
 
-  markAllRead(): void {
-    this.notifications.markAllRead();
-  }
+  onBellClick(): void { /* handled by Bootstrap dropdown */ }
+  markAllRead(): void  { this.notifications.markAllRead(); }
 
   priorityColor(priority: AppNotification['priority']): string {
     return { Critical: '#dc3545', High: '#fd7e14', Medium: '#ffc107', Low: '#6c757d' }[priority] ?? '#6c757d';

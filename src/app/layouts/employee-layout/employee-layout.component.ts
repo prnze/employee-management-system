@@ -32,10 +32,11 @@ import { TopNavbarComponent } from '../layout-components/top-navbar/top-navbar.c
 })
 export class EmployeeLayoutComponent {
   readonly items: NavItem[] = [
-    { label: 'Dashboard',     path: '/employee/dashboard',      icon: '📊', permission: 'dashboard:view' },
-    { label: 'Profile',       path: '/employee/profile',        icon: '🪪', permission: 'profile:update' },
-    { label: 'Attendance',    path: '/employee/attendance',     icon: '📅', permission: 'attendance:view' },
-    { label: 'Tasks',         path: '/employee/tasks',          icon: '✅', permission: 'tasks:view' },
-    { label: 'Notifications', path: '/employee/notifications',  icon: '🔔', permission: 'notifications:view' }
+    { label: 'NAV_DASHBOARD',     path: '/employee/dashboard',     icon: '📊', permission: 'dashboard:view' },
+    { label: 'NAV_PROFILE',       path: '/employee/profile',       icon: '🪪', permission: 'profile:update' },
+    { label: 'NAV_ATTENDANCE',    path: '/employee/attendance',    icon: '📅', permission: 'attendance:view' },
+    { label: 'NAV_TASKS',         path: '/employee/tasks',         icon: '✅', permission: 'tasks:view' },
+    { label: 'NAV_NOTIFICATIONS', path: '/employee/notifications', icon: '🔔', permission: 'notifications:view' }
   ];
 }
+

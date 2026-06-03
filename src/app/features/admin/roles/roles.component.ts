@@ -3,6 +3,8 @@ import { AppRole, APP_ROLES } from '@core/constants/roles.constant';
 import { PermissionsService } from '@core/auth/permissions.service';
 import { PermissionDirective } from '@shared/directives/permission.directive';
 import { ToastService } from '@core/services/toast.service';
+import { TranslatePipe } from '@ngx-translate/core';
+import { LanguageService } from '@core/services/language.service';
 
 /** Groups raw permission strings like 'employees:create' into { scope, action }. */
 interface PermissionEntry {
@@ -14,14 +16,14 @@ interface PermissionEntry {
 @Component({
   selector: 'app-roles',
   standalone: true,
-  imports: [PermissionDirective],
+  imports: [PermissionDirective, TranslatePipe],
   template: `
     <div class="d-flex align-items-center justify-content-between mb-4">
       <div>
-        <h1 class="h3 mb-1">Roles &amp; Permissions</h1>
-        <p class="text-body-secondary mb-0">Toggle permissions per role. Changes apply immediately.</p>
+        <h1 class="h3 mb-1">{{ 'ROLES_TITLE' | translate }}</h1>
+        <p class="text-body-secondary mb-0">{{ 'ROLES_SUBTITLE' | translate }}</p>
       </div>
-      <span *appPermission="'roles:manage'" class="badge text-bg-success fs-6">Live editing enabled</span>
+      <span *appPermission="'roles:manage'" class="badge text-bg-success fs-6">{{ 'ROLES_LIVE_EDITING' | translate }}</span>
     </div>
 
     <!-- Role tabs -->
@@ -50,8 +52,8 @@ interface PermissionEntry {
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h5 mb-0">{{ selectedRole() }} permissions</h2>
         <div class="d-flex gap-2" *appPermission="'roles:manage'">
-          <button class="btn btn-sm btn-outline-success" type="button" (click)="grantAll()">Grant all</button>
-          <button class="btn btn-sm btn-outline-danger" type="button" (click)="revokeAll()">Revoke all</button>
+          <button class="btn btn-sm btn-outline-success" type="button" (click)="grantAll()">{{ 'ROLES_GRANT_ALL' | translate }}</button>
+          <button class="btn btn-sm btn-outline-danger" type="button" (click)="revokeAll()">{{ 'ROLES_REVOKE_ALL' | translate }}</button>
         </div>
       </div>
 
@@ -106,7 +108,7 @@ interface PermissionEntry {
               @for (perm of permissionsService.getPermissions(role); track perm) {
                 <span class="badge text-bg-primary">{{ perm }}</span>
               } @empty {
-                <span class="text-body-secondary fst-italic small">No permissions assigned</span>
+                <span class="text-body-secondary fst-italic small">{{ 'USER_NO_EXTRA_PERMS' | translate }}</span>
               }
             </div>
           </div>
@@ -135,7 +137,8 @@ interface PermissionEntry {
 })
 export class RolesComponent {
   readonly permissionsService = inject(PermissionsService);
-  private readonly toast = inject(ToastService);
+  private readonly toast   = inject(ToastService);
+  private readonly langSvc = inject(LanguageService);
 
   readonly roles: AppRole[] = [APP_ROLES.admin, APP_ROLES.employee];
   readonly selectedRole = signal<AppRole>(APP_ROLES.admin);

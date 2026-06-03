@@ -35,13 +35,13 @@ import { TopNavbarComponent } from '../layout-components/top-navbar/top-navbar.c
 })
 export class AdminLayoutComponent {
   readonly items: NavItem[] = [
-    { label: 'Dashboard',     path: '/admin/dashboard',   icon: '📊', permission: 'dashboard:view' },
-    { label: 'Employees',     path: '/admin/employees',   icon: '👥', permission: 'employees:read' },
-    { label: 'Users',         path: '/admin/users',       icon: '👤', permission: 'users:manage' },
-    { label: 'Roles',         path: '/admin/roles',       icon: '🔑', permission: 'roles:manage' },
-    { label: 'Reports',       path: '/admin/reports',     icon: '📄', permission: 'reports:view' },
-    { label: 'Notifications', path: '/admin/notifications', icon: '🔔' },
-    { label: 'Audit Logs',    path: '/admin/audit-logs',  icon: '🔍', permission: 'audit:view' },
-    { label: 'Settings',      path: '/admin/settings',    icon: '⚙️', permission: 'settings:manage' }
+    { label: 'NAV_DASHBOARD',     path: '/admin/dashboard',     icon: '📊', permission: 'dashboard:view' },
+    { label: 'NAV_EMPLOYEES',     path: '/admin/employees',     icon: '👥', permission: 'employees:read' },
+    { label: 'NAV_USERS',         path: '/admin/users',         icon: '👤', permission: 'users:manage' },
+    { label: 'NAV_ROLES',         path: '/admin/roles',         icon: '🔑', permission: 'roles:manage' },
+    { label: 'NAV_REPORTS',       path: '/admin/reports',       icon: '📄', permission: 'reports:view' },
+    { label: 'NAV_NOTIFICATIONS', path: '/admin/notifications', icon: '🔔' },
+    { label: 'NAV_AUDIT_LOGS',    path: '/admin/audit-logs',   icon: '🔍', permission: 'audit:view' },
+    { label: 'NAV_SETTINGS',      path: '/admin/settings',     icon: '⚙️', permission: 'settings:manage' }
   ];
 }

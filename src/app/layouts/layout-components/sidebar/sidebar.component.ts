@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { PermissionsService } from '@core/auth/permissions.service';
 
 export interface NavItem {
+  /** Translation key string (e.g. 'NAV_DASHBOARD'). */
   label: string;
   path: string;
   icon?: string;
@@ -13,7 +15,7 @@ export interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, TranslatePipe],
   styles: [`
     :host { display: block; }
     .sidebar { min-height: 100%; }
@@ -38,7 +40,7 @@ export interface NavItem {
             @if (item.icon) {
               <span class="nav-icon">{{ item.icon }}</span>
             }
-            {{ item.label }}
+            {{ item.label | translate }}
           </a>
         }
       </nav>
@@ -50,7 +52,6 @@ export class SidebarComponent {
   readonly items = input.required<NavItem[]>();
   private readonly perms = inject(PermissionsService);
 
-  /** Filter items by permission; items without a permission field are always shown. */
   readonly visibleItems = computed(() =>
     this.items().filter((item) => !item.permission || this.perms.hasPermission(item.permission))
   );
