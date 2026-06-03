@@ -12,6 +12,10 @@ export interface ApiError {
 
 export interface DashboardStats {
   employees: number;
+  activeEmployees: number;
+  onLeave: number;
+  departments: number;
+  /** @deprecated use activeEmployees */
   activeUsers: number;
   pendingTasks: number;
   unreadNotifications: number;

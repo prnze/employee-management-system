@@ -1,21 +1,11 @@
-import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { AdminDataService } from '@core/services/admin-data.service';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { NotificationListComponent } from '@shared/components/notification-list/notification-list.component';
 
 @Component({
   selector: 'app-admin-notifications',
   standalone: true,
-  imports: [AsyncPipe],
-  template: `
-    <h1 class="h3 mb-3">Notifications</h1>
-    <div class="list-group">
-      @for (notification of notifications$ | async; track notification.id) {
-        <article class="list-group-item"><div class="d-flex justify-content-between"><strong>{{ notification.title }}</strong><span class="badge text-bg-secondary">{{ notification.type }}</span></div><p class="mb-0">{{ notification.message }}</p></article>
-      }
-    </div>
-  `,
+  imports: [NotificationListComponent],
+  template: `<app-notification-list />`,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AdminNotificationsComponent {
-  readonly notifications$ = inject(AdminDataService).notifications();
-}
+export class AdminNotificationsComponent {}
