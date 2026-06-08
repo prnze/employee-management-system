@@ -1,0 +1,7 @@
+    @if (visible()) {
+      <div class="lt-overlay" [class.enter]="phase() === 'enter'" [class.exit]="phase() === 'exit'" aria-hidden="true" role="presentation">
+        <div class="lt-panel"></div>
+        <span class="lt-label"><app-icon [icon]="APP_ICONS.LANGUAGE" [size]="48" aria-hidden="true"></app-icon></span>
+      </div>
+    }
+  

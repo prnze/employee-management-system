@@ -1,0 +1,10 @@
+<textarea
+  [id]="id"
+  class="form-control"
+  [placeholder]="placeholder"
+  [rows]="rows"
+  [value]="value() ?? ''"
+  [disabled]="disabled()"
+  (input)="handleValueChange($any($event.target).value)"
+  (blur)="handleBlur()"
+></textarea>

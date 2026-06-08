@@ -1,0 +1,38 @@
+    <h1 class="h3 mb-3">{{ 'SETTINGS_TITLE' | translate }}</h1>
+    <form class="surface p-3 row g-3" [formGroup]="form">
+      <div class="col-md-6">
+        <app-form-field
+          #orgField
+          label="SETTINGS_ORG_NAME"
+          [control]="form.controls.organization">
+          <app-input
+            [id]="orgField.id"
+            formControlName="organization">
+          </app-input>
+        </app-form-field>
+      </div>
+      <div class="col-md-6">
+        <app-form-field
+          #timeoutField
+          label="SETTINGS_TIMEOUT"
+          [control]="form.controls.timeout">
+          <app-input
+            [id]="timeoutField.id"
+            type="number"
+            formControlName="timeout">
+          </app-input>
+        </app-form-field>
+      </div>
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-primary text-white" type="submit" (click)="saveSettings(); $event.preventDefault()">
+          {{ 'COMMON_SAVE' | translate }}
+        </button>
+        <button class="btn btn-outline-primary" type="button" (click)="theme.toggle()">
+          {{ 'SETTINGS_TOGGLE_THEME' | translate }}
+        </button>
+        <button class="btn btn-outline-danger" type="button" (click)="resetSettings()">
+          {{ 'SETTINGS_RESET' | translate }}
+        </button>
+      </div>
+    </form>
+  

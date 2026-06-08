@@ -1,0 +1,193 @@
+<!-- ── Header ─────────────────────────────────────────────── -->
+<div class="welcome-banner mb-4 p-4 rounded-4 position-relative overflow-hidden shadow-sm">
+  <div class="welcome-banner-glow"></div>
+  <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 fw-bold mb-1 welcome-title">{{ 'EMP_DASHBOARD_WELCOME' | translate }}, {{ firstName() }}</h1>
+      <p class="welcome-subtitle mb-0 d-flex align-items-center gap-2">
+        <app-icon [icon]="APP_ICONS.CALENDAR" class="welcome-icon" aria-hidden="true"></app-icon>
+        <span>{{ today }}</span>
+      </p>
+    </div>
+    <a class="btn btn-premium-primary d-flex align-items-center gap-2" routerLink="/employee/attendance">
+      <app-icon [icon]="APP_ICONS.CALENDAR" aria-hidden="true"></app-icon>
+      <span>{{ 'EMP_DASHBOARD_LOG_BTN' | translate }}</span>
+    </a>
+  </div>
+</div>
+
+@if (analytics(); as a) {
+  <!-- ── KPI Cards ────────────────────────────────────────── -->
+  <section class="row g-3 mb-4" aria-label="Personal metrics">
+    @for (card of kpiCards(a.summary); track card.labelKey) {
+      <div class="col-6 col-xl-3">
+        <article class="kpi-card p-4 h-100 d-flex flex-column" [style.--kpi-color]="card.color">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="kpi-icon-wrapper d-flex align-items-center justify-content-center">
+              <app-icon [icon]="card.icon" aria-hidden="true"></app-icon>
+            </span>
+          </div>
+          <p class="kpi-label mb-1">{{ card.labelKey | translate }}</p>
+          <strong class="kpi-value mb-1">{{ card.value }}</strong>
+          @if (card.subKey) {
+            <span class="text-body-secondary small mt-auto kpi-sub-text">
+              @if (card.subNum !== undefined) { <strong class="text-body fw-semibold">{{ card.subNum }}</strong> }
+              {{ card.subKey | translate }}
+            </span>
+          }
+        </article>
+      </div>
+    }
+  </section>
+
+  <!-- ── Charts Row ───────────────────────────────────────── -->
+  <section class="row g-3 mb-3">
+    <!-- Attendance Trend -->
+    <div class="col-lg-6">
+      <app-chart-card
+        [title]="'EMP_DASHBOARD_ATTEND_TREND' | translate"
+        [badge]="'EMP_DASHBOARD_LAST_8WK' | translate"
+        badgeClass="text-bg-success"
+        skeletonHeight="220px">
+        <app-line-chart
+          [dataPoints]="a.attendanceTrend"
+          [label]="'EMP_DASHBOARD_ATTEND_RATE' | translate"
+          color="#198754"
+          yLabel="%"
+          height="220px" />
+      </app-chart-card>
+    </div>
+
+    <!-- Task Completion -->
+    <div class="col-lg-6">
+      <app-chart-card
+        [title]="'EMP_DASHBOARD_TASKS_TREND' | translate"
+        [badge]="'EMP_DASHBOARD_PER_WEEK' | translate"
+        skeletonHeight="220px">
+        <app-bar-chart
+          [dataPoints]="a.taskCompletionTrend"
+          [label]="'EMP_DASHBOARD_TASKS_DONE' | translate"
+          [yLabel]="'EMP_DASHBOARD_TASKS_DONE' | translate"
+          height="220px" />
+      </app-chart-card>
+    </div>
+  </section>
+
+  <!-- ── Personal Activity Summary + Upcoming Tasks ─────── -->
+  <section class="row g-3">
+    <!-- Activity Summary -->
+    <div class="col-lg-6">
+      <div class="surface activity-summary-card p-4 h-100">
+        <h2 class="h6 fw-bold mb-4 d-flex align-items-center gap-2">
+          <app-icon [icon]="APP_ICONS.TRENDING_UP" class="text-success" aria-hidden="true"></app-icon>
+          <span>{{ 'EMP_DASHBOARD_ACTIVITY_SUM' | translate }}</span>
+        </h2>
+        <div class="row g-3">
+          @for (stat of activityStats(a.summary); track stat.labelKey) {
+            <div class="col-6">
+              <div class="p-3 rounded-3 border stat-box d-flex flex-column h-100">
+                <div class="fs-2 fw-bold mb-1" [class]="stat.colorClass">{{ stat.value }}</div>
+                <div class="text-body-secondary small fw-medium mb-2">{{ stat.labelKey | translate }}</div>
+                <div class="progress mt-auto mb-2" style="height:6px">
+                  <div class="progress-bar rounded-pill" [class]="stat.barClass" [style.width]="stat.pct + '%'"></div>
+                </div>
+                <div class="text-body-secondary small mt-1">
+                  @if (stat.subNum !== undefined) { <strong class="text-body fw-semibold">{{ stat.subNum }}</strong> }
+                  {{ stat.subKey | translate }}
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Tasks Widget -->
+    <div class="col-lg-6">
+      <div class="surface upcoming-tasks-card p-4 h-100 d-flex flex-column">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h2 class="h6 fw-bold mb-0 d-flex align-items-center gap-2">
+            <app-icon [icon]="APP_ICONS.TASKS" class="text-primary" aria-hidden="true"></app-icon>
+            <span>{{ 'EMP_DASHBOARD_UPCOMING' | translate }}</span>
+          </h2>
+          <a class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold timeline-view-all" routerLink="/employee/tasks">
+            <span>{{ 'EMP_DASHBOARD_VIEW_TASKS' | translate }}</span>
+            <app-icon [icon]="APP_ICONS.ARROW_FORWARD" [size]="16" class="align-middle ms-1" aria-hidden="true"></app-icon>
+          </a>
+        </div>
+        @if (a.upcomingTasks.length > 0) {
+          <ul class="list-unstyled mb-0 flex-grow-1 d-flex flex-column gap-3">
+            @for (task of a.upcomingTasks; track task.id) {
+              <li class="d-flex align-items-start gap-3 task-item p-3 rounded-3 border">
+                <span class="badge task-priority-badge mt-1 flex-shrink-0" [class]="priorityClass(task.priority)">{{ task.priority }}</span>
+                <div class="flex-grow-1 min-w-0">
+                  <p class="mb-1 fw-bold text-truncate task-title" style="font-size: 0.9rem;">{{ task.title }}</p>
+                  <p class="mb-0 text-body-secondary small d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge task-category-badge">{{ task.category }}</span>
+                    <span class="d-flex align-items-center gap-1">
+                      <app-icon [icon]="APP_ICONS.CALENDAR" [size]="14" aria-hidden="true"></app-icon>
+                      <span>{{ 'EMP_DASHBOARD_DUE' | translate }} {{ task.dueDate | appDate }}</span>
+                    </span>
+                    <!-- dueSoonKey() returns a translation key or '' — the translate pipe handles both -->
+                    @if (dueSoonKey(task.dueDate)) {
+                      <span [class]="dueSoonClass(task.dueDate) + ' badge px-2 py-1'" style="font-size: 0.75rem;">
+                        {{ dueSoonKey(task.dueDate) | translate }}
+                      </span>
+                    }
+                    @if (dueSoonDays(task.dueDate) > 0 && dueSoonDays(task.dueDate) <= 3) {
+                      <span [class]="dueSoonClass(task.dueDate) + ' badge px-2 py-1'" style="font-size: 0.75rem;">
+                        {{ dueSoonDays(task.dueDate) }}d
+                      </span>
+                    }
+                  </p>
+                </div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-body-secondary py-5">
+            <div class="fs-1 text-success mb-2"><app-icon [icon]="APP_ICONS.SUCCESS" [size]="48" aria-hidden="true"></app-icon></div>
+            <p class="mb-0 small mt-2 fw-medium text-body-secondary">{{ 'EMP_DASHBOARD_ALL_CAUGHT' | translate }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+} @else if (error()) {
+  <!-- ── Error state ───────────────────────────────────────── -->
+  <div class="surface p-5 text-center error-card rounded-4 shadow-sm">
+    <div class="fs-1 text-danger d-block mb-3"><app-icon [icon]="APP_ICONS.WARNING" [size]="48" aria-hidden="true"></app-icon></div>
+    <h2 class="h5 text-danger fw-bold mb-2">{{ 'EMP_DASHBOARD_ERROR_TITLE' | translate }}</h2>
+    <p class="text-body-secondary mb-4">{{ 'EMP_DASHBOARD_ERROR_MSG' | translate }}</p>
+    <button class="btn btn-action-primary px-4 mx-auto" type="button" (click)="reload()">
+      {{ 'EMP_DASHBOARD_RELOAD_BTN' | translate }}
+    </button>
+  </div>
+
+} @else {
+  <!-- ── Loading skeletons ──────────────────────────────────── -->
+  <section class="row g-3 mb-4" aria-label="Loading metrics">
+    @for (i of [1,2,3,4]; track i) {
+      <div class="col-6 col-xl-3">
+        <div class="kpi-card kpi-card-skeleton p-4 placeholder-glow" aria-hidden="true">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="kpi-icon-wrapper placeholder rounded-circle" style="width: 40px; height: 40px; display: inline-block;"></span>
+          </div>
+          <span class="placeholder col-6 mb-2 d-block rounded" style="height: 1rem;"></span>
+          <span class="placeholder col-4 rounded" style="height: 2.2rem; display: block;"></span>
+        </div>
+      </div>
+    }
+  </section>
+  <div class="row g-3">
+    @for (i of [1,2]; track i) {
+      <div class="col-lg-6">
+        <div class="surface p-3 placeholder-glow" aria-hidden="true">
+          <span class="placeholder col-4 mb-3 d-block rounded"></span>
+          <div class="rounded" style="height:220px;background:var(--app-border);opacity:.3;"></div>
+        </div>
+      </div>
+    }
+  </div>
+}

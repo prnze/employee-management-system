@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 @Component({
   selector: 'app-empty-state',
   standalone: true,
-  template: `<section class="surface text-center p-5"><h2 class="fs-5">{{ title() }}</h2><p class="text-body-secondary mb-0">{{ message() }}</p></section>`,
+  templateUrl: './empty-state.component.html',
+  styleUrl: './empty-state.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmptyStateComponent {

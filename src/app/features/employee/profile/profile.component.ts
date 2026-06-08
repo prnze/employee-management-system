@@ -8,43 +8,8 @@ import { UnsavedChangesAware } from '@core/guards/unsaved-changes.guard';
   selector: 'app-profile',
   standalone: true,
   imports: [ReactiveFormsModule, TranslatePipe],
-  template: `
-    <h1 class="h3 mb-3">{{ 'PROFILE_TITLE' | translate }}</h1>
-    <form class="surface p-3 row g-3" [formGroup]="form" (ngSubmit)="save()">
-      <div class="col-md-6">
-        <label class="form-label">{{ 'PROFILE_FULL_NAME' | translate }}</label>
-        <input class="form-control" formControlName="fullName" />
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">{{ 'PROFILE_EMAIL' | translate }}</label>
-        <input class="form-control" type="email" formControlName="email" />
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">{{ 'PROFILE_PHONE' | translate }}</label>
-        <input class="form-control" formControlName="phone" />
-      </div>
-      <div class="col-md-6">
-        <label class="form-label" for="avatar">{{ 'PROFILE_PICTURE' | translate }}</label>
-        <input id="avatar" class="form-control" type="file"
-          accept="image/png,image/jpeg,image/webp" (change)="onAvatarSelected($event)" />
-        <!-- avatarErrorKey stores a translation KEY — pipe translates it reactively -->
-        @if (avatarErrorKey()) {
-          <div class="form-text text-danger">{{ avatarErrorKey() | translate }}</div>
-        }
-      </div>
-      @if (avatarPreview()) {
-        <div class="col-12">
-          <img [src]="avatarPreview()" alt="Selected profile preview"
-            class="rounded-circle border" width="96" height="96" />
-        </div>
-      }
-      <div class="col-12">
-        <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
-          {{ 'PROFILE_SAVE' | translate }}
-        </button>
-      </div>
-    </form>
-  `,
+  templateUrl: './profile.component.html',
+  styleUrl: './profile.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProfileComponent implements UnsavedChangesAware {

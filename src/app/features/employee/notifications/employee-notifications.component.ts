@@ -5,7 +5,8 @@ import { NotificationListComponent } from '@shared/components/notification-list/
   selector: 'app-employee-notifications',
   standalone: true,
   imports: [NotificationListComponent],
-  template: `<app-notification-list />`,
+  templateUrl: './employee-notifications.component.html',
+  styleUrl: './employee-notifications.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeeNotificationsComponent {}

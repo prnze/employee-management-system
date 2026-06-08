@@ -1,0 +1,40 @@
+<div class="dialog-backdrop" (click)="onBackdropClick()" aria-hidden="true"></div>
+<div class="dialog-wrapper" role="dialog" aria-modal="true" [attr.aria-labelledby]="'dialog-title'" #dialogContainer>
+  <div class="dialog-content" [class]="'dialog-content--' + (data().variant ?? 'info')">
+    <!-- Icon header -->
+    <div class="dialog-icon-container">
+      <app-icon [icon]="iconName" [size]="40" aria-hidden="true"></app-icon>
+    </div>
+
+    <!-- Title -->
+    <h2 id="dialog-title" class="dialog-title">
+      {{ data().title | translate }}
+    </h2>
+
+    <!-- Body message -->
+    <div class="dialog-body">
+      <p>{{ data().message | translate:data().translationParams }}</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="dialog-actions">
+      @if (hasCancel) {
+        <button class="btn btn-outline-secondary btn-dialog" type="button" (click)="onCancel()">
+          {{ cancelLabel | translate }}
+        </button>
+      }
+      <button
+        #confirmBtn
+        class="btn btn-dialog"
+        [class.btn-danger]="data().variant === 'danger'"
+        [class.btn-warning]="data().variant === 'warning'"
+        [class.btn-success]="data().variant === 'success'"
+        [class.btn-primary]="!data().variant || data().variant === 'info'"
+        type="button"
+        (click)="onConfirm()"
+      >
+        {{ confirmLabel | translate }}
+      </button>
+    </div>
+  </div>
+</div>

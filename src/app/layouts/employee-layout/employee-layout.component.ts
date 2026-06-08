@@ -1,42 +1,28 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { BreadcrumbComponent } from '../layout-components/breadcrumb/breadcrumb.component';
 import { FooterComponent } from '../layout-components/footer/footer.component';
 import { NavItem, SidebarComponent } from '../layout-components/sidebar/sidebar.component';
 import { TopNavbarComponent } from '../layout-components/top-navbar/top-navbar.component';
+import { APP_ICONS } from '@core/constants/icon.constants';
+import { PERMISSIONS } from '@core/auth/permission.service';
+import { ShellStateService } from '@core/services/shell-state.service';
 
 @Component({
   selector: 'app-employee-layout',
   standalone: true,
   imports: [RouterOutlet, SidebarComponent, TopNavbarComponent, BreadcrumbComponent, FooterComponent],
-  styles: [`.desktop-sidebar { width: var(--app-sidebar-width); }`],
-  template: `
-    <div class="d-flex min-vh-100">
-      <div class="desktop-sidebar d-none d-lg-block"><app-sidebar [items]="items" /></div>
-      <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
-        <div class="offcanvas-header">
-          <h2 class="offcanvas-title fs-5" id="mobileSidebarLabel">Navigation</h2>
-          <button class="btn-close" type="button" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body p-0"><app-sidebar [items]="items" /></div>
-      </div>
-      <div class="flex-grow-1 d-flex flex-column">
-        <app-top-navbar />
-        <app-breadcrumb />
-        <main id="main-content" class="app-page flex-grow-1"><router-outlet /></main>
-        <app-footer />
-      </div>
-    </div>
-  `,
+  styleUrl: './employee-layout.component.scss',
+  templateUrl: './employee-layout.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeeLayoutComponent {
+  readonly shell = inject(ShellStateService);
   readonly items: NavItem[] = [
-    { label: 'NAV_DASHBOARD',     path: '/employee/dashboard',     icon: '📊', permission: 'dashboard:view' },
-    { label: 'NAV_PROFILE',       path: '/employee/profile',       icon: '🪪', permission: 'profile:update' },
-    { label: 'NAV_ATTENDANCE',    path: '/employee/attendance',    icon: '📅', permission: 'attendance:view' },
-    { label: 'NAV_TASKS',         path: '/employee/tasks',         icon: '✅', permission: 'tasks:view' },
-    { label: 'NAV_NOTIFICATIONS', path: '/employee/notifications', icon: '🔔', permission: 'notifications:view' }
+    { label: 'NAV_DASHBOARD',     path: '/employee/dashboard',     icon: APP_ICONS.DASHBOARD, permission: PERMISSIONS.DASHBOARD.VIEW },
+    { label: 'NAV_PROFILE',       path: '/employee/profile',       icon: APP_ICONS.EMPLOYEE, permission: PERMISSIONS.PROFILE.UPDATE },
+    { label: 'NAV_ATTENDANCE',    path: '/employee/attendance',    icon: APP_ICONS.CALENDAR, permission: PERMISSIONS.ATTENDANCE.VIEW },
+    { label: 'NAV_TASKS',         path: '/employee/tasks',         icon: APP_ICONS.TASKS, permission: PERMISSIONS.TASKS.VIEW },
+    { label: 'NAV_NOTIFICATIONS', path: '/employee/notifications', icon: APP_ICONS.NOTIFICATIONS, permission: PERMISSIONS.NOTIFICATIONS.VIEW, featureFlag: 'notifications' }
   ];
 }
-

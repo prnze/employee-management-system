@@ -2,7 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { effect, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { fromEvent, merge, Subscription, throttleTime } from 'rxjs';
-import { environment } from '@env/environment';
+import { RuntimeConfigService } from '@core/services/runtime-config.service';
 import { AuthService } from './auth.service';
 import { AuthStateService } from './auth-state.service';
 
@@ -11,6 +11,7 @@ export class SessionService {
   private readonly document = inject(DOCUMENT);
   private readonly auth = inject(AuthService);
   private readonly authState = inject(AuthStateService);
+  private readonly configSvc = inject(RuntimeConfigService);
   private readonly router = inject(Router);
   private readonly lastActivity = signal(Date.now());
   private timer: ReturnType<typeof setInterval> | null = null;
@@ -53,7 +54,8 @@ export class SessionService {
 
   private checkIdle(): void {
     const idleMs = Date.now() - this.lastActivity();
-    if (idleMs > environment.idleTimeoutMinutes * 60_000) {
+    const idleTimeoutMinutes = this.configSvc.config()?.idleTimeoutMinutes ?? 20;
+    if (idleMs > idleTimeoutMinutes * 60_000) {
       this.auth.logout();
       void this.router.navigateByUrl('/auth/login');
     }

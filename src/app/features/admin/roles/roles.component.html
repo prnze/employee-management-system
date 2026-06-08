@@ -1,0 +1,102 @@
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h1 class="h3 mb-1">{{ 'ROLES_TITLE' | translate }}</h1>
+        <p class="text-body-secondary mb-0">{{ 'ROLES_SUBTITLE' | translate }}</p>
+      </div>
+      <span *appPermission="{ module: 'roles', action: 'manage' }" class="badge text-bg-success fs-6">{{ 'ROLES_LIVE_EDITING' | translate }}</span>
+    </div>
+
+    <!-- Role tabs -->
+    <ul class="nav nav-tabs mb-4" role="tablist">
+      @for (role of roles; track role) {
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            [class.active]="selectedRole() === role"
+            type="button"
+            role="tab"
+            [attr.aria-selected]="selectedRole() === role"
+            (click)="selectedRole.set(role)"
+          >
+            {{ role }}
+            <span class="badge ms-2" [class.text-bg-primary]="selectedRole() === role" [class.text-bg-secondary]="selectedRole() !== role">
+              {{ permissionsService.getPermissions(role).length }}
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+
+    <!-- Permission matrix -->
+    <div class="surface p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">{{ selectedRole() }} permissions</h2>
+        <div class="d-flex gap-2" *appPermission="{ module: 'roles', action: 'manage' }">
+          <button class="btn btn-sm btn-outline-success" type="button" (click)="grantAll()">{{ 'ROLES_GRANT_ALL' | translate }}</button>
+          <button class="btn btn-sm btn-outline-danger" type="button" (click)="revokeAll()">{{ 'ROLES_REVOKE_ALL' | translate }}</button>
+        </div>
+      </div>
+
+      @for (group of groupedPermissions(); track group.scope) {
+        <div class="mb-4">
+          <h3 class="h6 text-uppercase text-body-secondary border-bottom pb-2 mb-3">
+            <app-icon [icon]="scopeIcon(group.scope)" class="me-2" aria-hidden="true"></app-icon>{{ group.scope }}
+          </h3>
+          <div class="row g-2">
+            @for (entry of group.entries; track entry.raw) {
+              <div class="col-sm-6 col-lg-4">
+                <div
+                  class="permission-card d-flex align-items-center gap-3 p-3 rounded border"
+                  [class.permission-card--granted]="isGranted(entry.raw)"
+                  [class.permission-card--denied]="!isGranted(entry.raw)"
+                >
+                  <div class="form-check form-switch mb-0">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      [id]="'perm-' + entry.raw + '-' + selectedRole()"
+                      [checked]="isGranted(entry.raw)"
+                      [attr.aria-label]="'Toggle ' + entry.raw + ' for ' + selectedRole()"
+                      (change)="toggle(entry.raw)"
+                    />
+                  </div>
+                  <label class="mb-0 flex-grow-1" [for]="'perm-' + entry.raw + '-' + selectedRole()">
+                    <span class="fw-semibold d-block">{{ entry.action }}</span>
+                    <code class="small text-body-secondary">{{ entry.raw }}</code>
+                  </label>
+                  @if (isGranted(entry.raw)) {
+                    <span class="badge text-bg-success d-inline-flex align-items-center justify-content-center" style="width: 18px; height: 18px; padding: 0;">
+                      <app-icon [icon]="APP_ICONS.SUCCESS" [size]="12" aria-hidden="true"></app-icon>
+                    </span>
+                  } @else {
+                    <span class="badge text-bg-secondary d-inline-flex align-items-center justify-content-center" style="width: 18px; height: 18px; padding: 0;">
+                      <app-icon [icon]="APP_ICONS.ERROR" [size]="12" aria-hidden="true"></app-icon>
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Summary panel -->
+    <div class="row g-3 mt-2">
+      @for (role of roles; track role) {
+        <div class="col-md-6">
+          <div class="surface p-3 h-100">
+            <h3 class="h6 fw-semibold mb-2">{{ role }}</h3>
+            <div class="d-flex flex-wrap gap-1">
+              @for (perm of permissionsService.getPermissions(role); track perm) {
+                <span class="badge text-bg-primary">{{ perm }}</span>
+              } @empty {
+                <span class="text-body-secondary fst-italic small">{{ 'USER_NO_EXTRA_PERMS' | translate }}</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  

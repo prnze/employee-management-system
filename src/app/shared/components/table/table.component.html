@@ -1,0 +1,56 @@
+<div class="table-responsive surface">
+  <table class="table table-hover align-middle mb-0">
+    <thead>
+      <tr>
+        @if (selectable()) {
+          <th scope="col" class="text-center" style="width: 3rem;">
+            <input class="form-check-input" type="checkbox" aria-label="Select all rows" [checked]="allSelected()" (change)="toggleAll()" />
+          </th>
+        }
+        @for (col of visibleColumns(); track col.key) {
+          <th scope="col" [class]="col.headerClass || ''" [style.width]="col.width || null">
+            @if (col.sortable) {
+              <button class="sort-btn d-inline-flex align-items-center gap-1" type="button" (click)="onSort(col.key)">
+                <span>{{ col.label | translate }}</span>
+                @if (isSorted(col.key.toString())) {
+                  <app-icon [icon]="getSortIcon(col.key.toString())" [size]="14" aria-hidden="true"></app-icon>
+                }
+                @if (sortStackIndex(col.key.toString()) > 0 && sortStack().length > 1) {
+                  <sup class="sort-stack-badge text-primary" style="font-size: .65rem;">{{ sortStackIndex(col.key.toString()) }}</sup>
+                }
+              </button>
+            } @else {
+              {{ col.label | translate }}
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track trackById(row)) {
+        <tr [class.clickable]="rowClickable()" (click)="onRowClick(row)" [class.row-selected]="selectable() && selectedIds().includes(row.id)">
+          @if (selectable()) {
+            <td class="text-center" (click)="$event.stopPropagation()">
+              <input class="form-check-input" type="checkbox" [checked]="selectedIds().includes(row.id)" (change)="toggleRow(row)" [attr.aria-label]="'Select row'" />
+            </td>
+          }
+          @for (col of visibleColumns(); track col.key) {
+            <td [class]="col.cellClass || ''">
+              @if (col.cellTemplate) {
+                <ng-container *ngTemplateOutlet="col.cellTemplate; context: { $implicit: row, value: getRowValue(row, col.key) }"></ng-container>
+              } @else {
+                {{ getRowValue(row, col.key) }}
+              }
+            </td>
+          }
+        </tr>
+      } @empty {
+        <tr>
+          <td [attr.colspan]="visibleColumns().length + (selectable() ? 1 : 0)" class="p-0">
+            <app-empty-state [title]="emptyTitle() | translate" [message]="emptyMessage() | translate"></app-empty-state>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

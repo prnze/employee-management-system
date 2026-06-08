@@ -1,18 +1,27 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { PermissionsService } from '@core/auth/permissions.service';
+import { PermissionService, PermissionDefinition } from '@core/auth/permission.service';
 
 /**
  * Route-level permission guard.
- * Usage: add `data: { permission: 'employees:create' }` to a route,
- * then include `permissionGuard` in its `canActivate` array.
+ * Consumes: string (legacy) or PermissionDefinition object in route.data.permission.
  */
 export const permissionGuard: CanActivateFn = (route) => {
-  const permissions = inject(PermissionsService);
+  const permissions = inject(PermissionService);
   const router = inject(Router);
-  const required = route.data?.['permission'] as string | undefined;
-  if (!required || permissions.hasPermission(required)) {
+  const required = route.data?.['permission'] as PermissionDefinition | string | undefined;
+
+  if (!required) {
     return true;
   }
-  return router.createUrlTree(['/403']);
+
+  let allowed = false;
+  if (typeof required === 'string') {
+    const [module, action] = required.split(':');
+    allowed = permissions.can(module ?? '', action ?? '');
+  } else if (required && typeof required === 'object' && 'module' in required && 'action' in required) {
+    allowed = permissions.can(required.module, required.action);
+  }
+
+  return allowed ? true : router.createUrlTree(['/403']);
 };

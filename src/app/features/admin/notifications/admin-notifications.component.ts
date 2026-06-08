@@ -5,7 +5,8 @@ import { NotificationListComponent } from '@shared/components/notification-list/
   selector: 'app-admin-notifications',
   standalone: true,
   imports: [NotificationListComponent],
-  template: `<app-notification-list />`,
+  templateUrl: './admin-notifications.component.html',
+  styleUrl: './admin-notifications.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminNotificationsComponent {}

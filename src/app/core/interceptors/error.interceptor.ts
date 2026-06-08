@@ -16,7 +16,7 @@ export const errorInterceptor: HttpInterceptorFn = (request, next) => {
         if (error.status >= 500) {
           void router.navigateByUrl('/500');
         }
-        toast.show({ title: 'Request failed', message: error.message, type: 'danger' });
+        toast.showToast('REQUEST_FAILED', 'error', { message: error.message });
       }
       return throwError(() => error);
     })

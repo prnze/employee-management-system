@@ -1,0 +1,512 @@
+<!-- ── Header & Welcome Banner ────────────────────────────────────────────── -->
+<div class="welcome-banner mb-4 p-4 rounded-4 position-relative overflow-hidden shadow-sm">
+  <div class="welcome-banner-glow"></div>
+  <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 fw-bold mb-1 welcome-title">User Management</h1>
+      <p class="welcome-subtitle mb-0 d-flex align-items-center gap-2">
+        <app-icon [icon]="APP_ICONS.USERS" class="welcome-icon" aria-hidden="true"></app-icon>
+        <span>{{ svc.totalCount() }} users · {{ svc.activeCount() }} active · {{ svc.lockedCount() }} locked</span>
+      </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <!-- Export Dropdown -->
+      <div class="dropdown">
+        <button class="btn btn-premium-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-label="Export">
+          <app-icon [icon]="APP_ICONS.DOWNLOAD" [size]="18" aria-hidden="true"></app-icon>
+          <span>Export</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-3 mt-2">
+          <li>
+            <button class="dropdown-item d-inline-flex align-items-center gap-2 py-2" type="button" (click)="exportCsv()">
+              <app-icon [icon]="APP_ICONS.REPORTS" [size]="16" aria-hidden="true"></app-icon>
+              <span>CSV</span>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item d-inline-flex align-items-center gap-2 py-2" type="button" (click)="exportExcel()">
+              <app-icon [icon]="APP_ICONS.DASHBOARD" [size]="16" aria-hidden="true"></app-icon>
+              <span>Excel</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+      <!-- New User Button -->
+      <button class="btn btn-premium-primary d-flex align-items-center gap-2" type="button" (click)="openCreate()">
+        <app-icon [icon]="APP_ICONS.ADD" aria-hidden="true"></app-icon>
+        <span>New User</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── KPI Cards ────────────────────────────────────────────── -->
+<section class="row g-3 mb-4" aria-label="User statistics">
+  @for (card of kpiCards(); track card.label) {
+    <div class="col-6 col-xl-3">
+      <article class="kpi-card p-4 h-100 d-flex flex-column" [style.--kpi-color]="card.color">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <span class="kpi-icon-wrapper d-flex align-items-center justify-content-center">
+            <app-icon [icon]="card.icon" aria-hidden="true"></app-icon>
+          </span>
+        </div>
+        <p class="kpi-label mb-1">{{ card.label }}</p>
+        <strong class="kpi-value mb-0 mt-auto">{{ card.value }}</strong>
+      </article>
+    </div>
+  }
+</section>
+
+<!-- ── Filters ───────────────────────────────────────────────── -->
+<form [formGroup]="filterForm" class="surface filter-card p-4 mb-4" aria-label="User filters">
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-4">
+      <div class="position-relative search-input-wrapper">
+        <app-icon [icon]="APP_ICONS.SEARCH" class="position-absolute start-3 text-muted search-icon" [size]="18" aria-hidden="true"></app-icon>
+        <input class="form-control" placeholder="Search name, email, dept…" formControlName="query" aria-label="Search users" />
+        @if (filterForm.controls.query.value) {
+          <button class="btn btn-clear position-absolute end-2 top-50 translate-middle-y d-flex align-items-center justify-content-center" type="button" aria-label="Clear search" (click)="filterForm.controls.query.setValue('')">
+            <app-icon [icon]="APP_ICONS.CLOSE" [size]="16" aria-hidden="true"></app-icon>
+          </button>
+        }
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <select class="form-select" formControlName="role" aria-label="Filter by role">
+        <option value="">All roles</option>
+        <option value="Admin">Admin</option>
+        <option value="Employee">Employee</option>
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <select class="form-select" formControlName="status" aria-label="Filter by status">
+        <option value="">All statuses</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+        <option value="Locked">Locked</option>
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <button class="btn btn-outline-secondary w-100 btn-advanced d-flex align-items-center justify-content-center gap-2" type="button" (click)="showAdvanced.update(v => !v)">
+        <span>{{ showAdvanced() ? 'Less' : 'More filters' }}</span>
+        <app-icon [icon]="showAdvanced() ? APP_ICONS.SORT_UP : APP_ICONS.SORT_DOWN" [size]="16" aria-hidden="true"></app-icon>
+      </button>
+    </div>
+    <div class="col-6 col-md-2">
+      <button class="btn btn-outline-secondary w-100 btn-reset d-flex align-items-center justify-content-center gap-2" type="button" (click)="resetFilters()">
+        <app-icon [icon]="APP_ICONS.SORT_NONE" aria-hidden="true" [size]="16"></app-icon>
+        <span>Reset</span>
+      </button>
+    </div>
+  </div>
+  
+  @if (showAdvanced()) {
+    <div class="row g-3 pt-3 border-top advanced-filters-row">
+      <div class="col-12 col-md-3">
+        <label class="form-label small fw-bold text-body-secondary mb-1">Created from</label>
+        <input class="form-control" type="date" formControlName="createdFrom" aria-label="Created from" />
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label small fw-bold text-body-secondary mb-1">Created to</label>
+        <input class="form-control" type="date" formControlName="createdTo" aria-label="Created to" />
+      </div>
+      <div class="col-6 col-md-3 d-flex align-items-center pt-4">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" formControlName="hasExtraPermissions" id="extraPermCheck" />
+          <label class="form-check-label small fw-semibold text-body" for="extraPermCheck">Has extra permissions</label>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 d-flex align-items-end justify-content-end">
+        <button class="btn btn-action-outline d-inline-flex align-items-center gap-2" type="button" (click)="saveCurrentFilter()">
+          <app-icon [icon]="APP_ICONS.SAVE" aria-hidden="true" [size]="16"></app-icon>
+          <span>Save filter</span>
+        </button>
+      </div>
+    </div>
+  }
+  
+  <!-- Saved filter presets -->
+  @if (savedFilters().length > 0) {
+    <div class="d-flex flex-wrap align-items-center gap-2 mt-3 pt-3 border-top saved-filters-panel">
+      <span class="small fw-semibold text-body-secondary me-2">Saved Presets:</span>
+      @for (sf of savedFilters(); track sf.id) {
+        <div class="saved-preset-chip d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill border">
+          <button type="button" class="btn-preset-label p-0" (click)="applyFilter(sf)">{{ sf.name }}</button>
+          <button class="btn-preset-close d-inline-flex align-items-center justify-content-center" type="button" (click)="removeSavedFilter(sf.id)" aria-label="Remove saved filter">
+            <app-icon [icon]="APP_ICONS.CLOSE" [size]="12" aria-hidden="true"></app-icon>
+          </button>
+        </div>
+      }
+    </div>
+  }
+</form>
+
+<!-- ── Active filter chips ──────────────────────────────────── -->
+<div class="mb-3">
+  <app-filter-chips
+    [chips]="activeChips()"
+    (remove)="clearChip($event)"
+    (clearAll)="resetFilters()"></app-filter-chips>
+</div>
+
+<!-- ── Bulk action bar ──────────────────────────────────────── -->
+@if (selectedIds().length > 0) {
+  <div class="bulk-toolbar mb-4 p-3 rounded-4 d-flex flex-wrap align-items-center justify-content-between gap-3 shadow">
+    <div class="d-flex align-items-center gap-2">
+      <span class="bulk-indicator-dot"></span>
+      <strong class="bulk-text-count">{{ selectedIds().length }} users selected</strong>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-bulk-action" type="button" (click)="bulkActivate()">
+        <app-icon [icon]="APP_ICONS.SUCCESS" aria-hidden="true" [size]="16"></app-icon>
+        <span>Activate</span>
+      </button>
+      <button class="btn btn-bulk-action" type="button" (click)="bulkDeactivate()">
+        <app-icon [icon]="APP_ICONS.ERROR" aria-hidden="true" [size]="16"></app-icon>
+        <span>Deactivate</span>
+      </button>
+      <button class="btn btn-bulk-action-danger" type="button" (click)="confirmBulkDelete()">
+        <app-icon [icon]="APP_ICONS.DELETE" aria-hidden="true" [size]="16"></app-icon>
+        <span>Delete</span>
+      </button>
+      <button class="btn btn-bulk-deselect ms-2" type="button" (click)="selectedIds.set([])">Deselect all</button>
+    </div>
+  </div>
+}
+
+<!-- ── Table ───────────────────────────────────────────────── -->
+@if (paged().length > 0 || !loading()) {
+  <div class="table-container mb-3">
+    <app-table
+      class="d-block"
+      [rows]="paged()"
+      [columns]="columns()"
+      [selectedIds]="selectedIds()"
+      [selectable]="true"
+      [sortStack]="sortStack()"
+      (selectionChange)="selectedIds.set($event)"
+      (sort)="addSort($event)"></app-table>
+  </div>
+
+  <!-- ── Pagination ─────────────────────────────────────────── -->
+  @if (totalPages() > 1) {
+    <app-pagination
+      [page]="page()"
+      [pageSize]="10"
+      [total]="filteredUsers().length"
+      (pageChange)="setPage($event)"></app-pagination>
+  }
+}
+
+<!-- ── Detail Drawer ──────────────────────────────────────────── -->
+@if (detailUser()) {
+  <div class="drawer-backdrop" (click)="closeDetail()" aria-hidden="true"></div>
+  <aside class="drawer p-4 d-flex flex-column h-100 shadow-lg" role="dialog" aria-modal="true" [attr.aria-label]="detailUser()!.fullName + ' details'">
+    @let u = detailUser()!;
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-shrink-0">
+      <h2 class="h5 fw-bold mb-0">User Details</h2>
+      <div class="d-flex gap-2">
+        <button class="btn btn-action-outline btn-sm d-flex align-items-center gap-1" type="button" (click)="openEdit(u)">
+          <app-icon [icon]="APP_ICONS.EDIT" [size]="16" aria-hidden="true"></app-icon>
+          <span>Edit</span>
+        </button>
+        <button class="btn btn-action-close d-flex align-items-center justify-content-center" type="button" (click)="closeDetail()" aria-label="Close">
+          <app-icon [icon]="APP_ICONS.CLOSE" [size]="18" aria-hidden="true"></app-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="drawer-scroll-container flex-grow-1 overflow-y-auto pe-1">
+      <!-- Avatar + identity -->
+      <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded-3 border bg-body-tertiary">
+        <div class="avatar-circle-lg rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" [style.background]="avatarColor(u.role)">
+          {{ u.fullName | initials }}
+        </div>
+        <div class="min-w-0">
+          <h3 class="h5 fw-bold mb-1 text-truncate">{{ u.fullName }}</h3>
+          <p class="text-body-secondary small mb-2 text-truncate">{{ u.email }}</p>
+          <div class="d-flex gap-2 flex-wrap">
+            <span class="badge" [class]="roleClass(u.role)">{{ u.role }}</span>
+            <span class="badge" [class]="statusClass(u.status)">{{ u.status }}</span>
+            @if (u.forcePasswordReset) { <span class="badge text-bg-warning">Reset required</span> }
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="surface p-3 rounded-3 mb-4">
+        <h4 class="h6 fw-bold mb-3 border-bottom pb-2">Information</h4>
+        <dl class="row row-cols-2 g-3 small mb-0">
+          <div class="col">
+            <dt class="text-body-secondary fw-semibold">Phone</dt>
+            <dd class="mb-0 fw-medium">{{ u.phone || '—' }}</dd>
+          </div>
+          <div class="col">
+            <dt class="text-body-secondary fw-semibold">Department</dt>
+            <dd class="mb-0 fw-medium">{{ u.department || '—' }}</dd>
+          </div>
+          <div class="col">
+            <dt class="text-body-secondary fw-semibold">Last Login</dt>
+            <dd class="mb-0 fw-medium">{{ u.lastLoginAt | appDate:'medium' }}</dd>
+          </div>
+          <div class="col">
+            <dt class="text-body-secondary fw-semibold">Member Since</dt>
+            <dd class="mb-0 fw-medium">{{ u.createdAt | appDate:'mediumDate' }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="surface p-3 rounded-3 mb-4" *appPermission="{ module: 'users', action: 'manage' }">
+        <h4 class="h6 fw-bold mb-3 border-bottom pb-2">Quick Actions</h4>
+        <div class="d-flex flex-wrap gap-2">
+          @if (u.status !== 'Active') {
+            <button class="btn btn-outline-success btn-sm d-inline-flex align-items-center gap-1" type="button" (click)="activate(u.id)">
+              <app-icon [icon]="APP_ICONS.SUCCESS" aria-hidden="true" [size]="16"></app-icon>
+              <span>Activate</span>
+            </button>
+          }
+          @if (u.status === 'Active') {
+            <button class="btn btn-outline-warning btn-sm d-inline-flex align-items-center gap-1" type="button" (click)="deactivate(u.id)">
+              <app-icon [icon]="APP_ICONS.ERROR" aria-hidden="true" [size]="16"></app-icon>
+              <span>Deactivate</span>
+            </button>
+          }
+          @if (u.status !== 'Locked') {
+            <button class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1" type="button" (click)="lock(u.id)">
+              <app-icon [icon]="APP_ICONS.LOCK" aria-hidden="true" [size]="16"></app-icon>
+              <span>Lock</span>
+            </button>
+          } @else {
+            <button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" type="button" (click)="unlock(u.id)">
+              <app-icon [icon]="APP_ICONS.UNLOCK" aria-hidden="true" [size]="16"></app-icon>
+              <span>Unlock</span>
+            </button>
+          }
+          <button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" type="button" (click)="forceReset(u.id)">
+            <app-icon [icon]="APP_ICONS.ROLE" aria-hidden="true" [size]="16"></app-icon>
+            <span>Force Reset</span>
+          </button>
+          <button class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1" type="button" (click)="confirmDeleteUser(u)">
+            <app-icon [icon]="APP_ICONS.DELETE" aria-hidden="true" [size]="16"></app-icon>
+            <span>Delete</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Role permissions -->
+      <div class="surface p-3 rounded-3 mb-4">
+        <h4 class="h6 fw-bold mb-3 border-bottom pb-2 d-flex align-items-center justify-content-between">
+          <span>Role Permissions</span>
+          <span class="badge text-bg-secondary">{{ u.role }}</span>
+        </h4>
+        <div class="d-flex flex-wrap gap-1.5">
+          @for (p of rolePermissions(u.role); track p) {
+            <span class="badge role-perm-badge border">{{ p }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Extra permissions -->
+      <div class="surface p-3 rounded-3 mb-4">
+        <h4 class="h6 fw-bold mb-3 border-bottom pb-2">Extra Permissions</h4>
+        @if ((u.extraPermissions?.length ?? 0) === 0) {
+          <p class="text-body-secondary small mb-3">No extra permissions assigned.</p>
+        } @else {
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            @for (p of u.extraPermissions; track p) {
+              <div class="d-flex align-items-center gap-1 border rounded px-2 py-1 bg-light-subtle">
+                <span class="badge text-bg-primary perm-chip">{{ p }}</span>
+                <button class="btn-clear-perm d-inline-flex align-items-center justify-content-center p-0" type="button"
+                  (click)="removeExtraPermission(u.id, p)" [attr.aria-label]="'Remove ' + p">
+                  <app-icon [icon]="APP_ICONS.CLOSE" [size]="12" aria-hidden="true"></app-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
+        <!-- Add extra permission -->
+        <div class="d-flex gap-2">
+          <select class="form-select form-select-sm" [(ngModel)]="newPermissionDraft" [ngModelOptions]="{standalone: true}" aria-label="Select permission to add">
+            <option value="">Add permission…</option>
+            @for (p of availableExtraPermissions(u); track p) { <option [value]="p">{{ p }}</option> }
+          </select>
+          <button class="btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center" type="button" [disabled]="!newPermissionDraft" (click)="addExtraPermission(u.id)">
+            <app-icon [icon]="APP_ICONS.ADD" [size]="16" class="me-1"></app-icon>
+            <span>Add</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Role change -->
+      <div class="surface p-3 rounded-3 mb-3">
+        <h4 class="h6 fw-bold mb-3 border-bottom pb-2">Change Role</h4>
+        <div class="d-flex gap-2">
+          <select class="form-select form-select-sm" [(ngModel)]="roleDraft" [ngModelOptions]="{standalone: true}" aria-label="Change role">
+            <option value="Admin">Admin</option>
+            <option value="Employee">Employee</option>
+          </select>
+          <button class="btn btn-outline-warning btn-sm d-flex align-items-center justify-content-center" type="button" [disabled]="roleDraft === u.role" (click)="changeRole(u.id)">
+            <app-icon [icon]="APP_ICONS.ROLE" [size]="16" class="me-1"></app-icon>
+            <span>Change</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+}
+
+<!-- ── Create / Edit Modal ───────────────────────────────────── -->
+@if (modalMode()) {
+  <div class="modal-wrapper d-flex align-items-center justify-content-center" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" (click)="closeModal()" aria-hidden="true"></div>
+    <div class="modal-dialog modal-lg position-relative z-2 w-100 max-w-lg p-3">
+      <div class="modal-content border shadow-lg rounded-4 overflow-hidden bg-body">
+        <div class="modal-header px-4 py-3 border-bottom d-flex align-items-center justify-content-between bg-body-tertiary">
+          <h5 class="modal-title fw-bold text-body mb-0">
+            <app-icon [icon]="modalMode() === 'create' ? APP_ICONS.ADD : APP_ICONS.EDIT" class="text-primary me-2 align-middle" [size]="20"></app-icon>
+            <span class="align-middle">{{ modalMode() === 'create' ? 'Create User' : 'Edit User' }}</span>
+          </h5>
+          <button class="btn-close" type="button" (click)="closeModal()" aria-label="Close"></button>
+        </div>
+        
+        <form [formGroup]="userForm" (ngSubmit)="submitUser()">
+          <div class="modal-body p-4">
+            @if (formError()) {
+              <div class="alert alert-danger small py-2 rounded-3 mb-3 d-flex align-items-center gap-2">
+                <app-icon [icon]="APP_ICONS.ERROR" [size]="16" aria-hidden="true"></app-icon>
+                <span>{{ formError() }}</span>
+              </div>
+            }
+            
+            <div class="form-section mb-3">
+              <h6 class="small fw-bold text-uppercase text-muted border-bottom pb-1.5 mb-3">Identity Details</h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold" for="fullName">Full Name *</label>
+                  <input id="fullName" class="form-control" formControlName="fullName" placeholder="e.g. Jane Smith" />
+                  @if (fc('fullName').touched && fc('fullName').errors?.['required']) {
+                    <div class="text-danger small mt-1 d-flex align-items-center gap-1">
+                      <app-icon [icon]="APP_ICONS.ERROR" [size]="12" aria-hidden="true"></app-icon>
+                      <span>Full name is required</span>
+                    </div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold" for="email">Email *</label>
+                  <input id="email" class="form-control" type="email" formControlName="email" placeholder="user@company.local" />
+                  @if (fc('email').touched && fc('email').errors?.['required']) {
+                    <div class="text-danger small mt-1 d-flex align-items-center gap-1">
+                      <app-icon [icon]="APP_ICONS.ERROR" [size]="12" aria-hidden="true"></app-icon>
+                      <span>Email is required</span>
+                    </div>
+                  }
+                  @if (fc('email').touched && fc('email').errors?.['email']) {
+                    <div class="text-danger small mt-1 d-flex align-items-center gap-1">
+                      <app-icon [icon]="APP_ICONS.ERROR" [size]="12" aria-hidden="true"></app-icon>
+                      <span>Enter a valid email</span>
+                    </div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold" for="phone">Phone</label>
+                  <input id="phone" class="form-control" formControlName="phone" placeholder="+91 98765 43210" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold" for="department">Department</label>
+                  <input id="department" class="form-control" formControlName="department" placeholder="e.g. Engineering" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section pt-3">
+              <h6 class="small fw-bold text-uppercase text-muted border-bottom pb-1.5 mb-3">Account Configuration</h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold" for="role">Role *</label>
+                  <select id="role" class="form-select" formControlName="role">
+                    <option value="Admin">Admin</option>
+                    <option value="Employee">Employee</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold" for="status">Status *</label>
+                  <select id="status" class="form-select" formControlName="status">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Locked">Locked</option>
+                  </select>
+                </div>
+                <div class="col-12 pt-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" formControlName="forcePasswordReset" id="fpr" />
+                    <label class="form-check-label small fw-semibold text-body" for="fpr">Require password reset on next login</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="modal-footer px-4 py-3 border-top d-flex justify-content-end gap-2 bg-body-tertiary">
+            <button class="btn btn-outline-secondary" type="button" (click)="closeModal()">Cancel</button>
+            <button class="btn btn-primary d-flex align-items-center gap-2" type="submit" [disabled]="userForm.invalid || submitting()">
+              @if (submitting()) { <span class="spinner-border spinner-border-sm"></span> }
+              <span>{{ modalMode() === 'create' ? 'Create User' : 'Save Changes' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Save filter dialog ──────────────────────────────────── -->
+<app-modal [open]="showSaveDialog()" [title]="'Save filter'" (closed)="showSaveDialog.set(false)">
+  <div class="mb-3">
+    <input #filterNameEl class="form-control" placeholder="Filter name…" [value]="filterNameDraft()" (input)="filterNameDraft.set(filterNameEl.value)" />
+  </div>
+  <div class="d-flex justify-content-end gap-2">
+    <button class="btn btn-outline-secondary btn-sm" type="button" (click)="showSaveDialog.set(false)">Cancel</button>
+    <button class="btn btn-primary btn-sm" type="button" [disabled]="!filterNameDraft().trim()" (click)="confirmSaveFilter()">Save</button>
+  </div>
+</app-modal>
+
+<!-- ── Custom cell templates for Table Framework ──────────────── -->
+<ng-template #nameTpl let-row>
+  <div class="d-flex align-items-center gap-2 py-1">
+    <div class="avatar-circle rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" [style.background]="avatarColor(row.role)">
+      {{ row.fullName | initials }}
+    </div>
+    <div class="min-w-0">
+      <div class="fw-bold small text-truncate text-body" style="font-size: 0.875rem;">{{ row.fullName }}</div>
+      @if (row.forcePasswordReset) {
+        <span class="badge text-bg-warning mt-0.5" style="font-size:.6rem; font-weight:600;">Reset required</span>
+      }
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #roleTpl let-row>
+  <span class="badge role-badge" [class]="roleClass(row.role)">{{ row.role }}</span>
+</ng-template>
+
+<ng-template #statusTpl let-row>
+  <span class="badge status-badge" [class]="statusClass(row.status)">{{ row.status }}</span>
+</ng-template>
+
+<ng-template #lastLoginTpl let-row>
+  <span class="small text-muted fw-medium">{{ row.lastLoginAt | appDate:'mediumDate' }}</span>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <div class="d-flex justify-content-end gap-1.5 flex-wrap">
+    <button class="btn btn-sm btn-action-outline" type="button" (click)="openDetail(row)" [attr.aria-label]="'View ' + row.fullName">
+      <app-icon [icon]="APP_ICONS.USER" [size]="14" class="me-1"></app-icon>
+      <span>View</span>
+    </button>
+    <button class="btn btn-sm btn-action-outline" type="button" (click)="openEdit(row)" [attr.aria-label]="'Edit ' + row.fullName">
+      <app-icon [icon]="APP_ICONS.EDIT" [size]="14" class="me-1"></app-icon>
+      <span>Edit</span>
+    </button>
+  </div>
+</ng-template>

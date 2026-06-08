@@ -6,13 +6,8 @@ import { TranslatePipe } from '@ngx-translate/core';
   selector: 'app-not-found',
   standalone: true,
   imports: [RouterLink, TranslatePipe],
-  template: `
-    <main class="container py-5 text-center">
-      <h1>404</h1>
-      <p>{{ 'ERROR_404_MSG' | translate }}</p>
-      <a class="btn btn-primary" routerLink="/">{{ 'ERROR_404_HOME' | translate }}</a>
-    </main>
-  `,
+  templateUrl: './not-found.component.html',
+  styleUrl: './not-found.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NotFoundComponent {}

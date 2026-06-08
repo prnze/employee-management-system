@@ -4,38 +4,20 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '@core/auth/auth.service';
 import { matchPasswordValidator } from '@shared/validators/match-password.validator';
 import { passwordStrengthValidator } from '@shared/validators/password-strength.validator';
+import { FormFieldComponent } from '@shared/form-controls/form-field/form-field.component';
+import { InputComponent } from '@shared/form-controls/input/input.component';
 
 @Component({
   selector: 'app-change-password',
   standalone: true,
-  imports: [ReactiveFormsModule, TranslatePipe],
-  template: `
-    <section class="surface p-3">
-      <h1 class="h4">{{ 'CHANGE_PWD_TITLE' | translate }}</h1>
-      @if (saved()) {
-        <div class="alert alert-success">{{ 'CHANGE_PWD_SAVED' | translate }}</div>
-      }
-      <form [formGroup]="form" (ngSubmit)="submit()" class="row g-3">
-        <div class="col-12">
-          <input class="form-control" type="password"
-            [placeholder]="'CHANGE_PWD_CURRENT' | translate" formControlName="currentPassword" />
-        </div>
-        <div class="col-md-6">
-          <input class="form-control" type="password"
-            [placeholder]="'CHANGE_PWD_NEW' | translate" formControlName="newPassword" />
-        </div>
-        <div class="col-md-6">
-          <input class="form-control" type="password"
-            [placeholder]="'CHANGE_PWD_CONFIRM' | translate" formControlName="confirmPassword" />
-        </div>
-        <div class="col-12">
-          <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
-            {{ 'CHANGE_PWD_SAVE' | translate }}
-          </button>
-        </div>
-      </form>
-    </section>
-  `,
+  imports: [
+    ReactiveFormsModule,
+    TranslatePipe,
+    FormFieldComponent,
+    InputComponent
+  ],
+  templateUrl: './change-password.component.html',
+  styleUrl: './change-password.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChangePasswordComponent {
@@ -52,6 +34,7 @@ export class ChangePasswordComponent {
   );
 
   submit(): void {
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     const { currentPassword, newPassword } = this.form.getRawValue();
     this.auth.changePassword({ currentPassword, newPassword }).subscribe(() => this.saved.set(true));
   }

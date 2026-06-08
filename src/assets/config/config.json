@@ -1,0 +1,11 @@
+{
+  "apiUrl": "/api",
+  "appName": "Employee Management System",
+  "version": "1.0.0",
+  "accessTokenTtlMinutes": 15,
+  "idleTimeoutMinutes": 20,
+  "featureFlags": {
+    "auditLogs": true,
+    "notifications": true
+  }
+}

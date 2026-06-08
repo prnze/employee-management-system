@@ -1,0 +1,304 @@
+<!-- ── Header & Welcome Banner ─────────────────────────────────── -->
+<div class="welcome-banner mb-4 p-4 rounded-4 position-relative overflow-hidden shadow-sm">
+  <div class="welcome-banner-glow"></div>
+  <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 fw-bold mb-1 welcome-title">Workforce Directory</h1>
+      <p class="welcome-subtitle mb-0 d-flex align-items-center gap-2">
+        <app-icon [icon]="APP_ICONS.EMPLOYEE" class="welcome-icon" aria-hidden="true"></app-icon>
+        <span>{{ totalText() }}</span>
+      </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <!-- Column visibility toggle -->
+      <div class="dropdown">
+        <button class="btn btn-premium-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-label="Toggle columns">
+          <app-icon [icon]="APP_ICONS.SETTINGS" [size]="18" aria-hidden="true"></app-icon>
+          <span>Columns</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg p-2.5 border rounded-3 mt-2 col-manage-dropdown" style="min-width:180px">
+          <li class="dropdown-header border-bottom pb-1.5 mb-2 small fw-bold text-uppercase text-muted">Toggle Columns</li>
+          @for (col of columnsConfig(); track col.key) {
+            <li>
+              <label class="dropdown-item d-flex align-items-center gap-2 rounded-2 col-visible-toggle py-1.5" style="cursor:pointer">
+                <input class="form-check-input mt-0" type="checkbox" [checked]="col.visible" (change)="toggleColumn(col)" />
+                <span class="small fw-semibold text-body">{{ col.label }}</span>
+              </label>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Export -->
+      <div class="dropdown" *appPermission="{ module: 'employees', action: 'read' }">
+        <button class="btn btn-premium-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-label="Export">
+          <app-icon [icon]="APP_ICONS.DOWNLOAD" [size]="18" aria-hidden="true"></app-icon>
+          <span>Export</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg border rounded-3 mt-2">
+          <li class="dropdown-header border-bottom pb-1.5 mb-2 small fw-bold text-uppercase text-muted">Format Options</li>
+          <li>
+            <button class="dropdown-item d-inline-flex align-items-center gap-2 py-2" type="button" (click)="exportCsv()">
+              <app-icon [icon]="APP_ICONS.REPORTS" [size]="16" aria-hidden="true"></app-icon>
+              <span>CSV</span>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item d-inline-flex align-items-center gap-2 py-2" type="button" (click)="exportExcel()">
+              <app-icon [icon]="APP_ICONS.DASHBOARD" [size]="16" aria-hidden="true"></app-icon>
+              <span>Excel (XLS)</span>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item d-inline-flex align-items-center gap-2 py-2" type="button" (click)="exportFiltered()">
+              <app-icon [icon]="APP_ICONS.SEARCH" [size]="16" aria-hidden="true"></app-icon>
+              <span>Filtered CSV</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- New Employee Button -->
+      <a *appPermission="{ module: 'employees', action: 'create' }" class="btn btn-premium-primary d-inline-flex align-items-center gap-2 text-decoration-none" routerLink="/admin/employees/create">
+        <app-icon [icon]="APP_ICONS.ADD" aria-hidden="true"></app-icon>
+        <span>New Employee</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Filter panel ────────────────────────────── -->
+<form [formGroup]="filterForm" class="surface filter-card p-4 mb-4" aria-label="Employee filters">
+  <div class="row g-3 mb-3">
+    <!-- Global search -->
+    <div class="col-12 col-md-4">
+      <div class="position-relative search-input-wrapper">
+        <app-icon [icon]="APP_ICONS.SEARCH" class="position-absolute start-3 text-muted search-icon" [size]="18" aria-hidden="true"></app-icon>
+        <input class="form-control" placeholder="Search name, email, code, dept…" formControlName="query" aria-label="Search employees" />
+        @if (filterForm.controls.query.value) {
+          <button class="btn btn-clear position-absolute end-2 top-50 translate-middle-y d-flex align-items-center justify-content-center" type="button" (click)="filterForm.controls.query.setValue('')" aria-label="Clear search">
+            <app-icon [icon]="APP_ICONS.CLOSE" [size]="16" aria-hidden="true"></app-icon>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <select class="form-select" formControlName="department" aria-label="Filter by department">
+        <option value="">All departments</option>
+        @for (dept of departments(); track dept) { <option [value]="dept">{{ dept }}</option> }
+      </select>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <select class="form-select" formControlName="status" aria-label="Filter by status">
+        <option value="">All statuses</option>
+        <option>Active</option><option>Inactive</option><option>On Leave</option>
+      </select>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <select class="form-select" formControlName="location" aria-label="Filter by location">
+        <option value="">All locations</option>
+        @for (loc of locations(); track loc) { <option [value]="loc">{{ loc }}</option> }
+      </select>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <button class="btn btn-outline-secondary w-100 btn-advanced d-flex align-items-center justify-content-center gap-2" type="button" (click)="showAdvanced.update(v => !v)">
+        <span>{{ showAdvanced() ? 'Less' : 'More filters' }}</span>
+        <app-icon [icon]="showAdvanced() ? APP_ICONS.SORT_UP : APP_ICONS.SORT_DOWN" [size]="16" aria-hidden="true"></app-icon>
+      </button>
+    </div>
+  </div>
+
+  @if (showAdvanced()) {
+    <div class="row g-3 pt-3 border-top advanced-filters-row">
+      <div class="col-12 col-md-3">
+        <label class="form-label small fw-bold text-body-secondary mb-1">Designation</label>
+        <select class="form-select" formControlName="designation" aria-label="Filter by designation">
+          <option value="">All designations</option>
+          @for (d of designations(); track d) { <option [value]="d">{{ d }}</option> }
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label small fw-bold text-body-secondary mb-1">Joined from</label>
+        <input class="form-control" type="date" formControlName="joinedFrom" aria-label="Joined from date" />
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label small fw-bold text-body-secondary mb-1">Joined to</label>
+        <input class="form-control" type="date" formControlName="joinedTo" aria-label="Joined to date" />
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label small fw-bold text-body-secondary mb-1">Page size</label>
+        <select class="form-select" formControlName="pageSize" aria-label="Rows per page">
+          <option [ngValue]="5">5 per page</option>
+          <option [ngValue]="10">10 per page</option>
+          <option [ngValue]="25">25 per page</option>
+          <option [ngValue]="50">50 per page</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-3 d-flex align-items-end gap-2">
+        <button class="btn btn-outline-secondary flex-fill btn-reset" type="button" (click)="resetFilters()">Reset</button>
+        <button class="btn btn-action-outline flex-fill btn-reset d-flex align-items-center justify-content-center gap-1.5" type="button" (click)="saveCurrentFilter()">
+          <app-icon [icon]="APP_ICONS.SAVE" [size]="14"></app-icon>
+          <span>Save filter</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Saved filter presets -->
+  @if (savedFilters().length > 0) {
+    <div class="d-flex flex-wrap align-items-center gap-2 mt-3 pt-3 border-top saved-filters-panel">
+      <span class="small fw-semibold text-body-secondary me-2">Saved Presets:</span>
+      @for (sf of savedFilters(); track sf.id) {
+        <div class="saved-preset-chip d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill border">
+          <button type="button" class="btn-preset-label p-0" (click)="applyFilter(sf)">{{ sf.name }}</button>
+          <button class="btn-preset-close d-inline-flex align-items-center justify-content-center" type="button" (click)="removeSavedFilter(sf.id)" aria-label="Remove saved filter">
+            <app-icon [icon]="APP_ICONS.CLOSE" [size]="12" aria-hidden="true"></app-icon>
+          </button>
+        </div>
+      }
+    </div>
+  }
+</form>
+
+<!-- ── Active filter chips ─────────────────────── -->
+<div class="mb-3">
+  <app-filter-chips
+    [chips]="activeChips()"
+    (remove)="clearChip($event)"
+    (clearAll)="resetFilters()"></app-filter-chips>
+</div>
+
+<!-- ── Sort stack badges ───────────────────────── -->
+@if (sortStack().length > 0) {
+  <div class="d-flex flex-wrap gap-2 mb-4 align-items-center sort-stack-panel p-2.5 rounded-3 border bg-body-tertiary">
+    <span class="small fw-semibold text-body-secondary me-2">Active Sort Priority:</span>
+    @for (entry of sortStack(); track entry.field; let i = $index) {
+      <div class="sort-badge d-flex align-items-center gap-2 px-2.5 py-1.5 rounded border bg-body">
+        <span class="sort-badge-index fw-bold text-primary">#{{ i + 1 }}</span>
+        <span class="sort-badge-label small text-body">{{ entry.field }}</span>
+        <app-icon [icon]="entry.direction === 'asc' ? APP_ICONS.SORT_UP : APP_ICONS.SORT_DOWN" [size]="14" class="text-primary" aria-hidden="true"></app-icon>
+        <button class="btn-sort-close d-inline-flex align-items-center justify-content-center p-0" type="button" (click)="removeSortEntry(i)" aria-label="Remove sort">
+          <app-icon [icon]="APP_ICONS.CLOSE" [size]="12" aria-hidden="true"></app-icon>
+        </button>
+      </div>
+    }
+    <button class="btn btn-clear-sort btn-sm ms-2 small fw-semibold text-decoration-none" type="button" (click)="clearSort()">Clear sort</button>
+  </div>
+}
+
+<!-- ── Bulk action bar ────────────────────────── -->
+@if (selectedIds().length > 0) {
+  <div class="bulk-toolbar mb-4 p-3 rounded-4 d-flex flex-wrap align-items-center justify-content-between gap-3 shadow">
+    <div class="d-flex align-items-center gap-2">
+      <span class="bulk-indicator-dot"></span>
+      <strong class="bulk-text-count">{{ selectedIds().length }} selected</strong>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <button *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-bulk-action" type="button" (click)="bulkSetStatus('Active')">
+        <app-icon [icon]="APP_ICONS.SUCCESS" aria-hidden="true" [size]="16"></app-icon>
+        <span>Activate</span>
+      </button>
+      <button *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-bulk-action" type="button" (click)="bulkSetStatus('Inactive')">
+        <app-icon [icon]="APP_ICONS.ERROR" aria-hidden="true" [size]="16"></app-icon>
+        <span>Deactivate</span>
+      </button>
+      <button *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-bulk-action" type="button" (click)="bulkSetStatus('On Leave')">
+        <app-icon [icon]="APP_ICONS.LEAVE" aria-hidden="true" [size]="16"></app-icon>
+        <span>On Leave</span>
+      </button>
+      <button *appPermission="{ module: 'employees', action: 'delete' }" class="btn btn-bulk-action-danger" type="button" (click)="confirmBulkDelete()">
+        <app-icon [icon]="APP_ICONS.DELETE" aria-hidden="true" [size]="16"></app-icon>
+        <span>Delete</span>
+      </button>
+      <button class="btn btn-bulk-deselect ms-2" type="button" (click)="selectedIds.set([])">Deselect all</button>
+    </div>
+  </div>
+}
+
+<!-- ── Table ──────────────────────────────────── -->
+@if (paged(); as pagedVal) {
+  <div class="table-container mb-3">
+    <app-table
+      class="d-block"
+      [rows]="pagedVal.items"
+      [columns]="tableColumns()"
+      [selectedIds]="selectedIds()"
+      [selectable]="true"
+      [sortStack]="sortStack()"
+      (selectionChange)="selectedIds.set($event)"
+      (sort)="addSort($event)"></app-table>
+  </div>
+
+  <!-- ── Pagination footer ──────────────────── -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3">
+    <div class="small text-body-secondary fw-medium">
+      Showing <strong class="text-body">{{ rangeStart(pagedVal) }}</strong>–<strong class="text-body">{{ rangeEnd(pagedVal) }}</strong> of <strong class="text-body">{{ pagedVal.total }}</strong>
+    </div>
+    <app-pagination
+      [page]="filterForm.controls.page.value"
+      [pageSize]="filterForm.controls.pageSize.value"
+      [total]="pagedVal.total"
+      (pageChange)="setPage($event)" />
+  </div>
+} @else {
+  <div class="surface p-5 text-center text-body-secondary rounded-4">
+    <div class="spinner-border text-primary mb-3" role="status"><span class="visually-hidden">Loading…</span></div>
+    <p class="mb-0 fw-medium">Loading employees…</p>
+  </div>
+}
+
+<!-- ── Save filter dialog (inline) ───────────── -->
+<app-modal [open]="showSaveDialog()" [title]="'Save filter'" (closed)="showSaveDialog.set(false)">
+  <div class="mb-3">
+    <input #filterNameInput class="form-control" placeholder="Filter name…" [value]="filterNameDraft()" (input)="filterNameDraft.set(filterNameInput.value)" />
+  </div>
+  <div class="d-flex justify-content-end gap-2">
+    <button class="btn btn-outline-secondary btn-sm" type="button" (click)="showSaveDialog.set(false)">Cancel</button>
+    <button class="btn btn-primary btn-sm" type="button" [disabled]="!filterNameDraft().trim()" (click)="confirmSaveFilter()">Save</button>
+  </div>
+</app-modal>
+
+<!-- ── Custom cell templates for Table Framework ──────────────── -->
+<ng-template #codeTpl let-row>
+  <code class="employee-code font-monospace fw-semibold px-2 py-1 rounded bg-body-secondary text-body" style="font-size: 0.8rem;">{{ row.employeeCode }}</code>
+</ng-template>
+
+<ng-template #nameTpl let-row>
+  <div class="py-1">
+    <strong class="text-body d-block fw-semibold" style="font-size: 0.875rem;">{{ row.firstName }} {{ row.lastName }}</strong>
+    <span class="text-muted small d-block" style="font-size: 0.75rem;">{{ row.email }}</span>
+  </div>
+</ng-template>
+
+<ng-template #phoneTpl let-row>
+  <span class="text-body-secondary small fw-medium">{{ row.phone | phoneFormat }}</span>
+</ng-template>
+
+<ng-template #deptTpl let-row>
+  <span class="badge dept-badge">{{ row.department }}</span>
+</ng-template>
+
+<ng-template #statusTpl let-row>
+  <span class="badge status-badge" [class]="statusClass(row.status)">{{ row.status }}</span>
+</ng-template>
+
+<ng-template #joinedTpl let-row>
+  <span class="small text-muted fw-medium">{{ row.joinedAt | appDate }}</span>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <div class="d-flex justify-content-end gap-1.5 flex-wrap">
+    <a class="btn btn-sm btn-action-outline text-decoration-none" [routerLink]="['/admin/employees', row.id]">
+      <app-icon [icon]="APP_ICONS.USER" [size]="14" class="me-1"></app-icon>
+      <span>View</span>
+    </a>
+    <a *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-sm btn-action-outline text-decoration-none" [routerLink]="['/admin/employees', row.id, 'edit']">
+      <app-icon [icon]="APP_ICONS.EDIT" [size]="14" class="me-1"></app-icon>
+      <span>Edit</span>
+    </a>
+  </div>
+</ng-template>

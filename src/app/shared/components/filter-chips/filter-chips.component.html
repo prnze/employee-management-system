@@ -1,0 +1,18 @@
+@if (chips().length > 0) {
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    @for (chip of chips(); track chip.key) {
+      <span class="chip">
+        <span>{{ chip.label }}</span>
+        <button class="chip-close d-inline-flex align-items-center justify-content-center" 
+                type="button" 
+                (click)="remove.emit(chip.key)" 
+                [attr.aria-label]="'COMMON_DELETE' | translate">
+          <app-icon [icon]="APP_ICONS.CLOSE" [size]="12" aria-hidden="true"></app-icon>
+        </button>
+      </span>
+    }
+    <button class="btn btn-link btn-sm p-0" type="button" (click)="clearAll.emit()">
+      {{ clearLabel() | translate }}
+    </button>
+  </div>
+}

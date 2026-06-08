@@ -1,4 +1,5 @@
 import {
+  APP_INITIALIZER,
   ApplicationConfig,
   ENVIRONMENT_INITIALIZER,
   ErrorHandler,
@@ -6,6 +7,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection
 } from '@angular/core';
+import { RuntimeConfigService } from '@core/services/runtime-config.service';
 
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
@@ -26,6 +28,8 @@ import {
   provideTranslateHttpLoader
 } from '@ngx-translate/http-loader';
 
+import { provideAnimations } from '@angular/platform-browser/animations';
+
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { routes } from './app.routes';
@@ -42,6 +46,7 @@ import { LanguageService } from '@core/services/language.service';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideAnimations(),
 
     provideZoneChangeDetection({
       eventCoalescing: true
@@ -82,6 +87,13 @@ export const appConfig: ApplicationConfig = {
     {
       provide: ErrorHandler,
       useClass: GlobalErrorHandler
+    },
+
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (configService: RuntimeConfigService) => () => configService.loadConfig(),
+      deps: [RuntimeConfigService],
+      multi: true
     },
 
     {

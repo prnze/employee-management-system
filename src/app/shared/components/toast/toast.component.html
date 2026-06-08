@@ -1,0 +1,19 @@
+@for (toast of toastService.toasts(); track toast) {
+  @if (toast.visible) {
+    <div
+      class="toast show rc-toast"
+      [ngClass]="toast.classname"
+      role="status"
+      aria-live="polite"
+      (click)="toastService.remove(toast)"
+      @slideInOut>
+      <div class="toast-body">
+        @if (isTemplate(toast)) {
+          <ng-template [ngTemplateOutlet]="toast.textOrTpl"></ng-template>
+        } @else {
+          {{ $any(toast.textOrTpl) | translate: toast.params }}
+        }
+      </div>
+    </div>
+  }
+}

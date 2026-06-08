@@ -1,0 +1,36 @@
+<aside class="sidebar p-3 d-flex flex-column h-100" [class.sidebar--collapsed]="shell.sidebarCollapsed()" aria-label="Primary navigation">
+  <!-- User Information Panel -->
+  @if (user(); as u) {
+    <div class="user-panel p-3 mb-4 rounded-3 d-flex align-items-center gap-3 border transition-all">
+      <!-- Initials Avatar -->
+      <div class="avatar-circle rounded-circle d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0">
+        {{ u.fullName | initials }}
+      </div>
+      <!-- Details -->
+      <div class="user-info min-w-0 flex-grow-1" [class.d-none]="shell.sidebarCollapsed()">
+        <div class="user-name fw-bold text-truncate" [title]="u.fullName">{{ u.fullName }}</div>
+        <div class="user-role text-muted small text-truncate">{{ displayRole() }}</div>
+        @if (orgName() && orgName().trim()) {
+          <div class="user-org text-muted small text-truncate mt-1" [title]="orgName()">{{ orgName() }}</div>
+        }
+      </div>
+    </div>
+  }
+
+  <nav class="nav-menu d-flex flex-column gap-2 flex-grow-1">
+    @for (item of visibleItems(); track item.path) {
+      <a class="nav-menu-link d-flex align-items-center gap-3 px-3 py-2" 
+         [class.justify-content-center]="shell.sidebarCollapsed()" 
+         [routerLink]="item.path" 
+         routerLinkActive="active" 
+         [title]="shell.sidebarCollapsed() ? (item.label | translate) : ''">
+        @if (item.icon) {
+          <span class="nav-menu-icon-wrapper d-flex align-items-center justify-content-center">
+            <app-icon [icon]="item.icon" aria-hidden="true" [size]="20"></app-icon>
+          </span>
+        }
+        <span class="nav-menu-label" [class.d-none]="shell.sidebarCollapsed()">{{ item.label | translate }}</span>
+      </a>
+    }
+  </nav>
+</aside>

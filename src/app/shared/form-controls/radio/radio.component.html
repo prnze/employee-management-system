@@ -1,0 +1,20 @@
+<div [class.d-flex]="inline" [class.gap-3]="inline">
+  @for (opt of options; track opt.value; let idx = $index) {
+    <div class="form-check" [class.form-check-inline]="inline">
+      <input
+        [id]="id + '-' + idx"
+        type="radio"
+        [name]="name"
+        class="form-check-input"
+        [value]="opt.value"
+        [checked]="value() === opt.value"
+        [disabled]="disabled()"
+        (change)="handleValueChange(opt.value)"
+        (blur)="handleBlur()"
+      />
+      <label class="form-check-label" [attr.for]="id + '-' + idx">
+        {{ opt.label }}
+      </label>
+    </div>
+  }
+</div>

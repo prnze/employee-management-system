@@ -5,7 +5,8 @@ import { TranslatePipe } from '@ngx-translate/core';
   selector: 'app-footer',
   standalone: true,
   imports: [TranslatePipe],
-  template: `<footer class="border-top bg-body px-3 py-2 small text-body-secondary">{{ 'FOOTER_TEXT' | translate }}</footer>`,
+  templateUrl: './footer.component.html',
+  styleUrl: './footer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FooterComponent {}

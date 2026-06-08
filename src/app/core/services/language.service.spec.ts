@@ -47,7 +47,7 @@ describe('LanguageService', () => {
   it('should compute current language object', () => {
     const lang = service.currentLanguage();
     expect(lang.code).toBe('en');
-    expect(lang.flag).toBeTruthy();
+    expect(lang.locale).toBeTruthy();
     expect(lang.name).toBeTruthy();
   });
 

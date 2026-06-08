@@ -3,24 +3,8 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 @Component({
   selector: 'app-pagination',
   standalone: true,
-  template: `
-    <nav aria-label="Table pagination" class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
-      <small class="text-body-secondary">Page {{ page() }} of {{ totalPages() }}</small>
-      <ul class="pagination mb-0">
-        <li class="page-item" [class.disabled]="page() === 1">
-          <button class="page-link" type="button" aria-label="Previous page" (click)="goTo(page() - 1)">Previous</button>
-        </li>
-        @for (item of pages(); track item) {
-          <li class="page-item" [class.active]="item === page()">
-            <button class="page-link" type="button" [attr.aria-label]="'Go to page ' + item" (click)="goTo(item)">{{ item }}</button>
-          </li>
-        }
-        <li class="page-item" [class.disabled]="page() === totalPages()">
-          <button class="page-link" type="button" aria-label="Next page" (click)="goTo(page() + 1)">Next</button>
-        </li>
-      </ul>
-    </nav>
-  `,
+  templateUrl: './pagination.component.html',
+  styleUrl: './pagination.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PaginationComponent {

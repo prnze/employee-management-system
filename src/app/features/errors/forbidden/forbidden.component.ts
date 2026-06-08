@@ -6,13 +6,8 @@ import { TranslatePipe } from '@ngx-translate/core';
   selector: 'app-forbidden',
   standalone: true,
   imports: [RouterLink, TranslatePipe],
-  template: `
-    <main class="container py-5 text-center">
-      <h1>403</h1>
-      <p>{{ 'ERROR_403_MSG' | translate }}</p>
-      <a class="btn btn-primary" routerLink="/">{{ 'ERROR_403_HOME' | translate }}</a>
-    </main>
-  `,
+  templateUrl: './forbidden.component.html',
+  styleUrl: './forbidden.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ForbiddenComponent {}

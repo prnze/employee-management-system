@@ -4,40 +4,24 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '@core/auth/auth.service';
 import { LoaderComponent } from '@shared/components/loader/loader.component';
+import { FormFieldComponent } from '@shared/form-controls/form-field/form-field.component';
+import { InputComponent } from '@shared/form-controls/input/input.component';
+import { CheckboxComponent } from '@shared/form-controls/checkbox/checkbox.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, LoaderComponent, TranslatePipe],
-  template: `
-    <h1 class="h3 mb-1">{{ 'AUTH_SIGN_IN' | translate }}</h1>
-    <p class="text-body-secondary">{{ 'AUTH_DEMO_HINT' | translate }}</p>
-    @if (error()) { <div class="alert alert-danger" role="alert">{{ error() }}</div> }
-    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <div class="mb-3">
-        <label class="form-label" for="email">{{ 'AUTH_EMAIL' | translate }}</label>
-        <input id="email" class="form-control" type="email" formControlName="email" autocomplete="email" />
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="password">{{ 'AUTH_PASSWORD' | translate }}</label>
-        <input id="password" class="form-control" type="password" formControlName="password" autocomplete="current-password" />
-      </div>
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <label class="form-check">
-          <input class="form-check-input" type="checkbox" formControlName="rememberMe" />
-          <span class="form-check-label">{{ 'AUTH_REMEMBER_ME' | translate }}</span>
-        </label>
-        <a routerLink="/auth/forgot-password">{{ 'AUTH_FORGOT_PASSWORD' | translate }}</a>
-      </div>
-      <button class="btn btn-primary w-100" type="submit" [disabled]="form.invalid || loading()">
-        @if (loading()) {
-          <app-loader [label]="'AUTH_SIGNING_IN' | translate" />
-        } @else {
-          {{ 'AUTH_SIGN_IN_BTN' | translate }}
-        }
-      </button>
-    </form>
-  `,
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    LoaderComponent,
+    TranslatePipe,
+    FormFieldComponent,
+    InputComponent,
+    CheckboxComponent
+  ],
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent {

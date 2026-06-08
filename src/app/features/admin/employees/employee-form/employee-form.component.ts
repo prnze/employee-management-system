@@ -9,25 +9,8 @@ import { UnsavedChangesAware } from '@core/guards/unsaved-changes.guard';
   selector: 'app-employee-form',
   standalone: true,
   imports: [ReactiveFormsModule],
-  template: `
-    <section class="surface p-3">
-      <h1 class="h3">{{ employee ? 'Edit' : 'Create' }} employee</h1>
-      <form [formGroup]="form" (ngSubmit)="submit()" class="row g-3">
-        <div class="col-md-6"><label class="form-label">First name</label><input class="form-control" formControlName="firstName" /></div>
-        <div class="col-md-6"><label class="form-label">Last name</label><input class="form-control" formControlName="lastName" /></div>
-        <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" type="email" formControlName="email" /></div>
-        <div class="col-md-6"><label class="form-label">Phone</label><input class="form-control" formControlName="phone" /></div>
-        <div class="col-md-4"><label class="form-label">Department</label><input class="form-control" formControlName="department" /></div>
-        <div class="col-md-4"><label class="form-label">Designation</label><input class="form-control" formControlName="designation" /></div>
-        <div class="col-md-4"><label class="form-label">Manager</label><input class="form-control" formControlName="manager" /></div>
-        <div class="col-md-4"><label class="form-label">Location</label><input class="form-control" formControlName="location" /></div>
-        <div class="col-md-4"><label class="form-label">Status</label><select class="form-select" formControlName="status"><option>Active</option><option>Inactive</option><option>On Leave</option></select></div>
-        <div class="col-md-4"><label class="form-label">Joined</label><input class="form-control" type="date" formControlName="joinedAt" /></div>
-        <div class="col-md-4"><label class="form-label">Salary</label><input class="form-control" type="number" formControlName="salary" /></div>
-        <div class="col-12 d-flex justify-content-end gap-2"><button class="btn btn-outline-secondary" type="button" (click)="cancel()">Cancel</button><button class="btn btn-primary" type="submit" [disabled]="form.invalid || saving()">{{ saving() ? 'Saving...' : 'Save employee' }}</button></div>
-      </form>
-    </section>
-  `,
+  templateUrl: './employee-form.component.html',
+  styleUrl: './employee-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeeFormComponent implements UnsavedChangesAware {

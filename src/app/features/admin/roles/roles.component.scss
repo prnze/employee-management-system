@@ -1,0 +1,16 @@
+    .permission-card {
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      cursor: default;
+    }
+    .permission-card--granted {
+      background-color: var(--bs-success-bg-subtle);
+      border-color: var(--bs-success-border-subtle) !important;
+    }
+    .permission-card--denied {
+      background-color: var(--bs-body-bg);
+      border-color: var(--bs-border-color) !important;
+    }
+    .form-check-input {
+      cursor: pointer;
+    }
+  

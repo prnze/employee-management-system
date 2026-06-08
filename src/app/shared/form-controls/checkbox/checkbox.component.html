@@ -1,0 +1,16 @@
+<div class="form-check">
+  <input
+    [id]="id"
+    type="checkbox"
+    class="form-check-input"
+    [checked]="value() ?? false"
+    [disabled]="disabled()"
+    (change)="handleValueChange($any($event.target).checked)"
+    (blur)="handleBlur()"
+  />
+  @if (label) {
+    <label class="form-check-label" [attr.for]="id">
+      {{ label }}
+    </label>
+  }
+</div>

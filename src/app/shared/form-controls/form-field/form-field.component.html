@@ -1,0 +1,24 @@
+<div class="form-field-wrapper mb-3">
+  @if (label) {
+    <label [attr.for]="id" class="form-label fw-semibold mb-1 d-flex align-items-center gap-1">
+      <span>{{ label | translate }}</span>
+      @if (required) {
+        <span class="text-danger" aria-hidden="true">*</span>
+      }
+    </label>
+  }
+
+  <div class="form-field-control position-relative">
+    <ng-content></ng-content>
+  </div>
+
+  @if (hint) {
+    <div class="form-text text-body-secondary small mt-1">
+      {{ hint | translate }}
+    </div>
+  }
+
+  @if (control) {
+    <app-validation-errors [control]="control"></app-validation-errors>
+  }
+</div>

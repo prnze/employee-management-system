@@ -7,6 +7,7 @@ import { StorageService } from '@core/services/storage.service';
 export class AuthStateService {
   private readonly userSignal = signal<AuthUser | null>(null);
   readonly user = this.userSignal.asReadonly();
+  readonly organization = signal<string>(localStorage.getItem('ems_org_name') || 'Acme People Ops');
   readonly isAuthenticated = computed(() => Boolean(this.userSignal()));
   readonly role = computed(() => this.userSignal()?.role ?? null);
   readonly permissions = computed(() => this.userSignal()?.permissions ?? []);

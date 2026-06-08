@@ -11,28 +11,8 @@ import { ThemeService } from '@core/services/theme.service';
   selector: 'app-doughnut-chart',
   standalone: true,
   imports: [BaseChartDirective],
-  template: `
-    <div class="chart-wrapper position-relative" [style.height]="height()">
-      @if (loading()) {
-        <div class="d-flex align-items-center justify-content-center h-100 text-body-secondary">
-          <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
-          Loading chart…
-        </div>
-      } @else if (chartData().datasets[0]?.data?.length === 0) {
-        <div class="d-flex align-items-center justify-content-center h-100 text-body-secondary fst-italic">
-          No data available
-        </div>
-      } @else {
-        <canvas baseChart
-          [type]="'doughnut'"
-          [data]="chartData()"
-          [options]="options()"
-          [plugins]="[]"
-          aria-label="Doughnut chart">
-        </canvas>
-      }
-    </div>
-  `,
+  templateUrl: './doughnut-chart.component.html',
+  styleUrl: './doughnut-chart.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DoughnutChartComponent {

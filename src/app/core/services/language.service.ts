@@ -4,15 +4,13 @@ import { TranslateService } from '@ngx-translate/core';
 export interface Language {
   code: string;
   name: string;
-  /** Unicode flag emoji — no external icon library required. */
-  flag: string;
   /** BCP-47 locale for date/number formatting. */
   locale: string;
 }
 
 export const SUPPORTED_LANGUAGES: Language[] = [
-  { code: 'en', name: 'English', flag: '🇬🇧', locale: 'en-GB' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪', locale: 'de-DE' }
+  { code: 'en', name: 'English', locale: 'en-GB' },
+  { code: 'de', name: 'Deutsch', locale: 'de-DE' }
 ];
 
 const STORAGE_KEY = 'ems_language';

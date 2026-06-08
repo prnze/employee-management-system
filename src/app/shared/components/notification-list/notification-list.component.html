@@ -1,0 +1,172 @@
+<!-- ── Header ─────────────────────────────────────────────── -->
+<div class="welcome-banner mb-4 p-4 rounded-4 position-relative overflow-hidden shadow-sm">
+  <div class="welcome-banner-glow"></div>
+  <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 fw-bold mb-1 welcome-title">{{ 'NOTIF_CENTER' | translate }}</h1>
+      <p class="welcome-subtitle mb-0 d-flex align-items-center gap-2">
+        <app-icon [icon]="APP_ICONS.NOTIFICATIONS" class="welcome-icon" aria-hidden="true"></app-icon>
+        <span>{{ svc.unreadCount() }} {{ 'NOTIF_UNREAD' | translate }} · {{ svc.all().length }} {{ 'NOTIF_TOTAL' | translate }}</span>
+      </p>
+    </div>
+    @if (svc.unreadCount() > 0) {
+      <button *appPermission="{ module: 'notifications', action: 'view' }" class="btn btn-premium-primary d-flex align-items-center gap-2" type="button" (click)="markAllRead()">
+        <app-icon [icon]="APP_ICONS.SUCCESS" aria-hidden="true"></app-icon>
+        <span>{{ 'NOTIF_MARK_ALL_READ' | translate }}</span>
+      </button>
+    }
+  </div>
+</div>
+
+<!-- ── Filters ─────────────────────────────────────────────── -->
+<form [formGroup]="filterForm" class="surface filter-card p-4 mb-4" [attr.aria-label]="'NOTIF_CENTER' | translate">
+  <div class="row g-3">
+    <div class="col-12 col-md-4">
+      <div class="position-relative search-input-wrapper">
+        <app-icon [icon]="APP_ICONS.SEARCH" class="position-absolute start-3 text-muted search-icon" [size]="18" aria-hidden="true"></app-icon>
+        <input class="form-control" [placeholder]="'NOTIF_SEARCH' | translate" formControlName="query"
+          [attr.aria-label]="'NOTIF_SEARCH' | translate" />
+        @if (filterForm.controls.query.value) {
+          <button class="btn btn-clear position-absolute end-2 top-50 translate-middle-y d-flex align-items-center justify-content-center" type="button"
+            [attr.aria-label]="'COMMON_RESET' | translate" (click)="filterForm.controls.query.setValue('')">
+            <app-icon [icon]="APP_ICONS.CLOSE" [size]="16" aria-hidden="true"></app-icon>
+          </button>
+        }
+      </div>
+    </div>
+    <div class="col-6 col-md-2">
+      <select class="form-select" formControlName="category" [attr.aria-label]="'NOTIF_ALL_CATS' | translate">
+        <option value="">{{ 'NOTIF_ALL_CATS' | translate }}</option>
+        @for (c of categories; track c) { <option [value]="c">{{ c }}</option> }
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <select class="form-select" formControlName="priority" [attr.aria-label]="'NOTIF_ALL_PRIORITIES' | translate">
+        <option value="">{{ 'NOTIF_ALL_PRIORITIES' | translate }}</option>
+        @for (p of priorities; track p) { <option [value]="p">{{ p }}</option> }
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <select class="form-select" formControlName="status" [attr.aria-label]="'NOTIF_ALL_STATUSES' | translate">
+        <option value="all">{{ 'NOTIF_ALL_STATUSES' | translate }}</option>
+        <option value="unread">{{ 'NOTIF_STATUS_UNREAD' | translate }}</option>
+        <option value="read">{{ 'NOTIF_STATUS_READ' | translate }}</option>
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <button class="btn btn-outline-secondary w-100 btn-reset d-flex align-items-center justify-content-center gap-2" type="button" (click)="resetFilters()">
+        <app-icon [icon]="APP_ICONS.SORT_NONE" aria-hidden="true" [size]="16"></app-icon>
+        <span>{{ 'COMMON_RESET' | translate }}</span>
+      </button>
+    </div>
+  </div>
+</form>
+
+<!-- ── Active filter chips ──────────────────────────────────── -->
+<div class="mb-3">
+  <app-filter-chips
+    [chips]="activeChips()"
+    (remove)="clearChip($event)"
+    (clearAll)="resetFilters()"></app-filter-chips>
+</div>
+
+<!-- ── Result count ─────────────────────────────────────────── -->
+<p class="text-body-secondary small mb-3 result-count-text">
+  {{ 'COMMON_SHOWING' | translate }} <strong class="text-body">{{ pagedItems().length }}</strong> {{ 'COMMON_OF' | translate }} <strong class="text-body">{{ filtered().length }}</strong> {{ (filtered().length === 1 ? 'NOTIF_NOTIFICATION' : 'NOTIF_NOTIFICATIONS') | translate }}
+</p>
+
+<!-- ── Notification list ─────────────────────────────────────── -->
+@if (loading()) {
+  <!-- Skeleton -->
+  <div class="d-flex flex-column gap-3">
+    @for (i of [1,2,3,4]; track i) {
+      <div class="surface p-4 placeholder-glow skeleton-card rounded-4" aria-hidden="true">
+        <div class="d-flex gap-3">
+          <span class="placeholder rounded-circle" style="width:48px;height:48px;flex-shrink:0"></span>
+          <div class="flex-grow-1">
+            <span class="placeholder col-4 d-block mb-2 rounded" style="height:1.2rem"></span>
+            <span class="placeholder col-8 d-block rounded mb-2" style="height:.8rem"></span>
+            <span class="placeholder col-2 d-block rounded" style="height:.8rem"></span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+} @else if (filtered().length === 0) {
+  <!-- Empty state -->
+  <div class="surface p-5 text-center text-body-secondary empty-state-card rounded-4">
+    <div class="fs-1 text-muted mb-3"><app-icon [icon]="APP_ICONS.NOTIFICATIONS" [size]="56" aria-hidden="true"></app-icon></div>
+    <h2 class="h5 fw-bold text-body mb-2">{{ 'NOTIF_NONE_FOUND' | translate }}</h2>
+    <p class="small text-body-secondary mb-4 mx-auto" style="max-width: 320px;">{{ 'NOTIF_ADJUST_FILTERS' | translate }}</p>
+    <button class="btn btn-premium-secondary px-4 d-inline-flex align-items-center gap-2 mx-auto" type="button" (click)="resetFilters()">
+      <app-icon [icon]="APP_ICONS.SORT_NONE" aria-hidden="true"></app-icon>
+      <span>{{ 'NOTIF_CLEAR_FILTERS' | translate }}</span>
+    </button>
+  </div>
+
+} @else {
+  <div class="d-flex flex-column gap-3 mb-4">
+    @for (n of pagedItems(); track n.id) {
+      <article class="surface p-4 notif-card rounded-4 d-flex gap-3 position-relative overflow-hidden" 
+        [class.unread]="!n.read"
+        [class]="'priority-border-' + n.priority.toLowerCase()"
+        [attr.aria-label]="(!n.read ? ('NOTIF_STATUS_UNREAD' | translate) + ': ' : '') + n.title">
+        
+        <!-- Icon -->
+        <div class="notif-icon-wrapper rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" [class]="n.type.toLowerCase()">
+          <app-icon [icon]="typeIcon(n.type)" [size]="20" aria-hidden="true"></app-icon>
+        </div>
+
+        <!-- Body -->
+        <div class="flex-grow-1 min-w-0">
+          <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap mb-2">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <h2 class="h6 mb-0 notif-title" [class.fw-bold]="!n.read" [class.text-muted]="n.read">
+                {{ n.title }}
+              </h2>
+              <span class="badge priority-badge" [class]="priorityClass(n.priority)">{{ n.priority }}</span>
+              <span class="badge category-badge" [class]="categoryClass(n.category)">{{ n.category }}</span>
+              @if (!n.read) {
+                <span class="badge text-bg-primary new-badge">{{ 'NOTIF_NEW_BADGE' | translate }}</span>
+              }
+            </div>
+            <span class="text-body-secondary small text-nowrap flex-shrink-0 notif-time">
+              {{ n.createdAt | appDate:'medium' }}
+            </span>
+          </div>
+          <p class="mb-3 small text-body-secondary notif-msg">{{ n.message }}</p>
+          
+          <!-- Actions -->
+          <div class="d-flex flex-wrap gap-3 notif-actions border-top pt-3">
+            @if (!n.read) {
+              <button *appPermission="{ module: 'notifications', action: 'view' }" class="btn btn-action-link" type="button" (click)="markRead(n.id)">
+                <app-icon [icon]="APP_ICONS.SUCCESS" [size]="16" aria-hidden="true"></app-icon>
+                <span>{{ 'NOTIF_MARK_READ' | translate }}</span>
+              </button>
+            }
+            @if (n.link) {
+              <a class="btn btn-action-link" [routerLink]="n.link">
+                <app-icon [icon]="APP_ICONS.ARROW_FORWARD" [size]="16" aria-hidden="true"></app-icon>
+                <span>{{ 'NOTIF_VIEW_DETAILS' | translate }}</span>
+              </a>
+            }
+            <button *appPermission="{ module: 'notifications', action: 'view' }" class="btn btn-action-link text-danger-hover ms-md-auto" type="button" (click)="confirmDelete(n.id)">
+              <app-icon [icon]="APP_ICONS.DELETE" [size]="16" aria-hidden="true"></app-icon>
+              <span>{{ 'COMMON_DELETE' | translate }}</span>
+            </button>
+          </div>
+        </div>
+      </article>
+    }
+  </div>
+
+  <!-- ── Pagination ───────────────────────────────────────── -->
+  @if (totalPages() > 1) {
+    <app-pagination
+      [page]="page()"
+      [pageSize]="pageSize"
+      [total]="filtered().length"
+      (pageChange)="setPage($event)"></app-pagination>
+  }
+}

@@ -1,0 +1,10 @@
+<input
+  [id]="id"
+  type="date"
+  class="form-control"
+  [placeholder]="placeholder"
+  [value]="value() ?? ''"
+  [disabled]="disabled()"
+  (input)="handleValueChange($any($event.target).value)"
+  (blur)="handleBlur()"
+/>

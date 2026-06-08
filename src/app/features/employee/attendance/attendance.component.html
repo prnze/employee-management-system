@@ -1,0 +1,24 @@
+    <h1 class="h3 mb-3">{{ 'ATTEND_TITLE' | translate }}</h1>
+    <div class="surface table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">{{ 'ATTEND_DATE' | translate }}</th>
+            <th scope="col">{{ 'ATTEND_CHECK_IN' | translate }}</th>
+            <th scope="col">{{ 'ATTEND_CHECK_OUT' | translate }}</th>
+            <th scope="col">{{ 'ATTEND_STATUS' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows; track row.date) {
+            <tr>
+              <td>{{ row.date }}</td>
+              <td>{{ row.in }}</td>
+              <td>{{ row.out }}</td>
+              <td><span class="badge text-bg-success">{{ row.status }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  

@@ -1,0 +1,217 @@
+<!-- Language transition overlay (sits above everything) -->
+<app-language-transition #langTransition />
+
+<header class="navbar navbar-expand px-3">
+  <!-- Brand Logo (visible on all screens) -->
+  <a class="navbar-brand fw-bold text-primary text-decoration-none fs-5 d-flex align-items-center gap-2 me-3" routerLink="/">
+    <span class="logo-icon-wrapper d-flex align-items-center justify-content-center">
+      <app-icon icon="bolt" [size]="20" aria-hidden="true"></app-icon>
+    </span>
+    <span class="logo-text">EMS</span>
+  </a>
+
+  <!-- Desktop Sidebar Toggle -->
+  <button class="btn btn-toggle-sidebar btn-sm d-none d-md-flex align-items-center justify-content-center me-2"
+    type="button"
+    (click)="shell.toggleSidebar()"
+    [attr.aria-label]="shell.sidebarCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'">
+    <app-icon [icon]="shell.sidebarCollapsed() ? 'menu_open' : 'menu'" aria-hidden="true" [size]="18"></app-icon>
+  </button>
+
+  <!-- Mobile Sidebar Toggle -->
+  <button class="btn btn-toggle-sidebar d-md-none me-2 d-flex align-items-center justify-content-center" type="button"
+    (click)="shell.openMobileSidebar()"
+    [attr.aria-label]="'NAV_NAVIGATION' | translate">
+    <app-icon icon="menu" aria-hidden="true" [size]="18"></app-icon>
+  </button>
+
+  <!-- Search Area (SaaS Search Box Visual) -->
+  <div class="d-none d-lg-flex align-items-center position-relative search-container ms-2 me-auto">
+    <app-icon [icon]="APP_ICONS.SEARCH" class="position-absolute search-icon" [size]="16" aria-hidden="true"></app-icon>
+    <input type="text" class="form-control search-input" placeholder="Search... (⌘K)" disabled>
+  </div>
+
+  <!-- Current Page Title & Breadcrumb Trail (Align right/center dynamically if needed, or left next to sidebar buttons) -->
+  <div class="d-none d-md-flex align-items-center gap-3 ms-3 me-auto lg-hide">
+    <h1 class="h6 mb-0 text-body fw-bold page-header-title">{{ shell.pageTitle() }}</h1>
+    @if (shell.breadcrumbs().length > 0) {
+      <span class="text-muted opacity-50">/</span>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 small-breadcrumb">
+          @for (crumb of shell.breadcrumbs(); track crumb.label; let last = $last) {
+            <li class="breadcrumb-item" [class.active]="last" [attr.aria-current]="last ? 'page' : null">
+              @if (last || !crumb.route) {
+                <span>{{ crumb.label }}</span>
+              } @else {
+                <a [routerLink]="crumb.route" class="text-decoration-none">{{ crumb.label }}</a>
+              }
+            </li>
+          }
+        </ol>
+      </nav>
+    }
+  </div>
+
+  <div class="ms-auto d-flex align-items-center gap-2">
+
+    <!-- Language selector -->
+    <div class="dropdown">
+      <button class="btn btn-navbar-action btn-sm dropdown-toggle d-flex align-items-center gap-2"
+        type="button" data-bs-toggle="dropdown" aria-expanded="false"
+        [attr.aria-label]="'LANG_SELECT' | translate">
+        <app-icon [icon]="APP_ICONS.LANGUAGE" aria-hidden="true" [size]="18"></app-icon>
+        <span class="d-none d-md-inline small-lang-text fw-medium">{{ langSvc.currentLanguage().name }}</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm border border-opacity-10 rounded-3 mt-2">
+        @for (lang of languages; track lang.code) {
+          <li>
+            <button class="dropdown-item d-flex align-items-center gap-2 py-2"
+              type="button"
+              [class.active]="lang.code === langSvc.currentCode()"
+              (click)="switchLanguage(lang.code)">
+              <app-icon [icon]="APP_ICONS.LANGUAGE" aria-hidden="true" [size]="16"></app-icon>
+              <span class="small fw-medium">{{ lang.code === 'en' ? ('LANG_ENGLISH' | translate) : ('LANG_GERMAN' | translate) }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <!-- Theme toggle (Sun/Moon Switcher) -->
+    <button class="btn btn-navbar-action btn-sm d-flex align-items-center justify-content-center" type="button"
+      [attr.aria-label]="'THEME_TOGGLE' | translate"
+      [title]="theme.theme() === 'light' ? ('THEME_DARK' | translate) : ('THEME_LIGHT' | translate)"
+      (click)="theme.toggle()">
+      <app-icon [icon]="theme.theme() === 'light' ? 'dark_mode' : 'light_mode'" aria-hidden="true" [size]="18"></app-icon>
+    </button>
+
+    <!-- Notification bell -->
+    <div class="dropdown">
+      <button class="btn btn-navbar-action btn-sm bell-btn position-relative d-flex align-items-center justify-content-center"
+        type="button" id="notif-dropdown-btn"
+        data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
+        [attr.aria-label]="('NOTIF_TITLE' | translate) + ' — ' + notifications.unreadCount() + ' ' + ('NOTIF_UNREAD' | translate)">
+        <app-icon [icon]="APP_ICONS.NOTIFICATIONS" aria-hidden="true" [size]="18"></app-icon>
+        @if (notifications.unreadCount() > 0) {
+          <span class="unread-badge" aria-hidden="true">
+            {{ notifications.unreadCount() > 99 ? '99+' : notifications.unreadCount() }}
+          </span>
+        }
+      </button>
+
+      <div class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg p-0 mt-2 border">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between px-3 py-3 border-bottom bg-body-tertiary rounded-top-3">
+          <strong class="fw-bold" style="font-size: 0.9rem;">{{ 'NOTIF_TITLE' | translate }}</strong>
+          <div class="d-flex gap-2">
+            @if (notifications.unreadCount() > 0) {
+              <button class="btn btn-link btn-sm p-0 small text-decoration-none fw-semibold" type="button" (click)="markAllRead()">
+                {{ 'NOTIF_MARK_ALL' | translate }}
+              </button>
+            }
+            <a class="btn btn-link btn-sm p-0 small text-decoration-none fw-semibold" [routerLink]="notificationsRoute()">
+              {{ 'NOTIF_VIEW_ALL' | translate }}
+            </a>
+          </div>
+        </div>
+
+        <!-- Preview list -->
+        <div class="notif-list-container" style="max-height: 280px; overflow-y: auto;">
+          @if (previewItems().length > 0) {
+            @for (n of previewItems(); track n.id) {
+              <div class="notif-item px-3 py-3 border-bottom d-flex gap-3"
+                [class.unread]="!n.read" [class.read]="n.read"
+                style="cursor:pointer" (click)="handleNotifClick(n)">
+                <span class="priority-dot mt-1.5" [style.background]="priorityColor(n.priority)"></span>
+                <div class="flex-grow-1 min-w-0">
+                  <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                    <p class="mb-0 small fw-bold text-truncate" [class.text-body-secondary]="n.read">{{ n.title }}</p>
+                    <span class="badge flex-shrink-0 notif-category-badge" [class]="categoryClass(n.category)">{{ n.category }}</span>
+                  </div>
+                  <p class="mb-1 small text-body-secondary text-truncate-2">{{ n.message }}</p>
+                  <p class="mb-0 small text-muted text-time">{{ n.createdAt | appDate:'shortTime' }}</p>
+                </div>
+                @if (!n.read) {
+                  <span class="unread-glow-dot align-self-center flex-shrink-0"></span>
+                }
+              </div>
+            }
+          } @else {
+            <div class="px-3 py-5 text-center text-body-secondary">
+              <div class="fs-2 mb-2 text-muted"><app-icon [icon]="APP_ICONS.NOTIFICATIONS" [size]="36" aria-hidden="true"></app-icon></div>
+              <p class="small mb-0 fw-medium">{{ 'NOTIF_ALL_CAUGHT_UP' | translate }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- Footer -->
+        <div class="px-3 py-2 text-center border-top">
+          <a class="btn btn-view-all-notifs btn-sm w-100 fw-semibold" [routerLink]="notificationsRoute()">
+            {{ 'NOTIF_VIEW_ALL' | translate }} ({{ notifications.all().length }})
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Area (Hover-triggered card) -->
+    <div class="profile-container position-relative ms-1">
+      <div class="profile-trigger d-flex align-items-center gap-2" style="cursor: pointer;">
+        <div class="avatar-circle rounded-circle d-flex align-items-center justify-content-center text-white fw-bold">
+          {{ authState.user()?.fullName | initials }}
+        </div>
+        <span class="profile-username d-none d-md-inline fw-semibold text-body">{{ authState.user()?.fullName }}</span>
+        <app-icon icon="arrow_drop_down" [size]="16" class="text-muted dropdown-arrow"></app-icon>
+      </div>
+
+      <!-- Profile Hover Card -->
+      <div class="profile-hover-card shadow-lg p-3 rounded-4 bg-body border position-absolute">
+        <div class="d-flex flex-column align-items-center text-center gap-2 mb-3">
+          <div class="avatar-circle-lg rounded-circle d-flex align-items-center justify-content-center text-white fw-bold">
+            {{ authState.user()?.fullName | initials }}
+          </div>
+          <div class="w-100 min-w-0">
+            <div class="fw-bold text-body text-truncate" [title]="authState.user()?.fullName">{{ authState.user()?.fullName }}</div>
+            <div class="text-muted small text-truncate fw-medium">{{ displayRole() }}</div>
+          </div>
+        </div>
+        
+        <div class="profile-info-list border-top border-bottom py-2 my-2 small text-start">
+          <div class="d-flex align-items-center gap-2 py-1.5 text-muted text-truncate" [title]="authState.user()?.email">
+            <app-icon icon="mail" [size]="16" class="flex-shrink-0"></app-icon>
+            <span class="text-truncate text-body-secondary fw-medium">{{ authState.user()?.email }}</span>
+          </div>
+          @if (orgName() && orgName().trim()) {
+            <div class="d-flex align-items-center gap-2 py-1.5 text-muted text-truncate" [title]="orgName()">
+              <app-icon icon="business" [size]="16" class="flex-shrink-0"></app-icon>
+              <span class="text-truncate text-body-secondary fw-medium">{{ orgName() }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="profile-actions d-flex flex-column gap-1 w-100">
+          <a class="btn btn-sm btn-profile-item text-start d-flex align-items-center gap-2" routerLink="/profile">
+            <app-icon icon="person" [size]="16"></app-icon>
+            <span>Profile</span>
+          </a>
+          <a class="btn btn-sm btn-profile-item text-start d-flex align-items-center gap-2" routerLink="/account/change-password">
+            <app-icon icon="lock" [size]="16"></app-icon>
+            <span>Change Password</span>
+          </a>
+          <button class="btn btn-sm btn-profile-item-danger text-start d-flex align-items-center gap-2" type="button" (click)="logout()">
+            <app-icon icon="logout" [size]="16"></app-icon>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Persistent Accessible Logout Button -->
+    <button class="btn btn-navbar-action btn-sm logout-btn ms-1 d-flex align-items-center justify-content-center text-danger-hover"
+      type="button"
+      (click)="logout()"
+      title="Logout"
+      aria-label="Logout">
+      <app-icon icon="logout" aria-hidden="true" [size]="18"></app-icon>
+    </button>
+  </div>
+</header>

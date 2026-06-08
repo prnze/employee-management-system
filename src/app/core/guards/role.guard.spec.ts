@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { AuthStateService } from '@core/auth/auth-state.service';
-import { PermissionsService } from '@core/auth/permissions.service';
+import { PermissionService } from '@core/auth/permission.service';
 import { AuthUser } from '@core/models/auth.models';
 import { roleGuard } from './role.guard';
 
@@ -15,7 +15,7 @@ describe('roleGuard', () => {
   };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [provideRouter([]), AuthStateService, PermissionsService] });
+    TestBed.configureTestingModule({ providers: [provideRouter([]), AuthStateService, PermissionService] });
     TestBed.inject(AuthStateService).setUser(user, false);
   });
 

@@ -1,0 +1,15 @@
+<select
+  [id]="id"
+  class="form-select"
+  [value]="value() ?? ''"
+  [disabled]="disabled()"
+  (change)="handleValueChange($any($event.target).value)"
+  (blur)="handleBlur()"
+>
+  @if (placeholder) {
+    <option value="" disabled selected>{{ placeholder }}</option>
+  }
+  @for (opt of options; track opt.value) {
+    <option [value]="opt.value">{{ opt.label }}</option>
+  }
+</select>

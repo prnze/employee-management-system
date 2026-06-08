@@ -7,10 +7,6 @@ export class GlobalErrorHandler implements ErrorHandler {
 
   handleError(error: unknown): void {
     console.error(error);
-    this.toast.show({
-      title: 'Application error',
-      message: 'A recoverable application error occurred.',
-      type: 'danger'
-    });
+    this.toast.showToast('APP_ERROR_RECOVERABLE', 'error');
   }
 }

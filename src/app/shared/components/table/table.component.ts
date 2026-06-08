@@ -1,61 +1,35 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { TableColumn } from '@core/models/table.models';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { IconComponent } from '../icon/icon.component';
+import { APP_ICONS } from '@core/constants/icon.constants';
 
 @Component({
   selector: 'app-table',
   standalone: true,
-  template: `
-    <div class="table-responsive surface">
-      <table class="table table-hover align-middle mb-0">
-        <thead>
-          <tr>
-            <th scope="col" class="text-center" style="width: 3rem;">
-              <input class="form-check-input" type="checkbox" aria-label="Select all rows" [checked]="allSelected()" (change)="toggleAll()" />
-            </th>
-            @for (column of visibleColumns(); track column.key) {
-              <th scope="col">
-                <button class="btn btn-link p-0 text-decoration-none fw-semibold" type="button" [disabled]="!column.sortable" (click)="sort.emit(column.key)">
-                  {{ column.label }}
-                </button>
-              </th>
-            }
-            <th scope="col" class="text-end">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (row of rows(); track trackById(row)) {
-            <tr>
-              <td class="text-center">
-                <input class="form-check-input" type="checkbox" aria-label="Select row" [checked]="selectedIds().includes(trackById(row))" (change)="toggleRow(row)" />
-              </td>
-              @for (column of visibleColumns(); track column.key) {
-                <td>{{ row[column.key] }}</td>
-              }
-              <td class="text-end">
-                <ng-content />
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td [attr.colspan]="visibleColumns().length + 2" class="text-center py-5 text-body-secondary">No records found.</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  `,
+  imports: [NgTemplateOutlet, TranslateModule, EmptyStateComponent, IconComponent],
+  templateUrl: './table.component.html',
+  styleUrl: './table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableComponent<T extends { id: string }> {
+  readonly APP_ICONS = APP_ICONS;
   readonly rows = input.required<T[]>();
   readonly columns = input.required<TableColumn<T>[]>();
   readonly selectedIds = input<string[]>([]);
-  readonly selectionChange = output<string[]>();
-  readonly sort = output<keyof T>();
+  readonly selectable = input<boolean>(false);
+  readonly rowClickable = input<boolean>(false);
+  readonly sortStack = input<{ field: string; direction: 'asc' | 'desc' }[]>([]);
+  readonly emptyTitle = input<string>('AUDIT_NONE_FOUND');
+  readonly emptyMessage = input<string>('AUDIT_ADJUST');
 
-  visibleColumns(): TableColumn<T>[] {
-    return this.columns().filter((column) => column.visible !== false);
-  }
+  readonly selectionChange = output<string[]>();
+  readonly sort = output<keyof T | string>();
+  readonly rowClick = output<T>();
+
+  readonly visibleColumns = computed(() => this.columns().filter((column) => column.visible !== false));
 
   allSelected(): boolean {
     return this.rows().length > 0 && this.rows().every((row) => this.selectedIds().includes(row.id));
@@ -72,5 +46,37 @@ export class TableComponent<T extends { id: string }> {
 
   trackById(row: T): string {
     return row.id;
+  }
+
+  getRowValue(row: T, key: keyof T | string): any {
+    return (row as any)[key];
+  }
+
+  onRowClick(row: T): void {
+    if (this.rowClickable()) {
+      this.rowClick.emit(row);
+    }
+  }
+
+  onSort(key: keyof T | string): void {
+    this.sort.emit(key);
+  }
+
+  isSorted(key: string): boolean {
+    return this.sortStack().some(e => e.field === key);
+  }
+
+  getSortDirection(key: string): 'asc' | 'desc' | null {
+    const entry = this.sortStack().find(e => e.field === key);
+    return entry ? entry.direction : null;
+  }
+
+  getSortIcon(key: string): string {
+    const dir = this.getSortDirection(key);
+    return dir === 'asc' ? APP_ICONS.SORT_UP : APP_ICONS.SORT_DOWN;
+  }
+
+  sortStackIndex(key: string): number {
+    return this.sortStack().findIndex(e => e.field === key) + 1;
   }
 }

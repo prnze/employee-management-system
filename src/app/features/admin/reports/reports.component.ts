@@ -7,20 +7,8 @@ const REPORT_NAMES = ['REPORTS_HEADCOUNT', 'REPORTS_ATTENDANCE', 'REPORTS_PAYROL
   selector: 'app-reports',
   standalone: true,
   imports: [TranslatePipe],
-  template: `
-    <h1 class="h3 mb-3">{{ 'REPORTS_TITLE' | translate }}</h1>
-    <section class="row g-3">
-      @for (key of reportKeys; track key) {
-        <article class="col-md-6 col-xl-3">
-          <div class="surface p-3">
-            <h2 class="h5">{{ key | translate }}</h2>
-            <p class="text-body-secondary">{{ 'REPORTS_MOCK_DESC' | translate }}</p>
-            <button class="btn btn-outline-primary">{{ 'REPORTS_GENERATE' | translate }}</button>
-          </div>
-        </article>
-      }
-    </section>
-  `,
+  templateUrl: './reports.component.html',
+  styleUrl: './reports.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReportsComponent {
