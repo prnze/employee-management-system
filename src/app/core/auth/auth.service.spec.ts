@@ -1,11 +1,72 @@
 import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
+import { SupabaseService } from '@core/services/supabase.service';
+
+const mockSupabaseClient = {
+  auth: {
+    signInWithPassword: jasmine.createSpy('signInWithPassword').and.callFake((credentials: any) => {
+      if (credentials.email === 'admin@ems.local' && credentials.password === 'Admin@123') {
+        return Promise.resolve({
+          data: {
+            session: {
+              access_token: 'mock-access-token',
+              refresh_token: 'mock-refresh-token',
+              expires_in: 3600,
+              user: { id: 'fe28418e-6dd2-4013-8125-253dce495ec2' }
+            },
+            user: { id: 'fe28418e-6dd2-4013-8125-253dce495ec2' }
+          },
+          error: null
+        });
+      }
+      return Promise.resolve({
+        data: { session: null, user: null },
+        error: new Error('Invalid email or password')
+      });
+    }),
+    signOut: jasmine.createSpy('signOut').and.returnValue(Promise.resolve({ error: null })),
+    getSession: jasmine.createSpy('getSession').and.returnValue(Promise.resolve({ data: { session: null }, error: null }))
+  },
+  from: jasmine.createSpy('from').and.callFake((table: string) => {
+    return {
+      select: jasmine.createSpy('select').and.callFake(() => {
+        return {
+          eq: jasmine.createSpy('eq').and.callFake(() => {
+            return {
+              single: jasmine.createSpy('single').and.callFake(() => {
+                return Promise.resolve({
+                  data: {
+                    id: 'fe28418e-6dd2-4013-8125-253dce495ec2',
+                    email: 'admin@ems.local',
+                    first_name: 'Avery',
+                    last_name: 'Admin',
+                    role: 'ADMIN',
+                    status: 'ACTIVE'
+                  },
+                  error: null
+                });
+              })
+            };
+          })
+        };
+      })
+    };
+  })
+};
+
+const mockSupabaseService = {
+  client: mockSupabaseClient
+};
 
 describe('AuthService', () => {
   let service: AuthService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: SupabaseService, useValue: mockSupabaseService }
+      ]
+    });
     service = TestBed.inject(AuthService);
   });
 

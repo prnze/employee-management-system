@@ -1,57 +1,50 @@
 import { Injectable } from '@angular/core';
-import { delay, map, Observable, of, throwError } from 'rxjs';
-import { APP_ROLES, ROLE_PERMISSIONS } from '@core/constants/roles.constant';
+import { from, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { APP_ROLES, ROLE_PERMISSIONS, AppRole } from '@core/constants/roles.constant';
 import { AuthUser, ChangePasswordRequest, LoginRequest, LoginResponse, ResetPasswordRequest } from '@core/models/auth.models';
 import { AuditService } from '@core/services/audit.service';
+import { SupabaseService } from '@core/services/supabase.service';
 import { AuthStateService } from './auth-state.service';
 import { TokenService } from './token.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly mockUsers: Array<AuthUser & { password: string }> = [
-    {
-      id: 'u-admin',
-      email: 'admin@ems.local',
-      password: 'Admin@123',
-      fullName: 'Avery Admin',
-      role: APP_ROLES.admin,
-      permissions: ROLE_PERMISSIONS.Admin
-    },
-    {
-      id: 'u-employee',
-      email: 'employee@ems.local',
-      password: 'Employee@123',
-      fullName: 'Emerson Employee',
-      role: APP_ROLES.employee,
-      permissions: ROLE_PERMISSIONS.Employee
-    }
-  ];
-
   constructor(
+    private readonly supabase: SupabaseService,
     private readonly authState: AuthStateService,
     private readonly tokenService: TokenService,
     private readonly audit: AuditService
   ) {}
 
   login(request: LoginRequest): Observable<LoginResponse> {
-    const found = this.mockUsers.find((user) => user.email === request.email && user.password === request.password);
-    if (!found) {
-      return throwError(() => new Error('Invalid email or password'));
-    }
-    const { password: _password, ...user } = found;
-    const response: LoginResponse = {
-      user,
-      accessToken: `mock-access-token-${user.role}-${Date.now()}`,
-      refreshToken: `mock-refresh-token-${user.id}-${Date.now()}`,
-      expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString()
-    };
-    return of(response).pipe(
-      delay(350),
-      map((result) => {
-        this.tokenService.setTokens(result.accessToken, result.refreshToken, request.rememberMe, result.expiresAt);
-        this.authState.setUser(result.user, request.rememberMe);
-        this.audit.record(result.user.fullName, 'LOGIN', 'Auth');
-        return result;
+    return from(
+      this.supabase.client.auth.signInWithPassword({
+        email: request.email,
+        password: request.password
+      })
+    ).pipe(
+      switchMap(({ data, error }) => {
+        if (error) {
+          return throwError(() => error);
+        }
+        if (!data.session || !data.user) {
+          return throwError(() => new Error('No session data returned'));
+        }
+        const session = data.session;
+        return this.fetchProfile(session.user.id).pipe(
+          map((user) => {
+            const response: LoginResponse = {
+              user,
+              accessToken: session.access_token,
+              refreshToken: session.refresh_token ?? '',
+              expiresAt: new Date(Date.now() + (session.expires_in ?? 3600) * 1000).toISOString()
+            };
+            this.tokenService.setTokens(response.accessToken, response.refreshToken, request.rememberMe, response.expiresAt);
+            this.authState.setUser(response.user, request.rememberMe);
+            this.audit.record(response.user.fullName, 'LOGIN', 'Auth');
+            return response;
+          })
+        );
       })
     );
   }
@@ -61,27 +54,121 @@ export class AuthService {
     this.audit.record(actor, 'LOGOUT', 'Auth');
     this.authState.clear();
     this.tokenService.clear();
+    void this.supabase.client.auth.signOut();
   }
 
   forgotPassword(email: string): Observable<boolean> {
-    return of(this.mockUsers.some((user) => user.email === email)).pipe(delay(300));
+    return from(
+      this.supabase.client.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`
+      })
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+        return true;
+      })
+    );
   }
 
-  resetPassword(_request: ResetPasswordRequest): Observable<boolean> {
-    return of(true).pipe(delay(300));
+  resetPassword(request: ResetPasswordRequest): Observable<boolean> {
+    return from(
+      this.supabase.client.auth.updateUser({ password: request.password })
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+        return true;
+      })
+    );
   }
 
-  changePassword(_request: ChangePasswordRequest): Observable<boolean> {
-    return of(true).pipe(delay(300));
+  changePassword(request: ChangePasswordRequest): Observable<boolean> {
+    return from(
+      this.supabase.client.auth.updateUser({ password: request.newPassword })
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+        return true;
+      })
+    );
   }
 
   refreshToken(): Observable<{ accessToken: string; expiresAt: string }> {
-    if (!this.tokenService.refreshToken()) {
-      return throwError(() => new Error('Missing refresh token'));
-    }
-    return of({
-      accessToken: `mock-access-token-refreshed-${Date.now()}`,
-      expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString()
-    }).pipe(delay(250));
+    return from(
+      this.supabase.client.auth.refreshSession()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        if (!data.session) throw new Error('Failed to refresh session');
+        
+        const session = data.session;
+        const expiresAt = new Date(Date.now() + (session.expires_in ?? 3600) * 1000).toISOString();
+        this.tokenService.updateAccessToken(session.access_token, expiresAt);
+        
+        return {
+          accessToken: session.access_token,
+          expiresAt: expiresAt
+        };
+      })
+    );
+  }
+
+  restoreSession(): Promise<void> {
+    return new Promise((resolve) => {
+      this.supabase.client.auth.getSession().then(({ data: { session } }) => {
+        if (session && session.user) {
+          const expiresAt = new Date(Date.now() + (session.expires_in ?? 3600) * 1000).toISOString();
+          this.tokenService.setTokens(
+            session.access_token,
+            session.refresh_token ?? '',
+            this.tokenService.rememberMe(),
+            expiresAt
+          );
+          
+          this.fetchProfile(session.user.id).subscribe({
+            next: (authUser) => {
+              this.authState.setUser(authUser, this.tokenService.rememberMe());
+              resolve();
+            },
+            error: (err) => {
+              console.error('Failed to restore session profile:', err);
+              this.logout();
+              resolve();
+            }
+          });
+        } else {
+          this.logout();
+          resolve();
+        }
+      }).catch((err) => {
+        console.error('Get session error during restore:', err);
+        this.logout();
+        resolve();
+      });
+    });
+  }
+
+  private fetchProfile(userId: string): Observable<AuthUser> {
+    return from(
+      this.supabase.client
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single()
+    ).pipe(
+      map((res) => {
+        if (res.error) throw res.error;
+        const dbUser = res.data;
+        const dbRole = (dbUser.role || '').toUpperCase();
+        const mappedRole: AppRole = dbRole === 'ADMIN' ? APP_ROLES.admin : APP_ROLES.employee;
+        return {
+          id: dbUser.id,
+          email: dbUser.email,
+          fullName: `${dbUser.first_name || ''} ${dbUser.last_name || ''}`.trim() || dbUser.email,
+          role: mappedRole,
+          permissions: ROLE_PERMISSIONS[mappedRole],
+          avatarUrl: dbUser.avatar_url || undefined
+        };
+      })
+    );
   }
 }

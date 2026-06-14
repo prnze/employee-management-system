@@ -42,6 +42,7 @@ import { loadingInterceptor } from '@core/interceptors/loading.interceptor';
 import { GlobalErrorHandler } from '@core/error-handling/global-error.handler';
 import { SessionService } from '@core/auth/session.service';
 import { LanguageService } from '@core/services/language.service';
+import { AuthService } from '@core/auth/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -93,6 +94,12 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: (configService: RuntimeConfigService) => () => configService.loadConfig(),
       deps: [RuntimeConfigService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (authService: AuthService) => () => authService.restoreSession(),
+      deps: [AuthService],
       multi: true
     },
 
