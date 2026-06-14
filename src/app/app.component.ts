@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ThemeService } from '@core/services/theme.service';
 import { ToastComponent } from './shared/components/toast/toast.component';
+import { SupabaseService } from './core/services/supabase.service';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +16,18 @@ import { ToastComponent } from './shared/components/toast/toast.component';
 export class AppComponent {
   private readonly theme = inject(ThemeService);
 
-  constructor() {
+  constructor(private supabase: SupabaseService) {
     this.theme.initialize();
+  }
+
+  async ngOnInit() {
+
+    const { data, error } =
+      await this.supabase.client
+        .from('users')
+        .select('*');
+
+    console.log('DATA', data);
+    console.log('ERROR', error);
   }
 }
