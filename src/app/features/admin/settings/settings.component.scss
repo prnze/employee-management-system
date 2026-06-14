@@ -1,0 +1,355 @@
+.welcome-banner {
+  background: linear-gradient(135deg, #09477b 0%, #0f6cbd 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px !important; // Standard uniform border-radius
+  box-shadow: 0 4px 12px rgba(15, 108, 189, 0.1);
+  padding: 1.25rem 1.5rem !important;
+
+  [data-bs-theme="dark"] & {
+    background: linear-gradient(135deg, #0d1624 0%, #152946 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(107, 184, 255, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .welcome-title {
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  }
+
+  .welcome-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.85);
+
+    .welcome-icon {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+  }
+}
+
+.toolbar-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border) !important;
+  border-radius: 8px !important; // Standard uniform border-radius
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+  padding: 0.75rem 1rem !important;
+
+  [data-bs-theme="dark"] & {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.search-settings-wrapper {
+  .search-icon {
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--app-muted) !important;
+  }
+  
+  .form-control {
+    padding-left: 38px;
+    border-radius: 8px !important; // Standard uniform border-radius
+    height: 36px;
+    font-size: 0.85rem;
+  }
+}
+
+.btn-premium-secondary {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px !important; // Standard uniform border-radius
+  padding: 0.25rem 0.75rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #ffffff;
+  }
+
+  [data-bs-theme="dark"] & {
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-color: var(--app-border);
+    
+    &:hover {
+      background: var(--app-bg);
+      border-color: var(--app-brand);
+      color: var(--app-brand);
+    }
+  }
+}
+
+.btn-premium-primary {
+  background: var(--app-brand);
+  color: #ffffff;
+  border: 1px solid var(--app-brand);
+  border-radius: 8px !important; // Standard uniform border-radius
+  font-weight: 600;
+  font-size: 0.825rem;
+  transition: all 0.2s ease;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  [data-bs-theme="dark"] & {
+    color: #111827;
+  }
+
+  &:hover {
+    opacity: 0.95;
+    transform: translateY(-0.5px);
+  }
+}
+
+/* Unified Card & Spacing Alignment */
+.settings-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border) !important;
+  border-radius: 8px !important; // Standard uniform border-radius
+  padding: 1rem 1.25rem !important; // Balanced internal card padding
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; // Consistent internal vertical gap rhythm
+
+  [data-bs-theme="dark"] & {
+    background: #182235;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+/* Section Header Spacing and Hierarchy */
+.settings-section-header {
+  margin-bottom: 4px; // Small vertical gap before fields start
+  
+  h2, h3, h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--app-text);
+    margin-bottom: 2px !important; // Tight gap to description
+  }
+  
+  p {
+    font-size: 0.75rem;
+    color: var(--app-muted);
+    margin-bottom: 8px !important; // Description to content border spacing
+  }
+}
+
+/* Setting Toggle Rows with exact aligned switches */
+.settings-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem; // Balanced internal padding
+  background: rgba(108, 117, 125, 0.01);
+  border: 1px solid var(--app-border);
+  border-radius: 8px !important; // Standard uniform border-radius
+  min-height: 48px; // 20-30% height reduction
+  
+  [data-bs-theme="dark"] & {
+    background: rgba(255, 255, 255, 0.01);
+    border-color: rgba(255, 255, 255, 0.04);
+  }
+
+  .toggle-title {
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: var(--app-text);
+    margin-bottom: 1px !important; // Tight vertical gap
+    display: block;
+  }
+
+  .toggle-desc {
+    font-size: 0.725rem;
+    color: var(--app-muted);
+    display: block;
+  }
+
+  .form-switch {
+    padding-left: 0;
+    margin-bottom: 0;
+    padding-right: 0.75rem; // Pushes switches 16-24px away from the right edge
+    
+    .form-check-input {
+      margin-left: 0;
+      float: none;
+      cursor: pointer;
+      width: 2.1em;
+      height: 1.05em;
+      border-radius: 8px !important; // Standard uniform border-radius
+    }
+  }
+}
+
+/* Inputs and Select Layout rhythm */
+.form-label {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: var(--app-muted) !important;
+  margin-bottom: 4px !important; // Consistent label vertical gap
+}
+
+.form-control, .form-select {
+  border-radius: 8px !important; // Standard uniform border-radius
+  border: 1px solid var(--app-border);
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  height: 34px; // Balanced equal heights
+  font-size: 0.825rem;
+  padding: 0.25rem 0.75rem !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  
+  &:focus {
+    background-color: var(--app-surface);
+    color: var(--app-text);
+    border-color: var(--app-brand);
+    box-shadow: 0 0 0 3px rgba(15, 108, 189, 0.15) !important;
+  }
+}
+
+.bg-light-subtle {
+  background-color: rgba(108, 117, 125, 0.02);
+}
+
+.xxs {
+  font-size: 0.725rem;
+}
+
+.matrix-switch {
+  &:checked {
+    background-color: #198754;
+    border-color: #198754;
+  }
+}
+
+/* Right Sidebar Status entries */
+.score-radial-progress {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--app-surface) 79%, transparent 80% 100%),
+              conic-gradient(#198754 calc(var(--score-pct) * 1%), var(--app-border) 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  
+  [data-bs-theme="dark"] & {
+    background: radial-gradient(closest-side, #182235 79%, transparent 80% 100%),
+                conic-gradient(#198754 calc(var(--score-pct) * 1%), rgba(255, 255, 255, 0.08) 0);
+  }
+}
+
+.settings-metric-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.875rem; // Internal visual padding to prevent card borders hug
+  background: rgba(108, 117, 125, 0.01);
+  border: 1px solid var(--app-border);
+  border-radius: 8px !important; // Standard uniform border-radius
+  font-size: 0.75rem;
+  
+  [data-bs-theme="dark"] & {
+    background: rgba(255, 255, 255, 0.01);
+    border-color: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.settings-change-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.45rem 0.875rem; // Equal visual padding
+  background: rgba(108, 117, 125, 0.01);
+  border: 1px solid var(--app-border);
+  border-radius: 8px !important; // Standard uniform border-radius
+  font-size: 0.725rem;
+  color: var(--app-text);
+  
+  [data-bs-theme="dark"] & {
+    background: rgba(255, 255, 255, 0.01);
+    border-color: rgba(255, 255, 255, 0.04);
+  }
+  
+  .bullet-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+}
+
+/* Floating Bottom Sticky Footer Bar */
+.sticky-footer-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 16px;
+  right: 16px;
+  z-index: 1040;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 8px !important; // Standard uniform border-radius
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 0.875rem 1.25rem;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  
+  [data-bs-theme="dark"] & {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    background: rgba(24, 34, 53, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .pending-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .shadow-glow-warning {
+    box-shadow: 0 0 8px #f59e0b;
+    background-color: #f59e0b;
+  }
+
+  @media (min-width: 992px) {
+    left: 280px;
+    right: 32px;
+  }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(150%); }
+  to { transform: translateY(0); }
+}

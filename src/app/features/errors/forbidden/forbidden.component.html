@@ -1,6 +1,24 @@
-    <main class="container py-5 text-center">
-      <h1>403</h1>
-      <p>{{ 'ERROR_403_MSG' | translate }}</p>
-      <a class="btn btn-primary" routerLink="/">{{ 'ERROR_403_HOME' | translate }}</a>
-    </main>
-  
+<main class="error-page-wrapper d-flex align-items-center justify-content-center">
+  <div class="error-card text-center p-5 rounded-4 shadow border">
+    <div class="error-illustration-wrapper mb-4">
+      <div class="error-pulse-glow bg-danger"></div>
+      <app-icon icon="shield" class="error-icon text-danger" [size]="48" aria-hidden="true"></app-icon>
+    </div>
+    
+    <h1 class="h2 fw-bold text-body mb-2">{{ 'ERROR_403_TITLE' | translate }}</h1>
+    <p class="text-muted small mb-4 mx-auto" style="max-width: 340px;">
+      {{ 'ERROR_403_MSG' | translate }}
+    </p>
+    
+    <div class="d-flex justify-content-center gap-2">
+      <button class="btn btn-premium-primary px-4 py-2" type="button" (click)="requestAccess()">
+        <app-icon icon="vpn_key" [size]="16" class="me-1.5" aria-hidden="true"></app-icon>
+        <span>{{ 'ERROR_403_REQUEST_ACCESS' | translate }}</span>
+      </button>
+      <button class="btn btn-premium-secondary px-4 py-2" type="button" (click)="goBack()">
+        <app-icon icon="arrow_back" [size]="16" class="me-1.5" aria-hidden="true"></app-icon>
+        <span>{{ 'ERROR_403_BACK' | translate }}</span>
+      </button>
+    </div>
+  </div>
+</main>

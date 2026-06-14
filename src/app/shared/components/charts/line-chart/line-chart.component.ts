@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy, Component, computed, effect, inject, input, signal
 } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ChartConfiguration, ChartDataset } from 'chart.js';
 import { MonthlyDataPoint } from '@core/models/analytics.models';
 import { ChartConfigService } from '@core/services/chart-config.service';
@@ -10,7 +11,7 @@ import { ThemeService } from '@core/services/theme.service';
 @Component({
   selector: 'app-line-chart',
   standalone: true,
-  imports: [BaseChartDirective],
+  imports: [BaseChartDirective, TranslatePipe],
   templateUrl: './line-chart.component.html',
   styleUrl: './line-chart.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

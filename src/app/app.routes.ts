@@ -8,6 +8,11 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
+    loadComponent: () => import('@features/landing/landing.component').then((m) => m.LandingComponent)
+  },
+  {
+    path: 'login',
+    pathMatch: 'full',
     redirectTo: 'auth/login'
   },
   {
@@ -36,11 +41,6 @@ export const routes: Routes = [
       const auth = inject(AuthStateService);
       return auth.role() === 'Admin' ? '/admin/profile' : '/employee/profile';
     }
-  },
-  {
-    path: 'account/change-password',
-    canActivate: [authGuard],
-    loadComponent: () => import('@features/auth/change-password/change-password.component').then((m) => m.ChangePasswordComponent)
   },
   {
     path: '403',

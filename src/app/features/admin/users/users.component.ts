@@ -16,13 +16,14 @@ import { TableColumn } from '@core/models/table.models';
 import { PermissionDirective } from '@shared/directives/permission.directive';
 import { UserService } from '@core/services/user.service';
 import { UsersStore } from './users.store';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-users',
   standalone: true,
   imports: [
     ReactiveFormsModule, FormsModule, AppDatePipe, InitialsPipe, IconComponent,
-    PermissionDirective, TableComponent, PaginationComponent, FilterChipsComponent, ModalComponent
+    PermissionDirective, TableComponent, PaginationComponent, FilterChipsComponent, ModalComponent, TranslatePipe
   ],
   styleUrl: './users.component.scss',
   templateUrl: './users.component.html',
@@ -41,11 +42,11 @@ export class UsersComponent {
   readonly actionsTpl = viewChild<TemplateRef<any>>('actionsTpl');
 
   readonly columns = computed<TableColumn<User>[]>(() => [
-    { key: 'fullName', label: 'Name', cellTemplate: this.nameTpl(), sortable: true },
-    { key: 'email', label: 'Email', sortable: true },
-    { key: 'role', label: 'Role', cellTemplate: this.roleTpl(), sortable: true },
-    { key: 'status', label: 'Status', cellTemplate: this.statusTpl(), sortable: true },
-    { key: 'lastLoginAt', label: 'Last Login', cellTemplate: this.lastLoginTpl(), sortable: true },
+    { key: 'fullName', label: 'USER_NAME', cellTemplate: this.nameTpl(), sortable: true },
+    { key: 'email', label: 'USER_EMAIL', sortable: true },
+    { key: 'role', label: 'USER_ROLE', cellTemplate: this.roleTpl(), sortable: true },
+    { key: 'status', label: 'USER_STATUS', cellTemplate: this.statusTpl(), sortable: true },
+    { key: 'lastLoginAt', label: 'USER_LAST_LOGIN', cellTemplate: this.lastLoginTpl(), sortable: true },
     { key: 'actions', label: '', cellTemplate: this.actionsTpl(), headerClass: 'text-end', cellClass: 'text-end' }
   ]);
 

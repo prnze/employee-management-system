@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { IconComponent } from '@shared/components/icon/icon.component';
 import { APP_ICONS } from '@core/constants/icon.constants';
 
@@ -17,7 +18,7 @@ import { APP_ICONS } from '@core/constants/icon.constants';
 @Component({
   selector: 'app-chart-card',
   standalone: true,
-  imports: [IconComponent],
+  imports: [IconComponent, TranslatePipe],
   templateUrl: './chart-card.component.html',
   styleUrl: './chart-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

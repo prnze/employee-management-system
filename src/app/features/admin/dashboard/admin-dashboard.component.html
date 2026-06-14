@@ -24,7 +24,7 @@
 
 <!-- ── KPI Cards ──────────────────────────────────────────── -->
 @if (stats(); as s) {
-  <section class="row g-3 mb-4" aria-label="Key performance indicators">
+  <section class="row g-3 mb-4" [attr.aria-label]="'DASHBOARD_KPI_LABEL' | translate">
     @for (card of kpiCards(s); track card.labelKey) {
       <div class="col-6 col-xl-3">
         <article class="kpi-card p-4 h-100 d-flex flex-column" [style.--kpi-color]="card.color">
@@ -43,7 +43,7 @@
     }
   </section>
 } @else {
-  <section class="row g-3 mb-4" aria-label="Loading metrics">
+  <section class="row g-3 mb-4" [attr.aria-label]="'DASHBOARD_LOADING_METRICS' | translate">
     @for (i of [1,2,3,4]; track i) {
       <div class="col-6 col-xl-3">
         <div class="kpi-card kpi-card-skeleton p-4 placeholder-glow" aria-hidden="true">

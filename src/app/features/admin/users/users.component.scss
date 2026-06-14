@@ -334,38 +334,8 @@
   }
 }
 
-/* Side detail drawer styles */
-.drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
-  z-index: 1055;
-}
-
+/* Side detail drawer custom content styles */
 .drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(480px, 100vw);
-  background: var(--app-surface);
-  border-left: 1px solid var(--app-border);
-  z-index: 1056;
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
-  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  
-  [data-bs-theme="dark"] & {
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.35);
-  }
-
-  .avatar-circle-lg {
-    width: 56px;
-    height: 56px;
-    font-size: 1.35rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-
   .role-perm-badge {
     background: var(--app-bg) !important;
     color: var(--app-muted) !important;
@@ -393,24 +363,6 @@
   }
 }
 
-.btn-action-close {
-  background: transparent;
-  border: 1px solid var(--app-border);
-  color: var(--app-muted);
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  
-  &:hover {
-    background: var(--app-bg);
-    color: var(--app-text);
-  }
-}
-
-@keyframes slideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
-}
 
 /* Modals overlays styling */
 .modal-wrapper {

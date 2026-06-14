@@ -59,6 +59,7 @@ describe('LanguageService', () => {
 
   it('should persist language to localStorage on switch', () => {
     service.setLanguage('de');
+    TestBed.flushEffects();
     expect(localStorage.getItem('ems_language')).toBe('de');
   });
 

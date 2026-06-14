@@ -1,24 +1,326 @@
-    <h1 class="h3 mb-3">{{ 'ATTEND_TITLE' | translate }}</h1>
-    <div class="surface table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="table-light">
-          <tr>
-            <th scope="col">{{ 'ATTEND_DATE' | translate }}</th>
-            <th scope="col">{{ 'ATTEND_CHECK_IN' | translate }}</th>
-            <th scope="col">{{ 'ATTEND_CHECK_OUT' | translate }}</th>
-            <th scope="col">{{ 'ATTEND_STATUS' | translate }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (row of rows; track row.date) {
-            <tr>
-              <td>{{ row.date }}</td>
-              <td>{{ row.in }}</td>
-              <td>{{ row.out }}</td>
-              <td><span class="badge text-bg-success">{{ row.status }}</span></td>
-            </tr>
-          }
-        </tbody>
-      </table>
+<!-- ── Header & Welcome Banner ────────────────────────────────────────────── -->
+<div class="welcome-banner mb-4 p-4 rounded-4 position-relative overflow-hidden shadow-sm">
+  <div class="welcome-banner-glow"></div>
+  <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 fw-bold mb-1 welcome-title">{{ 'ATTEND_HEADER_TITLE' | translate }}</h1>
+      <p class="welcome-subtitle mb-0 d-flex align-items-center gap-2 text-white-85">
+        <app-icon [icon]="APP_ICONS.CALENDAR" class="welcome-icon text-white-50" aria-hidden="true"></app-icon>
+        <span>{{ 'ATTEND_HEADER_SUBTITLE' | translate }}</span>
+      </p>
     </div>
-  
+    
+    <div class="d-flex align-items-center gap-2 bg-white-10 p-2.5 rounded-4 border border-white-10">
+      <app-icon [icon]="APP_ICONS.INFO" class="text-white-50" aria-hidden="true"></app-icon>
+      <span class="text-white small">{{ 'ATTEND_TODAY_LABEL' | translate }} <strong>{{ 'ATTEND_TODAY_DATE' | translate }}</strong></span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Today's Check-in Action Card ─────────────────────────────────────── -->
+<div class="card checkin-card mb-4 border rounded-4 overflow-hidden shadow-sm">
+  <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap gap-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="status-badge-glow-wrapper">
+        @if (isCheckedIn()) {
+          <div class="status-badge-glow bg-success shadow-glow-success"></div>
+        } @else if (isCheckedOut()) {
+          <div class="status-badge-glow bg-secondary"></div>
+        } @else {
+          <div class="status-badge-glow bg-warning shadow-glow-warning"></div>
+        }
+      </div>
+      <div>
+        <h2 class="h5 fw-bold mb-1">
+          @if (isCheckedIn()) {
+            {{ 'ATTEND_SHIFT_ACTIVE' | translate }}
+          } @else if (isCheckedOut()) {
+            {{ 'ATTEND_SHIFT_COMPLETED' | translate }}
+          } @else {
+            {{ 'ATTEND_SHIFT_READY' | translate }}
+          }
+        </h2>
+        <p class="text-muted small mb-0">
+          @if (isCheckedIn()) {
+            {{ 'ATTEND_CHECKED_IN_MSG' | translate }} <strong>{{ todayRecord()?.in }}</strong>. {{ 'ATTEND_CHECKOUT_REMINDER' | translate }}
+          } @else if (isCheckedOut()) {
+            {{ 'ATTEND_CHECKED_OUT_MSG' | translate }} <strong>{{ todayRecord()?.out }}</strong>. {{ 'ATTEND_TOTAL_HOURS' | translate }} <strong>{{ todayRecord()?.workHours }} {{ 'ATTEND_UNIT_HRS' | translate }}</strong>
+          } @else {
+            {{ 'ATTEND_CHECKIN_PROMPT' | translate }}
+          }
+        </p>
+      </div>
+    </div>
+
+    <div>
+      @if (isCheckedIn()) {
+        <button class="btn btn-premium-danger d-flex align-items-center gap-2 px-4 py-2.5" type="button" (click)="checkOut()">
+          <app-icon [icon]="APP_ICONS.CLOSE" [size]="18" aria-hidden="true"></app-icon>
+          <span>{{ 'ATTEND_CHECK_OUT_BTN' | translate }}</span>
+        </button>
+      } @else if (isCheckedOut()) {
+        <button class="btn btn-premium-secondary d-flex align-items-center gap-2 px-4 py-2.5" disabled type="button">
+          <app-icon [icon]="APP_ICONS.SUCCESS" [size]="18" class="text-success" aria-hidden="true"></app-icon>
+          <span>{{ 'ATTEND_SHIFT_LOGGED' | translate }}</span>
+        </button>
+      } @else {
+        <button class="btn btn-premium-success d-flex align-items-center gap-2 px-4 py-2.5" type="button" (click)="checkIn()">
+          <app-icon [icon]="APP_ICONS.BOLT" [size]="18" aria-hidden="true"></app-icon>
+          <span>{{ 'ATTEND_CHECK_IN_BTN' | translate }}</span>
+        </button>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- ── Attendance Statistics Row ─────────────────────────────────────────── -->
+<section class="row g-3 mb-4" [attr.aria-label]="'ATTEND_STATS_LABEL' | translate">
+  <div class="col-6 col-md-3">
+    <article class="stat-card p-3 rounded-4 border h-100 d-flex flex-column">
+      <span class="text-muted small fw-bold mb-1">{{ 'ATTEND_DAYS_PRESENT' | translate }}</span>
+      <div class="d-flex align-items-baseline gap-2 mt-auto">
+        <strong class="stat-value text-success">{{ statsPresentCount() }}</strong>
+        <span class="text-muted small">{{ 'ATTEND_UNIT_DAYS' | translate }}</span>
+      </div>
+    </article>
+  </div>
+  <div class="col-6 col-md-3">
+    <article class="stat-card p-3 rounded-4 border h-100 d-flex flex-column">
+      <span class="text-muted small fw-bold mb-1">{{ 'ATTEND_LATE_ARRIVALS' | translate }}</span>
+      <div class="d-flex align-items-baseline gap-2 mt-auto">
+        <strong class="stat-value text-warning">{{ statsLateCount() }}</strong>
+        <span class="text-muted small">{{ 'ATTEND_UNIT_TIMES' | translate }}</span>
+      </div>
+    </article>
+  </div>
+  <div class="col-6 col-md-3">
+    <article class="stat-card p-3 rounded-4 border h-100 d-flex flex-column">
+      <span class="text-muted small fw-bold mb-1">{{ 'ATTEND_LEAVES_HOLIDAYS' | translate }}</span>
+      <div class="d-flex align-items-baseline gap-2 mt-auto">
+        <strong class="stat-value text-info">{{ statsLeaveCount() }}</strong>
+        <span class="text-muted small">{{ 'ATTEND_UNIT_DAYS' | translate }}</span>
+      </div>
+    </article>
+  </div>
+  <div class="col-6 col-md-3">
+    <article class="stat-card p-3 rounded-4 border h-100 d-flex flex-column">
+      <span class="text-muted small fw-bold mb-1">{{ 'ATTEND_AVG_HOURS' | translate }}</span>
+      <div class="d-flex align-items-baseline gap-2 mt-auto">
+        <strong class="stat-value text-primary">{{ statsAvgHours() }} {{ 'ATTEND_UNIT_HRS' | translate }}</strong>
+        <span class="text-muted small">{{ 'ATTEND_UNIT_PER_DAY' | translate }}</span>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ── Main Workspace: Calendar & Leaves Split ───────────────────────────── -->
+<div class="row g-4 mb-4">
+  <!-- Calendar Panel -->
+  <div class="col-12 col-xl-8">
+    <div class="card calendar-card p-4 rounded-4 border shadow-sm">
+      <!-- Calendar Header -->
+      <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <h2 class="h5 fw-bold mb-0 d-flex align-items-center gap-2">
+          <app-icon [icon]="APP_ICONS.CALENDAR" class="text-primary" aria-hidden="true"></app-icon>
+          <span>{{ 'ATTEND_CALENDAR_TITLE' | translate }}</span>
+        </h2>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-icon btn-premium-secondary btn-sm" type="button" (click)="prevMonth()" [attr.aria-label]="'ATTEND_PREVIOUS_MONTH' | translate">
+            <app-icon [icon]="APP_ICONS.SORT_DOWN" style="transform: rotate(90deg);" [size]="14"></app-icon>
+          </button>
+          <span class="fw-bold px-2 text-body" style="min-width: 120px; text-align: center;">
+            {{ 'MONTH_' + currentMonth() | translate }} {{ currentYear() }}
+          </span>
+          <button class="btn btn-icon btn-premium-secondary btn-sm" type="button" (click)="nextMonth()" [attr.aria-label]="'ATTEND_NEXT_MONTH' | translate">
+            <app-icon [icon]="APP_ICONS.SORT_UP" style="transform: rotate(90deg);" [size]="14"></app-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="calendar-grid">
+        <!-- Weekday Headers -->
+        <div class="calendar-day-header">{{ 'ATTEND_DAY_SUN' | translate }}</div>
+        <div class="calendar-day-header">{{ 'ATTEND_DAY_MON' | translate }}</div>
+        <div class="calendar-day-header">{{ 'ATTEND_DAY_TUE' | translate }}</div>
+        <div class="calendar-day-header">{{ 'ATTEND_DAY_WED' | translate }}</div>
+        <div class="calendar-day-header">{{ 'ATTEND_DAY_THU' | translate }}</div>
+        <div class="calendar-day-header">{{ 'ATTEND_DAY_FRI' | translate }}</div>
+        <div class="calendar-day-header">{{ 'ATTEND_DAY_SAT' | translate }}</div>
+
+        <!-- Days Cells -->
+        @for (day of calendarDays(); track day.dateString || day.dayNumber) {
+          <div class="calendar-day-cell" 
+               [class.today-cell]="day.isToday"
+               [class.empty-cell]="!day.dayNumber"
+               [class.present]="day.record?.status === 'Present'"
+               [class.late]="day.record?.status === 'Late'"
+               [class.absent]="day.record?.status === 'Absent'"
+               [class.leave]="day.record?.status === 'Leave'"
+               [class.holiday]="day.record?.status === 'Holiday'"
+               [class.weekend]="day.record?.status === 'Weekend'">
+            
+            @if (day.dayNumber) {
+              <div class="day-number">{{ day.dayNumber }}</div>
+              
+              @if (day.record; as r) {
+                <div class="day-status-badge text-uppercase font-monospace">
+                  {{ 'ATTEND_STATUS_' + r.status.toUpperCase() | translate }}
+                </div>
+                @if (r.in) {
+                  <div class="day-times mt-auto">
+                    <span class="time-in d-block">{{ r.in }}</span>
+                    @if (r.out) {
+                      <span class="time-out d-block">{{ r.out }}</span>
+                    }
+                  </div>
+                }
+              }
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Leave Balance & Request Leaves Panel -->
+  <div class="col-12 col-xl-4 d-flex flex-column gap-4">
+    <!-- Leave Balances -->
+    <div class="card leave-balance-card p-4 rounded-4 border shadow-sm">
+      <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+        <app-icon [icon]="APP_ICONS.LEAVE" class="text-primary" aria-hidden="true"></app-icon>
+        <span>{{ 'ATTEND_LEAVE_ALLOTMENTS' | translate }}</span>
+      </h3>
+      <div class="d-flex flex-column gap-3">
+        @for (b of leaveBalances(); track b.name) {
+          <div class="balance-item">
+            <div class="d-flex justify-content-between mb-1 small text-body">
+              <span>{{ 'ATTEND_' + b.name.replace(' ', '_').toUpperCase() | translate }}</span>
+              <strong class="text-muted">{{ b.used }} / {{ b.total }} {{ 'ATTEND_UNIT_DAYS' | translate }}</strong>
+            </div>
+            <div class="progress rounded-pill" style="height: 6px;">
+              <div class="progress-bar rounded-pill" role="progressbar" 
+                   [style.width.%]="(b.used / b.total) * 100"
+                   [style.background-color]="b.color"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Request Leave Form Card -->
+    <div class="card leave-request-card p-4 rounded-4 border shadow-sm flex-grow-1">
+      <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+        <app-icon [icon]="APP_ICONS.ADD" class="text-primary" aria-hidden="true"></app-icon>
+        <span>{{ 'ATTEND_REQUEST_TIME_OFF' | translate }}</span>
+      </h3>
+      <form [formGroup]="leaveForm" (ngSubmit)="submitLeave()" class="d-flex flex-column gap-2.5">
+        <div>
+          <label class="form-label small fw-bold text-muted mb-1">{{ 'ATTEND_LEAVE_TYPE' | translate }}</label>
+          <select class="form-select form-select-sm" formControlName="leaveType" [attr.aria-label]="'ATTEND_LEAVE_TYPE' | translate">
+            <option value="Annual">{{ 'ATTEND_ANNUAL_LEAVE' | translate }}</option>
+            <option value="Sick">{{ 'ATTEND_SICK_LEAVE' | translate }}</option>
+            <option value="Personal">{{ 'ATTEND_PERSONAL_LEAVE' | translate }}</option>
+          </select>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label small fw-bold text-muted mb-1">{{ 'ATTEND_START_DATE' | translate }}</label>
+            <input type="date" class="form-control form-control-sm" formControlName="startDate" [attr.aria-label]="'ATTEND_START_DATE' | translate" />
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-bold text-muted mb-1">{{ 'ATTEND_END_DATE' | translate }}</label>
+            <input type="date" class="form-control form-control-sm" formControlName="endDate" [attr.aria-label]="'ATTEND_END_DATE' | translate" />
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label small fw-bold text-muted mb-1">{{ 'ATTEND_REASON' | translate }}</label>
+          <textarea class="form-control" style="height: 60px; font-size: 0.825rem;" formControlName="reason" [placeholder]="'ATTEND_REASON_PLACEHOLDER' | translate" [attr.aria-label]="'ATTEND_REASON' | translate"></textarea>
+        </div>
+
+        <button class="btn btn-premium-primary btn-sm w-100 mt-2 d-flex align-items-center justify-content-center gap-2" 
+                [disabled]="leaveForm.invalid || isSubmittingLeave()" type="submit">
+          <app-icon [icon]="APP_ICONS.SAVE" [size]="14" aria-hidden="true"></app-icon>
+          <span>{{ isSubmittingLeave() ? ('ATTEND_SUBMITTING' | translate) : ('ATTEND_SUBMIT_REQUEST' | translate) }}</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Hours Worked Trend Chart ─────────────────────────────────────────── -->
+<div class="card chart-wrapper-card p-4 rounded-4 border shadow-sm mb-4">
+  <h3 class="h6 fw-bold mb-4 d-flex align-items-center gap-2 pb-2 border-bottom">
+    <app-icon [icon]="APP_ICONS.TRENDING_UP" class="text-primary" aria-hidden="true"></app-icon>
+    <span>{{ 'ATTEND_TREND_TITLE' | translate }}</span>
+  </h3>
+  <div style="height: 250px;">
+    <app-line-chart [dataPoints]="hoursTrendData()" [label]="'ATTEND_TREND_LABEL' | translate" color="#0f6cbd" [yLabel]="'ATTEND_TREND_Y' | translate" height="230px"></app-line-chart>
+  </div>
+</div>
+
+<!-- ── Monthly Log History Table ───────────────────────────────────────── -->
+<div class="card table-wrapper-card p-4 rounded-4 border shadow-sm">
+  <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2 pb-2 border-bottom">
+    <app-icon [icon]="APP_ICONS.AUDIT" class="text-primary" aria-hidden="true"></app-icon>
+    <span>{{ 'ATTEND_LOG_TITLE' | translate }} ({{ 'MONTH_' + currentMonth() | translate }})</span>
+  </h3>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>{{ 'ATTEND_TABLE_DATE' | translate }}</th>
+          <th>{{ 'ATTEND_TABLE_CHECK_IN' | translate }}</th>
+          <th>{{ 'ATTEND_TABLE_CHECK_OUT' | translate }}</th>
+          <th>{{ 'ATTEND_TABLE_HOURS' | translate }}</th>
+          <th>{{ 'ATTEND_TABLE_STATUS' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of selectedMonthRecords(); track row.date) {
+          <tr>
+            <td class="fw-semibold">{{ row.date | appDate }}</td>
+            <td>
+              @if (row.in) {
+                <span class="text-body font-monospace">{{ row.in }}</span>
+              } @else {
+                <span class="text-muted">—</span>
+              }
+            </td>
+            <td>
+              @if (row.out) {
+                <span class="text-body font-monospace">{{ row.out }}</span>
+              } @else {
+                <span class="text-muted">—</span>
+              }
+            </td>
+            <td>
+              @if (row.workHours) {
+                <span class="badge bg-light text-dark font-monospace">{{ row.workHours }} {{ 'ATTEND_UNIT_HRS' | translate }}</span>
+              } @else {
+                <span class="text-muted">—</span>
+              }
+            </td>
+            <td>
+              <span class="badge" 
+                    [class.bg-success]="row.status === 'Present'"
+                    [class.bg-warning]="row.status === 'Late'"
+                    [class.bg-danger]="row.status === 'Absent'"
+                    [class.bg-info]="row.status === 'Leave'"
+                    [class.bg-primary]="row.status === 'Holiday'"
+                    [class.bg-secondary]="row.status === 'Weekend'">
+                {{ 'ATTEND_STATUS_' + row.status.toUpperCase() | translate }}
+              </span>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="text-center text-muted py-4">{{ 'ATTEND_NO_RECORDS' | translate }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

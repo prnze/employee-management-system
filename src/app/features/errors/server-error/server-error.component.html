@@ -1,6 +1,24 @@
-    <main class="container py-5 text-center">
-      <h1>500</h1>
-      <p>{{ 'ERROR_500_MSG' | translate }}</p>
-      <a class="btn btn-primary" routerLink="/">{{ 'ERROR_500_HOME' | translate }}</a>
-    </main>
-  
+<main class="error-page-wrapper d-flex align-items-center justify-content-center">
+  <div class="error-card text-center p-5 rounded-4 shadow border">
+     <div class="error-illustration-wrapper mb-4">
+       <div class="error-pulse-glow bg-warning"></div>
+       <app-icon [icon]="APP_ICONS.WARNING" class="error-icon text-warning" [size]="48" aria-hidden="true"></app-icon>
+     </div>
+     
+     <h1 class="h2 fw-bold text-body mb-2">{{ 'ERROR_500_SYSTEM_FAILURE' | translate }}</h1>
+     <p class="text-muted small mb-4 mx-auto" style="max-width: 340px;">
+       {{ 'ERROR_500_MSG' | translate }}
+     </p>
+     
+     <div class="d-flex justify-content-center gap-2">
+       <button class="btn btn-premium-secondary px-4 py-2" type="button" (click)="retry()">
+         <app-icon [icon]="APP_ICONS.AUDIT" [size]="16" class="me-1.5" aria-hidden="true"></app-icon>
+         <span>{{ 'ERROR_500_RETRY_BTN' | translate }}</span>
+       </button>
+       <a class="btn btn-premium-primary px-4 py-2" routerLink="/">
+         <app-icon [icon]="APP_ICONS.DASHBOARD" [size]="16" class="me-1.5" aria-hidden="true"></app-icon>
+         <span>{{ 'ERROR_500_RETURN_HOME' | translate }}</span>
+       </a>
+     </div>
+   </div>
+ </main>

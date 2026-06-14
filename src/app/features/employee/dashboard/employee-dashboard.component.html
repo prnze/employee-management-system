@@ -18,7 +18,7 @@
 
 @if (analytics(); as a) {
   <!-- ── KPI Cards ────────────────────────────────────────── -->
-  <section class="row g-3 mb-4" aria-label="Personal metrics">
+  <section class="row g-3 mb-4" [attr.aria-label]="'EMP_DASHBOARD_PERSONAL_METRICS' | translate">
     @for (card of kpiCards(a.summary); track card.labelKey) {
       <div class="col-6 col-xl-3">
         <article class="kpi-card p-4 h-100 d-flex flex-column" [style.--kpi-color]="card.color">
@@ -136,7 +136,7 @@
                     }
                     @if (dueSoonDays(task.dueDate) > 0 && dueSoonDays(task.dueDate) <= 3) {
                       <span [class]="dueSoonClass(task.dueDate) + ' badge px-2 py-1'" style="font-size: 0.75rem;">
-                        {{ dueSoonDays(task.dueDate) }}d
+                        {{ dueSoonDays(task.dueDate) }}{{ 'COMMON_UNIT_DAYS_SHORT' | translate }}
                       </span>
                     }
                   </p>
@@ -167,7 +167,7 @@
 
 } @else {
   <!-- ── Loading skeletons ──────────────────────────────────── -->
-  <section class="row g-3 mb-4" aria-label="Loading metrics">
+  <section class="row g-3 mb-4" [attr.aria-label]="'DASHBOARD_LOADING_METRICS' | translate">
     @for (i of [1,2,3,4]; track i) {
       <div class="col-6 col-xl-3">
         <div class="kpi-card kpi-card-skeleton p-4 placeholder-glow" aria-hidden="true">

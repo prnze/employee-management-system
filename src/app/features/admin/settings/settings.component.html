@@ -1,38 +1,375 @@
-    <h1 class="h3 mb-3">{{ 'SETTINGS_TITLE' | translate }}</h1>
-    <form class="surface p-3 row g-3" [formGroup]="form">
-      <div class="col-md-6">
-        <app-form-field
-          #orgField
-          label="SETTINGS_ORG_NAME"
-          [control]="form.controls.organization">
-          <app-input
-            [id]="orgField.id"
-            formControlName="organization">
-          </app-input>
-        </app-form-field>
-      </div>
-      <div class="col-md-6">
-        <app-form-field
-          #timeoutField
-          label="SETTINGS_TIMEOUT"
-          [control]="form.controls.timeout">
-          <app-input
-            [id]="timeoutField.id"
-            type="number"
-            formControlName="timeout">
-          </app-input>
-        </app-form-field>
-      </div>
-      <div class="col-12 d-flex gap-2">
-        <button class="btn btn-primary text-white" type="submit" (click)="saveSettings(); $event.preventDefault()">
-          {{ 'COMMON_SAVE' | translate }}
-        </button>
-        <button class="btn btn-outline-primary" type="button" (click)="theme.toggle()">
-          {{ 'SETTINGS_TOGGLE_THEME' | translate }}
-        </button>
-        <button class="btn btn-outline-danger" type="button" (click)="resetSettings()">
-          {{ 'SETTINGS_RESET' | translate }}
-        </button>
-      </div>
+<!-- ── Header & Welcome Banner ────────────────────────────────────────────── -->
+<div class="welcome-banner mb-4 p-4 rounded-3 position-relative overflow-hidden shadow-sm">
+  <div class="welcome-banner-glow"></div>
+  <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 fw-bold mb-1 welcome-title">{{ 'SETTINGS_HEADER_TITLE' | translate }}</h1>
+      <p class="welcome-subtitle mb-0 d-flex align-items-center gap-2 text-white-85">
+        <app-icon [icon]="APP_ICONS.SETTINGS" class="welcome-icon text-white-50" aria-hidden="true"></app-icon>
+        <span>{{ 'SETTINGS_HEADER_SUBTITLE' | translate }}</span>
+      </p>
+    </div>
+    <button class="btn btn-premium-secondary btn-sm d-flex align-items-center gap-2 shadow-sm" type="button"
+      (click)="resetSettings()">
+      <app-icon [icon]="APP_ICONS.CLOSE" [size]="16" aria-hidden="true"></app-icon>
+      <span>{{ 'SETTINGS_RESET' | translate }}</span>
+    </button>
+  </div>
+</div>
+
+<!-- ── Search & Filter Toolbar ───────────────────────────────────────────── -->
+<div class="card toolbar-card p-3 mb-4 shadow-sm border rounded-3">
+  <div class="position-relative search-settings-wrapper" style="max-width: 480px;">
+    <app-icon [icon]="APP_ICONS.SEARCH" class="position-absolute start-3 text-muted search-icon" [size]="18"
+      aria-hidden="true"></app-icon>
+    <input class="form-control ps-5" [placeholder]="'SETTINGS_SEARCH_PLACEHOLDER' | translate" [value]="searchQuery()"
+      (input)="updateSearchQuery($event)" [attr.aria-label]="'SETTINGS_SEARCH_LABEL' | translate" />
+  </div>
+</div>
+
+<!-- ── Main Grid Content (Split Columns) ─────────────────────────────────── -->
+<div class="row g-4 mb-5">
+  <!-- Left Side: Configuration Categories -->
+  <div class="col-12 col-xl-8">
+    <form [formGroup]="form" class="d-flex flex-column gap-3">
+
+      <!-- General Section -->
+      @if (isSectionVisible('general')) {
+      <section class="card settings-card" aria-labelledby="section-general">
+        <div class="settings-section-header">
+          <h2 id="section-general" class="h6 fw-bold mb-1">{{ 'SETTINGS_GENERAL_TITLE' | translate }}</h2>
+          <p class="text-muted xxs mb-0">{{ 'SETTINGS_GENERAL_DESC' | translate }}</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label class="form-label">{{ 'SETTINGS_ORG_NAME' | translate }}</label>
+            <input class="form-control" type="text" formControlName="organization" />
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label">{{ 'SETTINGS_DEFAULT_LANGUAGE' | translate }}</label>
+            <select class="form-select" formControlName="language">
+              <option value="en">{{ 'SETTINGS_LANG_EN' | translate }}</option>
+              <option value="de">{{ 'SETTINGS_LANG_DE' | translate }}</option>
+              <option value="fr">{{ 'SETTINGS_LANG_FR' | translate }}</option>
+              <option value="es">{{ 'SETTINGS_LANG_ES' | translate }}</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label">{{ 'SETTINGS_DEFAULT_TIMEZONE' | translate }}</label>
+            <select class="form-select" formControlName="timeZone">
+              <option value="UTC-5:00">{{ 'SETTINGS_TZ_EASTERN' | translate }}</option>
+              <option value="UTC+0:00">{{ 'SETTINGS_TZ_UTC' | translate }}</option>
+              <option value="UTC+1:00">{{ 'SETTINGS_TZ_CET' | translate }}</option>
+              <option value="UTC+5:30">{{ 'SETTINGS_TZ_IST' | translate }}</option>
+              <option value="UTC+8:00">{{ 'SETTINGS_TZ_SGT' | translate }}</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label">{{ 'SETTINGS_DATE_FORMAT' | translate }}</label>
+            <select class="form-select" formControlName="dateFormat">
+              <option value="YYYY-MM-DD">{{ 'SETTINGS_DATE_FORMAT_ISO' | translate }}</option>
+              <option value="DD/MM/YYYY">{{ 'SETTINGS_DATE_FORMAT_DMY' | translate }}</option>
+              <option value="MM/DD/YYYY">{{ 'SETTINGS_DATE_FORMAT_MDY' | translate }}</option>
+            </select>
+          </div>
+        </div>
+      </section>
+      }
+
+      <!-- Security Section -->
+      @if (isSectionVisible('security')) {
+      <section class="card settings-card" aria-labelledby="section-security">
+        <div class="settings-section-header">
+          <h2 id="section-security" class="h6 fw-bold mb-1">{{ 'SETTINGS_SECURITY_TITLE' | translate }}</h2>
+          <p class="text-muted xxs mb-0">{{ 'SETTINGS_SECURITY_DESC' | translate }}</p>
+        </div>
+
+        <div class="d-flex flex-column gap-2.5">
+          <div class="settings-toggle-row">
+            <div class="flex-grow-1 pe-3">
+              <span class="toggle-title">{{ 'SETTINGS_MFA_TITLE' | translate }}</span>
+              <span class="toggle-desc">{{ 'SETTINGS_MFA_DESC' | translate }}</span>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input matrix-switch" type="checkbox" role="switch"
+                formControlName="mfaEnabled" />
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">{{ 'SETTINGS_TIMEOUT' | translate }} {{ 'SETTINGS_TIMEOUT_UNIT' | translate }}</label>
+              <input class="form-control" type="number" formControlName="timeout" min="5" max="120" />
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">{{ 'SETTINGS_LOGIN_THRESHOLD' | translate }}</label>
+              <input class="form-control" type="number" formControlName="loginAttemptLimit" min="3" max="15" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ 'SETTINGS_PASSWORD_RULE' | translate }}</label>
+              <select class="form-select" formControlName="passwordRule">
+                <option value="standard">{{ 'SETTINGS_PASSWORD_STANDARD' | translate }}</option>
+                <option value="strong">{{ 'SETTINGS_PASSWORD_STRONG' | translate }}</option>
+                <option value="enterprise">{{ 'SETTINGS_PASSWORD_ENTERPRISE' | translate }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+      }
+
+      <!-- Notifications Section -->
+      @if (isSectionVisible('notifications')) {
+      <section class="card settings-card" aria-labelledby="section-notifications">
+        <div class="settings-section-header">
+          <h2 id="section-notifications" class="h6 fw-bold mb-1">{{ 'SETTINGS_NOTIF_TITLE' | translate }}</h2>
+          <p class="text-muted xxs mb-0">{{ 'SETTINGS_NOTIF_DESC' | translate }}</p>
+        </div>
+
+        <div class="d-flex flex-column gap-2.5">
+          <div class="settings-toggle-row mb-2">
+            <div class="flex-grow-1 pe-3">
+              <span class="toggle-title">{{ 'SETTINGS_EMAIL_ALERTS' | translate }}</span>
+              <span class="toggle-desc">{{ 'SETTINGS_EMAIL_ALERTS_DESC' | translate }}</span>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input matrix-switch" type="checkbox" role="switch"
+                formControlName="emailNotifications" />
+            </div>
+          </div>
+
+          <div class="settings-toggle-row mb-2">
+            <div class="flex-grow-1 pe-3">
+              <span class="toggle-title">{{ 'SETTINGS_SYSTEM_ALERTS' | translate }}</span>
+              <span class="toggle-desc">{{ 'SETTINGS_SYSTEM_ALERTS_DESC' | translate }}</span>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input matrix-switch" type="checkbox" role="switch"
+                formControlName="pushNotifications" />
+            </div>
+          </div>
+
+          <div class="settings-toggle-row mb-2">
+            <div class="flex-grow-1 pe-3">
+              <span class="toggle-title">{{ 'SETTINGS_COMPLIANCE_ALERTS' | translate }}</span>
+              <span class="toggle-desc">{{ 'SETTINGS_COMPLIANCE_ALERTS_DESC' | translate }}</span>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input matrix-switch" type="checkbox" role="switch"
+                formControlName="auditAlerts" />
+            </div>
+          </div>
+
+          <div class="settings-toggle-row mb-2">
+            <div class="flex-grow-1 pe-3">
+              <span class="toggle-title">{{ 'SETTINGS_WEEKLY_REPORTS' | translate }}</span>
+              <span class="toggle-desc">{{ 'SETTINGS_WEEKLY_REPORTS_DESC' | translate }}</span>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input matrix-switch" type="checkbox" role="switch"
+                formControlName="reportDelivery" />
+            </div>
+          </div>
+        </div>
+      </section>
+      }
+
+      <!-- Appearance Section -->
+      @if (isSectionVisible('appearance')) {
+      <section class="card settings-card" aria-labelledby="section-appearance">
+        <div class="settings-section-header">
+          <h2 id="section-appearance" class="h6 fw-bold mb-1">{{ 'SETTINGS_APPEARANCE_TITLE' | translate }}</h2>
+          <p class="text-muted xxs mb-0">{{ 'SETTINGS_APPEARANCE_DESC' | translate }}</p>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12 col-md-4">
+            <label class="form-label">{{ 'SETTINGS_THEME_MODE' | translate }}</label>
+            <select class="form-select" formControlName="themeMode">
+              <option value="system">{{ 'SETTINGS_THEME_SYSTEM' | translate }}</option>
+              <option value="light">{{ 'SETTINGS_THEME_LIGHT' | translate }}</option>
+              <option value="dark">{{ 'SETTINGS_THEME_DARK' | translate }}</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label">{{ 'SETTINGS_ACCENT_COLOR' | translate }}</label>
+            <select class="form-select" formControlName="accentColor">
+              <option value="blue">{{ 'SETTINGS_COLOR_BLUE' | translate }}</option>
+              <option value="teal">{{ 'SETTINGS_COLOR_TEAL' | translate }}</option>
+              <option value="purple">{{ 'SETTINGS_COLOR_PURPLE' | translate }}</option>
+              <option value="orange">{{ 'SETTINGS_COLOR_ORANGE' | translate }}</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label">{{ 'SETTINGS_LAYOUT_DENSITY' | translate }}</label>
+            <select class="form-select" formControlName="density">
+              <option value="comfortable">{{ 'SETTINGS_DENSITY_COMFORTABLE' | translate }}</option>
+              <option value="compact">{{ 'SETTINGS_DENSITY_COMPACT' | translate }}</option>
+            </select>
+          </div>
+          <div class="col-12 mt-2">
+            <div
+              class="p-2.5 rounded-3 border bg-light-subtle d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <span class="small text-muted ms-2">{{ 'SETTINGS_THEME_TEST' | translate }}</span>
+              <button class="btn btn-premium-secondary btn-sm" type="button" (click)="theme.toggle()">
+                {{ 'SETTINGS_SWITCH_THEME' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      }
+
+      <!-- Integrations Section -->
+      @if (isSectionVisible('integrations')) {
+      <section class="card settings-card" aria-labelledby="section-integrations">
+        <div class="settings-section-header">
+          <h2 id="section-integrations" class="h6 fw-bold mb-1">{{ 'SETTINGS_INTEGRATIONS_TITLE' | translate }}</h2>
+          <p class="text-muted xxs mb-0">{{ 'SETTINGS_INTEGRATIONS_DESC' | translate }}</p>
+        </div>
+
+        <div class="d-flex flex-column gap-2.5">
+          <div class="row g-2.5">
+            <div class="col-12 col-md-6">
+              <div class="settings-toggle-row h-100">
+                <div class="flex-grow-1 pe-3">
+                  <span class="toggle-title">{{ 'SETTINGS_LDAP_TITLE' | translate }}</span>
+                  <span class="toggle-desc">{{ 'SETTINGS_LDAP_DESC' | translate }}</span>
+                </div>
+                <div class="form-check form-switch mb-0">
+                  <input class="form-check-input matrix-switch" type="checkbox" role="switch"
+                    formControlName="ldapEnabled" />
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="settings-toggle-row h-100">
+                <div class="flex-grow-1 pe-3">
+                  <span class="toggle-title">{{ 'SETTINGS_SSO_TITLE' | translate }}</span>
+                  <span class="toggle-desc">{{ 'SETTINGS_SSO_DESC' | translate }}</span>
+                </div>
+                <div class="form-check form-switch mb-0">
+                  <input class="form-check-input matrix-switch" type="checkbox" role="switch"
+                    formControlName="ssoEnabled" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">{{ 'SETTINGS_EMAIL_PROVIDER' | translate }}</label>
+              <select class="form-select" formControlName="emailProvider">
+                <option value="smtp">{{ 'SETTINGS_EMAIL_SMTP' | translate }}</option>
+                <option value="ses">{{ 'SETTINGS_EMAIL_SES' | translate }}</option>
+                <option value="sendgrid">{{ 'SETTINGS_EMAIL_SENDGRID' | translate }}</option>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="settings-toggle-row mt-4">
+                <div class="flex-grow-1 pe-3">
+                  <span class="toggle-title">{{ 'SETTINGS_API_TOKENS' | translate }}</span>
+                  <span class="toggle-desc">{{ 'SETTINGS_API_TOKENS_DESC' | translate }}</span>
+                </div>
+                <div class="form-check form-switch mb-0">
+                  <input class="form-check-input matrix-switch" type="checkbox" role="switch"
+                    formControlName="apiAccessEnabled" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      }
     </form>
-  
+  </div>
+
+  <!-- Right Side: System Status Summary Card -->
+  <div class="col-12 col-xl-4">
+    <div class="card settings-card" style="height: 100%;">
+      <div class="settings-section-header">
+        <h3 class="h6 fw-bold mb-1">{{ 'SETTINGS_HEALTH_TITLE' | translate }}</h3>
+        <p class="text-muted xxs mb-0">{{ 'SETTINGS_HEALTH_DESC' | translate }}</p>
+      </div>
+
+      <!-- Score Progress Circle wrapper -->
+      <div class="d-flex flex-column align-items-center justify-content-center py-3 border-bottom mb-3">
+        <div class="score-radial-progress mb-2" style="--score-pct: 92;">
+          <div class="score-radial-inner">
+            <strong class="h4 fw-bold mb-0 text-success">92%</strong>
+          </div>
+        </div>
+        <span class="fw-bold small text-body">{{ 'SETTINGS_SECURITY_INDEX' | translate }}</span>
+        <span class="text-muted xxs mt-1 text-center">{{ 'SETTINGS_HEALTH_EXCELLENT' | translate }}</span>
+      </div>
+
+      <!-- Quick Metrics Logs -->
+      <div class="d-flex flex-column gap-2 mb-4 pb-3 border-bottom">
+        <div class="settings-metric-row">
+          <div>
+            <span class="fw-bold d-block xxs text-body">{{ 'SETTINGS_SECURITY_SCORE' | translate }}</span>
+          </div>
+          <strong class="xxs text-success">92%</strong>
+        </div>
+
+        <div class="settings-metric-row">
+          <div>
+            <span class="fw-bold d-block xxs text-body">{{ 'SETTINGS_MFA_COVERAGE' | translate }}</span>
+          </div>
+          <strong class="xxs text-primary">87%</strong>
+        </div>
+
+        <div class="settings-metric-row">
+          <div>
+            <span class="fw-bold d-block xxs text-body">{{ 'SETTINGS_FAILED_LOGINS' | translate }}</span>
+          </div>
+          <strong class="xxs text-danger">2</strong>
+        </div>
+      </div>
+
+      <!-- Recent Changes -->
+      <div class="recent-changes-section">
+        <div class="settings-section-header mb-3">
+          <h4 class="h6 fw-bold mb-1">{{ 'SETTINGS_RECENT_CHANGES' | translate }}</h4>
+          <p class="text-muted xxs mb-0">{{ 'SETTINGS_CHANGES_DESC' | translate }}</p>
+        </div>
+
+        <div class="d-flex flex-column gap-2">
+          <div class="settings-change-item">
+            <span class="bullet-dot bg-success"></span>
+            <span>{{ 'SETTINGS_CHANGE_MFA' | translate }}</span>
+          </div>
+          <div class="settings-change-item">
+            <span class="bullet-dot bg-primary"></span>
+            <span>{{ 'SETTINGS_CHANGE_TIMEOUT' | translate }}</span>
+          </div>
+          <div class="settings-change-item">
+            <span class="bullet-dot bg-warning"></span>
+            <span>{{ 'SETTINGS_CHANGE_PASSWORD' | translate }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Sticky Save Footer Bar ────────────────────────────────────────────── -->
+@if (isDirty()) {
+<div class="sticky-footer-bar shadow border p-3 d-flex align-items-center justify-content-between">
+  <div class="d-flex align-items-center gap-2">
+    <span class="pending-badge-dot bg-warning shadow-glow-warning"></span>
+    <span class="fw-bold text-body small">{{ 'SETTINGS_UNSAVED_CHANGES' | translate }}</span>
+  </div>
+  <div class="d-flex gap-2">
+    <button class="btn btn-premium-secondary px-3.5 btn-sm fw-semibold" type="button" (click)="resetForm()">
+      {{ 'SETTINGS_DISCARD' | translate }}
+    </button>
+    <button class="btn btn-premium-primary px-3.5 btn-sm fw-semibold" type="button" (click)="saveSettings()">
+      {{ 'SETTINGS_SAVE_CHANGES' | translate }}
+    </button>
+  </div>
+</div>
+}

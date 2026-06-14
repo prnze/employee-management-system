@@ -1,1 +1,7 @@
-<section class="surface text-center p-5"><h2 class="fs-5">{{ title() }}</h2><p class="text-body-secondary mb-0">{{ message() }}</p></section>
+<div class="empty-state-wrapper text-center p-5">
+  <div class="empty-state-icon-box mb-3 d-inline-flex align-items-center justify-content-center text-muted">
+    <app-icon [icon]="icon()" [size]="40" aria-hidden="true"></app-icon>
+  </div>
+  <h2 class="h6 fw-bold text-body mb-2">{{ title() }}</h2>
+  <p class="text-muted small mb-0 mx-auto" style="max-width: 320px;">{{ message() }}</p>
+</div>

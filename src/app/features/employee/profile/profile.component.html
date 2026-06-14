@@ -1,36 +1,226 @@
-    <h1 class="h3 mb-3">{{ 'PROFILE_TITLE' | translate }}</h1>
-    <form class="surface p-3 row g-3" [formGroup]="form" (ngSubmit)="save()">
-      <div class="col-md-6">
-        <label class="form-label">{{ 'PROFILE_FULL_NAME' | translate }}</label>
-        <input class="form-control" formControlName="fullName" />
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">{{ 'PROFILE_EMAIL' | translate }}</label>
-        <input class="form-control" type="email" formControlName="email" />
-      </div>
-      <div class="col-md-6">
-        <label class="form-label">{{ 'PROFILE_PHONE' | translate }}</label>
-        <input class="form-control" formControlName="phone" />
-      </div>
-      <div class="col-md-6">
-        <label class="form-label" for="avatar">{{ 'PROFILE_PICTURE' | translate }}</label>
-        <input id="avatar" class="form-control" type="file"
-          accept="image/png,image/jpeg,image/webp" (change)="onAvatarSelected($event)" />
-        <!-- avatarErrorKey stores a translation KEY — pipe translates it reactively -->
-        @if (avatarErrorKey()) {
-          <div class="form-text text-danger">{{ avatarErrorKey() | translate }}</div>
+@let emp = employeeRecord()!;
+
+<!-- ── Profile Hero Banner ────────────────────────────────────────────────── -->
+<div class="welcome-banner mb-4 p-4 rounded-4 position-relative overflow-hidden shadow-sm">
+  <div class="welcome-banner-glow"></div>
+  <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-4">
+    <!-- User Avatar & Identity info -->
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <div class="position-relative">
+        @if (avatarPreview()) {
+          <img [src]="avatarPreview()" [alt]="'PROFILE_PREVIEW_ALT' | translate" class="avatar-img shadow-sm" />
+        } @else if (authState.user()?.avatarUrl) {
+          <img [src]="authState.user()?.avatarUrl" [alt]="'PROFILE_AVATAR_ALT' | translate" class="avatar-img shadow-sm" />
+        } @else {
+          <div class="profile-avatar-fallback d-flex align-items-center justify-content-center shadow-sm">
+            {{ userInitials() }}
+          </div>
         }
+        <span class="status-indicator-dot bg-success" [title]="'EMP_FORM_STATUS_ACTIVE' | translate"></span>
       </div>
-      @if (avatarPreview()) {
-        <div class="col-12">
-          <img [src]="avatarPreview()" alt="Selected profile preview"
-            class="rounded-circle border" width="96" height="96" />
+      <div>
+        <h1 class="h3 fw-bold mb-1 welcome-title">{{ authState.user()?.fullName }}</h1>
+        <p class="welcome-subtitle mb-0 d-flex align-items-center gap-2 text-white-85 flex-wrap">
+          <span class="badge bg-white-15 text-white text-uppercase tracking-wider fw-bold small">{{ authState.user()?.role }}</span>
+          <span class="welcome-separator">·</span>
+          <span>{{ emp.designation }}</span>
+          <span class="welcome-separator">·</span>
+          <span>{{ emp.department }}</span>
+        </p>
+      </div>
+    </div>
+    
+    <!-- Secondary Employee Metadata -->
+    <div class="d-flex align-items-center gap-3 flex-wrap text-white-85 small">
+      <div class="meta-item">
+        <span class="text-white-50 d-block xs-label">{{ 'PROFILE_EMPLOYEE_CODE' | translate }}</span>
+        <strong class="text-white font-monospace">{{ emp.employeeCode }}</strong>
+      </div>
+      <span class="welcome-separator d-none d-md-inline">|</span>
+      <div class="meta-item">
+        <span class="text-white-50 d-block xs-label">{{ 'PROFILE_LOCATION' | translate }}</span>
+        <strong class="text-white">{{ emp.location }}</strong>
+      </div>
+      <span class="welcome-separator d-none d-md-inline">|</span>
+      <div class="meta-item">
+        <span class="text-white-50 d-block xs-label">{{ 'PROFILE_MANAGER' | translate }}</span>
+        <strong class="text-white">{{ emp.manager }}</strong>
+      </div>
+      <span class="welcome-separator d-none d-md-inline">|</span>
+      <div class="meta-item">
+        <span class="text-white-50 d-block xs-label">{{ 'PROFILE_JOINED_DATE' | translate }}</span>
+        <strong class="text-white">{{ emp.joinedAt | appDate }}</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main Profile Grid ──────────────────────────────────────────────────── -->
+<div class="row g-4 mb-5">
+  <!-- Left Side: Roster info & Statistics -->
+  <div class="col-12 col-lg-4">
+    <!-- Profile Completion -->
+    <div class="card profile-side-card p-4 rounded-4 shadow-sm border mb-4">
+      <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+        <app-icon [icon]="APP_ICONS.BOLT" class="text-primary" aria-hidden="true"></app-icon>
+        <span>{{ 'PROFILE_STRENGTH' | translate }}</span>
+      </h3>
+      <div class="progress mb-3" style="height: 10px; border-radius: 5px;">
+        <div 
+          class="progress-bar bg-primary progress-bar-striped progress-bar-animated" 
+          role="progressbar" 
+          [style.width.%]="profileCompletion()"
+          [attr.aria-valuenow]="profileCompletion()" 
+          aria-valuemin="0" 
+          aria-valuemax="100">
         </div>
-      }
-      <div class="col-12">
-        <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
-          {{ 'PROFILE_SAVE' | translate }}
-        </button>
       </div>
-    </form>
-  
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="small text-muted">{{ 'PROFILE_COMPLETION' | translate }}</span>
+        <strong class="text-primary small">{{ profileCompletion() }}%</strong>
+      </div>
+      
+      <ul class="list-unstyled mb-0 d-flex flex-column gap-2.5 small">
+        <li class="d-flex align-items-center gap-2 text-success">
+          <app-icon [icon]="APP_ICONS.SUCCESS" [size]="16" aria-hidden="true"></app-icon>
+          <span>{{ 'PROFILE_ACCOUNT_VERIFIED' | translate }}</span>
+        </li>
+        <li class="d-flex align-items-center gap-2 text-success">
+          <app-icon [icon]="APP_ICONS.SUCCESS" [size]="16" aria-hidden="true"></app-icon>
+          <span>{{ 'PROFILE_DETAILS_VERIFIED' | translate }}</span>
+        </li>
+        <li class="d-flex align-items-center gap-2" [class.text-success]="avatarPreview() || authState.user()?.avatarUrl" [class.text-muted]="!avatarPreview() && !authState.user()?.avatarUrl">
+          <app-icon [icon]="(avatarPreview() || authState.user()?.avatarUrl) ? APP_ICONS.SUCCESS : APP_ICONS.CLOSE" [size]="16" aria-hidden="true"></app-icon>
+          <span>{{ 'PROFILE_AVATAR_UPLOADED' | translate }}</span>
+        </li>
+        <li class="d-flex align-items-center gap-2" [class.text-success]="form.controls.phone.value" [class.text-muted]="!form.controls.phone.value">
+          <app-icon [icon]="form.controls.phone.value ? APP_ICONS.SUCCESS : APP_ICONS.CLOSE" [size]="16" aria-hidden="true"></app-icon>
+          <span>{{ 'PROFILE_MOBILE_ADDED' | translate }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Attendance and Task Summary Indicators -->
+    @if (analytics(); as a) {
+      <div class="card profile-side-card p-4 rounded-4 shadow-sm border mb-4">
+        <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+          <app-icon [icon]="APP_ICONS.DASHBOARD" class="text-primary" aria-hidden="true"></app-icon>
+          <span>{{ 'PROFILE_PERFORMANCE' | translate }}</span>
+        </h3>
+        <div class="row g-2">
+          <!-- Present Days -->
+          <div class="col-6">
+            <div class="stat-indicator p-2.5 rounded-3 border text-center">
+              <span class="text-muted d-block xxs font-semibold">{{ 'PROFILE_DAYS_PRESENT' | translate }}</span>
+              <strong class="fs-6 text-success">{{ a.summary.totalPresent }}{{ 'COMMON_UNIT_DAYS_SHORT' | translate }}</strong>
+            </div>
+          </div>
+          <!-- Absent Days -->
+          <div class="col-6">
+            <div class="stat-indicator p-2.5 rounded-3 border text-center">
+              <span class="text-muted d-block xxs font-semibold">{{ 'PROFILE_DAYS_ABSENT' | translate }}</span>
+              <strong class="fs-6 text-danger">{{ a.summary.totalAbsent }}{{ 'COMMON_UNIT_DAYS_SHORT' | translate }}</strong>
+            </div>
+          </div>
+          <!-- Tasks Completed -->
+          <div class="col-6">
+            <div class="stat-indicator p-2.5 rounded-3 border text-center">
+              <span class="text-muted d-block xxs font-semibold">{{ 'PROFILE_TASKS_DONE' | translate }}</span>
+              <strong class="fs-6 text-primary">{{ a.summary.tasksCompleted }}</strong>
+            </div>
+          </div>
+          <!-- Leave Balance -->
+          <div class="col-6">
+            <div class="stat-indicator p-2.5 rounded-3 border text-center">
+              <span class="text-muted d-block xxs font-semibold">{{ 'PROFILE_LEAVE_BALANCE' | translate }}</span>
+              <strong class="fs-6 text-warning">{{ a.summary.leaveBalance }}{{ 'COMMON_UNIT_DAYS_SHORT' | translate }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Right Side: Profile Details form & Activity Timeline -->
+  <div class="col-12 col-lg-8">
+    <!-- Profile Form -->
+    <div class="card profile-form-card p-4 rounded-4 shadow-sm border mb-4">
+      <h3 class="h6 fw-bold mb-4 d-flex align-items-center gap-2 border-bottom pb-2">
+        <app-icon [icon]="APP_ICONS.USER" class="text-primary" aria-hidden="true"></app-icon>
+        <span>{{ 'PROFILE_EDIT_DETAILS' | translate }}</span>
+      </h3>
+      
+      <form class="row g-3" [formGroup]="form" (ngSubmit)="save()">
+        <!-- Full name -->
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-muted mb-1">{{ 'PROFILE_FULL_NAME' | translate }}</label>
+          <input class="form-control" formControlName="fullName" />
+        </div>
+        
+        <!-- Email -->
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-muted mb-1">{{ 'PROFILE_EMAIL' | translate }}</label>
+          <input class="form-control" type="email" formControlName="email" />
+        </div>
+        
+        <!-- Phone -->
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-muted mb-1">{{ 'PROFILE_PHONE' | translate }}</label>
+          <input class="form-control" formControlName="phone" />
+        </div>
+        
+        <!-- Avatar selection file upload -->
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-muted mb-1" for="avatar">{{ 'PROFILE_PICTURE' | translate }}</label>
+          <input id="avatar" class="form-control" type="file"
+            accept="image/png,image/jpeg,image/webp" (change)="onAvatarSelected($event)" />
+          @if (avatarErrorKey()) {
+            <div class="form-text text-danger small mt-1">{{ avatarErrorKey() | translate }}</div>
+          }
+        </div>
+        
+        <div class="col-12 d-flex justify-content-between mt-4">
+          <button class="btn btn-outline-secondary px-4 fw-semibold d-flex align-items-center gap-2" type="button" (click)="showChangePasswordModal.set(true)">
+            <app-icon icon="lock" [size]="16"></app-icon>
+            <span>{{ 'NAV_CHANGE_PASSWORD' | translate }}</span>
+          </button>
+          <button class="btn btn-premium-primary px-4 fw-semibold" type="submit" [disabled]="form.invalid">
+            {{ 'PROFILE_SAVE' | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Activity Timeline -->
+    @if (analytics(); as a) {
+      <div class="card profile-timeline-card p-4 rounded-4 shadow-sm border">
+        <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+          <app-icon [icon]="APP_ICONS.AUDIT" class="text-primary" aria-hidden="true"></app-icon>
+          <span>{{ 'PROFILE_UPCOMING_TASKS' | translate }}</span>
+        </h3>
+        
+        <div class="timeline-container position-relative ps-4 mt-3">
+          <div class="timeline-line"></div>
+          @for (task of a.upcomingTasks; track task.id) {
+            <div class="timeline-item mb-3 position-relative">
+              <span class="timeline-dot" [class.dot-high]="task.priority === 'High'" [class.dot-medium]="task.priority === 'Medium'" [class.dot-low]="task.priority === 'Low'"></span>
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                  <strong class="d-block small text-body">{{ task.title }}</strong>
+                  <span class="badge bg-secondary-subtle text-secondary xxs mt-1">{{ task.category }}</span>
+                </div>
+                <div class="text-end">
+                  <span class="d-block text-muted xxs">{{ 'PROFILE_DUE_DATE' | translate }}</span>
+                  <strong class="small text-body-secondary">{{ task.dueDate | appDate }}</strong>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<app-change-password-modal [open]="showChangePasswordModal()" (closed)="showChangePasswordModal.set(false)" />
+

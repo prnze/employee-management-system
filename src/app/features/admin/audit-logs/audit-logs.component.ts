@@ -13,6 +13,7 @@ import { TableComponent } from '@shared/components/table/table.component';
 import { PaginationComponent } from '@shared/components/pagination/pagination.component';
 import { TableColumn } from '@core/models/table.models';
 import { FilterChipsComponent } from '@shared/components/filter-chips/filter-chips.component';
+import { JsonPipe, DecimalPipe } from '@angular/common';
 import { AuditLogsStore } from './audit-logs.store';
 
 const PAGE_SIZE = 15;
@@ -22,7 +23,8 @@ const PAGE_SIZE = 15;
   standalone: true,
   imports: [
     ReactiveFormsModule, AppDatePipe, IconComponent, TranslatePipe,
-    PermissionDirective, TableComponent, PaginationComponent, FilterChipsComponent
+    PermissionDirective, TableComponent, PaginationComponent, FilterChipsComponent,
+    JsonPipe, DecimalPipe
   ],
   styleUrl: './audit-logs.component.scss',
   templateUrl: './audit-logs.component.html',
@@ -34,6 +36,13 @@ export class AuditLogsComponent {
   readonly svc = inject(AuditService);
 
   readonly pageSize = PAGE_SIZE;
+
+  readonly totalLogsCount = computed(() => this.svc.totalCount());
+  readonly criticalEventsCount = computed(() => this.svc.logs().filter(l => l.severity === 'Critical').length);
+  readonly todayActivityCount = computed(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    return this.svc.logs().filter(l => l.createdAt.startsWith(todayStr)).length;
+  });
 
   // Template queries for table columns
   readonly severityTpl = viewChild<TemplateRef<any>>('severityTpl');
@@ -67,6 +76,7 @@ export class AuditLogsComponent {
   readonly filtered = this.store.filtered;
   readonly pagedItems = this.store.pagedItems;
   readonly activeChips = this.store.activeChips;
+  readonly loading = this.store.loading;
 
   // Actions delegated to the store
   resetFilters(): void {

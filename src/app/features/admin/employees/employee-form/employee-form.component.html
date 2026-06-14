@@ -1,18 +1,18 @@
     <section class="surface p-3">
-      <h1 class="h3">{{ employee ? 'Edit' : 'Create' }} employee</h1>
+      <h1 class="h3">{{ employee ? ('EMP_FORM_EDIT' | translate) : ('EMP_FORM_CREATE' | translate) }} {{ 'EMP_FORM_EMPLOYEE' | translate }}</h1>
       <form [formGroup]="form" (ngSubmit)="submit()" class="row g-3">
-        <div class="col-md-6"><label class="form-label">First name</label><input class="form-control" formControlName="firstName" /></div>
-        <div class="col-md-6"><label class="form-label">Last name</label><input class="form-control" formControlName="lastName" /></div>
-        <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" type="email" formControlName="email" /></div>
-        <div class="col-md-6"><label class="form-label">Phone</label><input class="form-control" formControlName="phone" /></div>
-        <div class="col-md-4"><label class="form-label">Department</label><input class="form-control" formControlName="department" /></div>
-        <div class="col-md-4"><label class="form-label">Designation</label><input class="form-control" formControlName="designation" /></div>
-        <div class="col-md-4"><label class="form-label">Manager</label><input class="form-control" formControlName="manager" /></div>
-        <div class="col-md-4"><label class="form-label">Location</label><input class="form-control" formControlName="location" /></div>
-        <div class="col-md-4"><label class="form-label">Status</label><select class="form-select" formControlName="status"><option>Active</option><option>Inactive</option><option>On Leave</option></select></div>
-        <div class="col-md-4"><label class="form-label">Joined</label><input class="form-control" type="date" formControlName="joinedAt" /></div>
-        <div class="col-md-4"><label class="form-label">Salary</label><input class="form-control" type="number" formControlName="salary" /></div>
-        <div class="col-12 d-flex justify-content-end gap-2"><button class="btn btn-outline-secondary" type="button" (click)="cancel()">Cancel</button><button class="btn btn-primary" type="submit" [disabled]="form.invalid || saving()">{{ saving() ? 'Saving...' : 'Save employee' }}</button></div>
+        <div class="col-md-6"><label class="form-label">{{ 'EMP_FORM_FIRST_NAME' | translate }}</label><input class="form-control" formControlName="firstName" /></div>
+        <div class="col-md-6"><label class="form-label">{{ 'EMP_FORM_LAST_NAME' | translate }}</label><input class="form-control" formControlName="lastName" /></div>
+        <div class="col-md-6"><label class="form-label">{{ 'EMP_FORM_EMAIL' | translate }}</label><input class="form-control" type="email" formControlName="email" /></div>
+        <div class="col-md-6"><label class="form-label">{{ 'EMP_FORM_PHONE' | translate }}</label><input class="form-control" formControlName="phone" /></div>
+        <div class="col-md-4"><label class="form-label">{{ 'EMP_FORM_DEPARTMENT' | translate }}</label><input class="form-control" formControlName="department" /></div>
+        <div class="col-md-4"><label class="form-label">{{ 'EMP_FORM_DESIGNATION' | translate }}</label><input class="form-control" formControlName="designation" /></div>
+        <div class="col-md-4"><label class="form-label">{{ 'EMP_FORM_MANAGER' | translate }}</label><input class="form-control" formControlName="manager" /></div>
+        <div class="col-md-4"><label class="form-label">{{ 'EMP_FORM_LOCATION' | translate }}</label><input class="form-control" formControlName="location" /></div>
+        <div class="col-md-4"><label class="form-label">{{ 'EMP_FORM_STATUS' | translate }}</label><select class="form-select" formControlName="status"><option value="Active">{{ 'EMP_FORM_STATUS_ACTIVE' | translate }}</option><option value="Inactive">{{ 'EMP_FORM_STATUS_INACTIVE' | translate }}</option><option value="On Leave">{{ 'EMP_FORM_STATUS_ON_LEAVE' | translate }}</option></select></div>
+        <div class="col-md-4"><label class="form-label">{{ 'EMP_FORM_JOINED' | translate }}</label><input class="form-control" type="date" formControlName="joinedAt" /></div>
+        <div class="col-md-4"><label class="form-label">{{ 'EMP_FORM_SALARY' | translate }}</label><input class="form-control" type="number" formControlName="salary" /></div>
+        <div class="col-12 d-flex justify-content-end gap-2"><button class="btn btn-outline-secondary" type="button" (click)="cancel()">{{ 'EMP_FORM_CANCEL' | translate }}</button><button class="btn btn-primary" type="submit" [disabled]="form.invalid || saving()">{{ saving() ? ('EMP_FORM_SAVING' | translate) : ('EMP_FORM_SAVE' | translate) }}</button></div>
       </form>
     </section>
   

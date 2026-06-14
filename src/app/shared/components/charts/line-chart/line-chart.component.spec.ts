@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { TranslateModule } from '@ngx-translate/core';
 import { LineChartComponent } from './line-chart.component';
 import { MonthlyDataPoint } from '@core/models/analytics.models';
 
@@ -15,7 +16,7 @@ describe('LineChartComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LineChartComponent],
+      imports: [LineChartComponent, TranslateModule.forRoot()],
       providers: [provideCharts(withDefaultRegisterables())]
     }).compileComponents();
 
@@ -48,7 +49,7 @@ describe('LineChartComponent', () => {
     fixture.componentRef.setInput('dataPoints', []);
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.textContent).toContain('No data available');
+    expect(el.textContent).toContain('COMMON_NO_DATA');
   });
 
   it('should show loading state when loading is true', () => {
@@ -56,6 +57,6 @@ describe('LineChartComponent', () => {
     fixture.componentRef.setInput('loading', true);
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.textContent).toContain('Loading chart');
+    expect(el.textContent).toContain('CHART_LOADING');
   });
 });

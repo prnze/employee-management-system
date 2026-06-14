@@ -1,0 +1,280 @@
+.welcome-banner {
+  background: linear-gradient(135deg, #09477b 0%, #0f6cbd 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 108, 189, 0.15);
+
+  [data-bs-theme="dark"] & {
+    background: linear-gradient(135deg, #0d1624 0%, #152946 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(107, 184, 255, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .welcome-title {
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  .welcome-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+
+    .welcome-icon {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+.bg-white-15 {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.kpi-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  border-left: 4px solid var(--kpi-color);
+
+  [data-bs-theme="dark"] & {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+    border-color: var(--kpi-color);
+
+    [data-bs-theme="dark"] & {
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .kpi-icon-wrapper {
+      transform: scale(1.1);
+      background: var(--kpi-color);
+      color: #ffffff;
+    }
+  }
+
+  .kpi-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(15, 108, 189, 0.05);
+    color: var(--kpi-color);
+    transition: all 0.3s ease;
+    font-size: 24px;
+
+    [data-bs-theme="dark"] & {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .kpi-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--app-muted);
+  }
+
+  .kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--app-text);
+    line-height: 1.2;
+  }
+  
+  .kpi-trend-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+  }
+}
+
+.toolbar-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+
+  [data-bs-theme="dark"] & {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.form-control, .form-select {
+  border-radius: 10px;
+  border: 1px solid var(--app-border);
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  height: 38px;
+  font-size: 0.875rem;
+  
+  &:focus {
+    background-color: var(--app-surface);
+    color: var(--app-text);
+    border-color: var(--app-brand);
+    box-shadow: 0 0 0 3px rgba(15, 108, 189, 0.15);
+  }
+}
+
+.btn-premium-primary {
+  background: var(--app-brand);
+  color: #ffffff;
+  border: 1px solid var(--app-brand);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+
+  [data-bs-theme="dark"] & {
+    color: #111827;
+  }
+
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+}
+
+.btn-premium-secondary {
+  background: var(--app-surface);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.825rem;
+  transition: all 0.2s ease;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: var(--app-bg);
+    border-color: var(--app-brand);
+    color: var(--app-brand);
+  }
+}
+
+.report-catalog-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border) !important;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.02);
+    border-color: var(--app-brand) !important;
+  }
+}
+
+.catalog-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  font-size: 1.25rem;
+}
+
+.bg-light-subtle {
+  background-color: rgba(108, 117, 125, 0.03);
+}
+
+.xxs {
+  font-size: 0.725rem;
+}
+
+.btn-action-outline {
+  background: var(--app-surface);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(15, 108, 189, 0.03);
+    border-color: var(--app-brand);
+    
+    [data-bs-theme="dark"] & {
+      background: rgba(255, 255, 255, 0.04);
+    }
+  }
+}
+
+/* Deep overrides inside ChartCardComponent */
+::ng-deep app-chart-card {
+  .card {
+    border-radius: 16px !important;
+    border: 1px solid var(--app-border) !important;
+    background-color: var(--app-surface) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+    
+    [data-bs-theme="dark"] & {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+  }
+}
+
+/* Deep overrides inside the Table framework */
+::ng-deep app-table {
+  .table-responsive {
+    border-radius: 12px !important;
+    border: 1px solid var(--app-border) !important;
+    background: var(--app-surface) !important;
+  }
+
+  .table {
+    thead th {
+      font-size: 0.8rem !important;
+      font-weight: 700 !important;
+      background-color: var(--app-bg) !important;
+      border-bottom: 2px solid var(--app-border) !important;
+      color: var(--app-muted) !important;
+      padding: 0.85rem 1rem !important;
+    }
+
+    tbody tr {
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: rgba(15, 108, 189, 0.01) !important;
+        
+        [data-bs-theme="dark"] & {
+          background-color: rgba(255, 255, 255, 0.01) !important;
+        }
+      }
+      
+      td {
+        padding: 0.75rem 1rem !important;
+        border-bottom: 1px solid var(--app-border) !important;
+        font-size: 0.85rem !important;
+      }
+    }
+  }
+}

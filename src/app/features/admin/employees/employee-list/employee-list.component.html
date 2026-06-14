@@ -3,7 +3,7 @@
   <div class="welcome-banner-glow"></div>
   <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-3">
     <div>
-      <h1 class="h3 fw-bold mb-1 welcome-title">Workforce Directory</h1>
+      <h1 class="h3 fw-bold mb-1 welcome-title">{{ 'EMP_LIST_HEADER_TITLE' | translate }}</h1>
       <p class="welcome-subtitle mb-0 d-flex align-items-center gap-2">
         <app-icon [icon]="APP_ICONS.EMPLOYEE" class="welcome-icon" aria-hidden="true"></app-icon>
         <span>{{ totalText() }}</span>
@@ -12,17 +12,17 @@
     <div class="d-flex flex-wrap gap-2">
       <!-- Column visibility toggle -->
       <div class="dropdown">
-        <button class="btn btn-premium-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-label="Toggle columns">
+        <button class="btn btn-premium-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' [attr.aria-label]="'EMP_LIST_COLUMNS' | translate">
           <app-icon [icon]="APP_ICONS.SETTINGS" [size]="18" aria-hidden="true"></app-icon>
-          <span>Columns</span>
+          <span>{{ 'EMP_LIST_COLUMNS' | translate }}</span>
         </button>
         <ul class="dropdown-menu dropdown-menu-end shadow-lg p-2.5 border rounded-3 mt-2 col-manage-dropdown" style="min-width:180px">
-          <li class="dropdown-header border-bottom pb-1.5 mb-2 small fw-bold text-uppercase text-muted">Toggle Columns</li>
+          <li class="dropdown-header border-bottom pb-1.5 mb-2 small fw-bold text-uppercase text-muted">{{ 'EMP_LIST_COLUMNS' | translate }}</li>
           @for (col of columnsConfig(); track col.key) {
             <li>
               <label class="dropdown-item d-flex align-items-center gap-2 rounded-2 col-visible-toggle py-1.5" style="cursor:pointer">
                 <input class="form-check-input mt-0" type="checkbox" [checked]="col.visible" (change)="toggleColumn(col)" />
-                <span class="small fw-semibold text-body">{{ col.label }}</span>
+                <span class="small fw-semibold text-body">{{ col.label | translate }}</span>
               </label>
             </li>
           }
@@ -31,22 +31,22 @@
 
       <!-- Export -->
       <div class="dropdown" *appPermission="{ module: 'employees', action: 'read' }">
-        <button class="btn btn-premium-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-label="Export">
+        <button class="btn btn-premium-secondary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' [attr.aria-label]="'EMP_LIST_EXPORT' | translate">
           <app-icon [icon]="APP_ICONS.DOWNLOAD" [size]="18" aria-hidden="true"></app-icon>
-          <span>Export</span>
+          <span>{{ 'EMP_LIST_EXPORT' | translate }}</span>
         </button>
         <ul class="dropdown-menu dropdown-menu-end shadow-lg border rounded-3 mt-2">
-          <li class="dropdown-header border-bottom pb-1.5 mb-2 small fw-bold text-uppercase text-muted">Format Options</li>
+          <li class="dropdown-header border-bottom pb-1.5 mb-2 small fw-bold text-uppercase text-muted">{{ 'COMMON_EXPORT' | translate }}</li>
           <li>
             <button class="dropdown-item d-inline-flex align-items-center gap-2 py-2" type="button" (click)="exportCsv()">
               <app-icon [icon]="APP_ICONS.REPORTS" [size]="16" aria-hidden="true"></app-icon>
-              <span>CSV</span>
+              <span>{{ 'EMP_LIST_CSV' | translate }}</span>
             </button>
           </li>
           <li>
             <button class="dropdown-item d-inline-flex align-items-center gap-2 py-2" type="button" (click)="exportExcel()">
               <app-icon [icon]="APP_ICONS.DASHBOARD" [size]="16" aria-hidden="true"></app-icon>
-              <span>Excel (XLS)</span>
+              <span>{{ 'EMP_LIST_EXCEL' | translate }}</span>
             </button>
           </li>
           <li>
@@ -61,22 +61,22 @@
       <!-- New Employee Button -->
       <a *appPermission="{ module: 'employees', action: 'create' }" class="btn btn-premium-primary d-inline-flex align-items-center gap-2 text-decoration-none" routerLink="/admin/employees/create">
         <app-icon [icon]="APP_ICONS.ADD" aria-hidden="true"></app-icon>
-        <span>New Employee</span>
+        <span>{{ 'EMP_LIST_NEW_EMPLOYEE' | translate }}</span>
       </a>
     </div>
   </div>
 </div>
 
 <!-- ── Filter panel ────────────────────────────── -->
-<form [formGroup]="filterForm" class="surface filter-card p-4 mb-4" aria-label="Employee filters">
+<form [formGroup]="filterForm" class="surface filter-card p-4 mb-4" [attr.aria-label]="'EMP_LIST_FILTERS_LABEL' | translate">
   <div class="row g-3 mb-3">
     <!-- Global search -->
     <div class="col-12 col-md-4">
       <div class="position-relative search-input-wrapper">
         <app-icon [icon]="APP_ICONS.SEARCH" class="position-absolute start-3 text-muted search-icon" [size]="18" aria-hidden="true"></app-icon>
-        <input class="form-control" placeholder="Search name, email, code, dept…" formControlName="query" aria-label="Search employees" />
+        <input class="form-control" [placeholder]="'EMP_LIST_SEARCH_PLACEHOLDER' | translate" formControlName="query" [attr.aria-label]="'EMP_LIST_SEARCH_EMPLOYEES' | translate" />
         @if (filterForm.controls.query.value) {
-          <button class="btn btn-clear position-absolute end-2 top-50 translate-middle-y d-flex align-items-center justify-content-center" type="button" (click)="filterForm.controls.query.setValue('')" aria-label="Clear search">
+          <button class="btn btn-clear position-absolute end-2 top-50 translate-middle-y d-flex align-items-center justify-content-center" type="button" (click)="filterForm.controls.query.setValue('')" [attr.aria-label]="'COMMON_CLEAR_SEARCH' | translate">
             <app-icon [icon]="APP_ICONS.CLOSE" [size]="16" aria-hidden="true"></app-icon>
           </button>
         }
@@ -84,29 +84,31 @@
     </div>
 
     <div class="col-6 col-md-2">
-      <select class="form-select" formControlName="department" aria-label="Filter by department">
-        <option value="">All departments</option>
+      <select class="form-select" formControlName="department" [attr.aria-label]="'EMP_LIST_FILTER_BY_DEPT' | translate">
+        <option value="">{{ 'EMP_LIST_ALL_DEPTS' | translate }}</option>
         @for (dept of departments(); track dept) { <option [value]="dept">{{ dept }}</option> }
       </select>
     </div>
 
     <div class="col-6 col-md-2">
-      <select class="form-select" formControlName="status" aria-label="Filter by status">
-        <option value="">All statuses</option>
-        <option>Active</option><option>Inactive</option><option>On Leave</option>
+      <select class="form-select" formControlName="status" [attr.aria-label]="'EMP_LIST_FILTER_BY_STATUS' | translate">
+        <option value="">{{ 'EMP_LIST_ALL_STATUSES' | translate }}</option>
+        <option value="Active">{{ 'EMP_FORM_STATUS_ACTIVE' | translate }}</option>
+        <option value="Inactive">{{ 'EMP_FORM_STATUS_INACTIVE' | translate }}</option>
+        <option value="On Leave">{{ 'EMP_FORM_STATUS_ON_LEAVE' | translate }}</option>
       </select>
     </div>
 
     <div class="col-6 col-md-2">
-      <select class="form-select" formControlName="location" aria-label="Filter by location">
-        <option value="">All locations</option>
+      <select class="form-select" formControlName="location" [attr.aria-label]="'EMP_LIST_FILTER_BY_LOCATION' | translate">
+        <option value="">{{ 'EMP_LIST_ALL_LOCATIONS' | translate }}</option>
         @for (loc of locations(); track loc) { <option [value]="loc">{{ loc }}</option> }
       </select>
     </div>
 
     <div class="col-6 col-md-2">
       <button class="btn btn-outline-secondary w-100 btn-advanced d-flex align-items-center justify-content-center gap-2" type="button" (click)="showAdvanced.update(v => !v)">
-        <span>{{ showAdvanced() ? 'Less' : 'More filters' }}</span>
+        <span>{{ showAdvanced() ? ('EMP_LIST_LESS' | translate) : ('EMP_LIST_MORE_FILTERS_SHORT' | translate) }}</span>
         <app-icon [icon]="showAdvanced() ? APP_ICONS.SORT_UP : APP_ICONS.SORT_DOWN" [size]="16" aria-hidden="true"></app-icon>
       </button>
     </div>
@@ -115,34 +117,34 @@
   @if (showAdvanced()) {
     <div class="row g-3 pt-3 border-top advanced-filters-row">
       <div class="col-12 col-md-3">
-        <label class="form-label small fw-bold text-body-secondary mb-1">Designation</label>
-        <select class="form-select" formControlName="designation" aria-label="Filter by designation">
-          <option value="">All designations</option>
+        <label class="form-label small fw-bold text-body-secondary mb-1">{{ 'EMP_DETAIL_DESIGNATION' | translate }}</label>
+        <select class="form-select" formControlName="designation" [attr.aria-label]="'EMP_LIST_FILTER_BY_DESIGNATION' | translate">
+          <option value="">{{ 'EMP_LIST_ALL_DESIGNATIONS' | translate }}</option>
           @for (d of designations(); track d) { <option [value]="d">{{ d }}</option> }
         </select>
       </div>
       <div class="col-6 col-md-2">
-        <label class="form-label small fw-bold text-body-secondary mb-1">Joined from</label>
-        <input class="form-control" type="date" formControlName="joinedFrom" aria-label="Joined from date" />
+        <label class="form-label small fw-bold text-body-secondary mb-1">{{ 'EMP_LIST_JOINED_FROM' | translate }}</label>
+        <input class="form-control" type="date" formControlName="joinedFrom" [attr.aria-label]="'EMP_LIST_JOINED_FROM_DATE' | translate" />
       </div>
       <div class="col-6 col-md-2">
-        <label class="form-label small fw-bold text-body-secondary mb-1">Joined to</label>
-        <input class="form-control" type="date" formControlName="joinedTo" aria-label="Joined to date" />
+        <label class="form-label small fw-bold text-body-secondary mb-1">{{ 'EMP_LIST_JOINED_TO' | translate }}</label>
+        <input class="form-control" type="date" formControlName="joinedTo" [attr.aria-label]="'EMP_LIST_JOINED_TO_DATE' | translate" />
       </div>
       <div class="col-6 col-md-2">
-        <label class="form-label small fw-bold text-body-secondary mb-1">Page size</label>
-        <select class="form-select" formControlName="pageSize" aria-label="Rows per page">
-          <option [ngValue]="5">5 per page</option>
-          <option [ngValue]="10">10 per page</option>
-          <option [ngValue]="25">25 per page</option>
-          <option [ngValue]="50">50 per page</option>
+        <label class="form-label small fw-bold text-body-secondary mb-1">{{ 'EMP_LIST_PAGE_SIZE' | translate }}</label>
+        <select class="form-select" formControlName="pageSize" [attr.aria-label]="'ROWS_PER_PAGE' | translate">
+          <option [ngValue]="5">5 {{ 'EMP_LIST_PER_PAGE' | translate }}</option>
+          <option [ngValue]="10">10 {{ 'EMP_LIST_PER_PAGE' | translate }}</option>
+          <option [ngValue]="25">25 {{ 'EMP_LIST_PER_PAGE' | translate }}</option>
+          <option [ngValue]="50">50 {{ 'EMP_LIST_PER_PAGE' | translate }}</option>
         </select>
       </div>
       <div class="col-6 col-md-3 d-flex align-items-end gap-2">
-        <button class="btn btn-outline-secondary flex-fill btn-reset" type="button" (click)="resetFilters()">Reset</button>
+        <button class="btn btn-outline-secondary flex-fill btn-reset" type="button" (click)="resetFilters()">{{ 'COMMON_RESET' | translate }}</button>
         <button class="btn btn-action-outline flex-fill btn-reset d-flex align-items-center justify-content-center gap-1.5" type="button" (click)="saveCurrentFilter()">
           <app-icon [icon]="APP_ICONS.SAVE" [size]="14"></app-icon>
-          <span>Save filter</span>
+          <span>{{ 'EMP_LIST_SAVE_FILTER_TITLE' | translate }}</span>
         </button>
       </div>
     </div>
@@ -151,11 +153,11 @@
   <!-- Saved filter presets -->
   @if (savedFilters().length > 0) {
     <div class="d-flex flex-wrap align-items-center gap-2 mt-3 pt-3 border-top saved-filters-panel">
-      <span class="small fw-semibold text-body-secondary me-2">Saved Presets:</span>
+      <span class="small fw-semibold text-body-secondary me-2">{{ 'EMP_LIST_SAVED_PRESETS' | translate }}</span>
       @for (sf of savedFilters(); track sf.id) {
         <div class="saved-preset-chip d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill border">
           <button type="button" class="btn-preset-label p-0" (click)="applyFilter(sf)">{{ sf.name }}</button>
-          <button class="btn-preset-close d-inline-flex align-items-center justify-content-center" type="button" (click)="removeSavedFilter(sf.id)" aria-label="Remove saved filter">
+          <button class="btn-preset-close d-inline-flex align-items-center justify-content-center" type="button" (click)="removeSavedFilter(sf.id)" [attr.aria-label]="'REMOVE_SAVED_FILTER' | translate">
             <app-icon [icon]="APP_ICONS.CLOSE" [size]="12" aria-hidden="true"></app-icon>
           </button>
         </div>
@@ -175,18 +177,18 @@
 <!-- ── Sort stack badges ───────────────────────── -->
 @if (sortStack().length > 0) {
   <div class="d-flex flex-wrap gap-2 mb-4 align-items-center sort-stack-panel p-2.5 rounded-3 border bg-body-tertiary">
-    <span class="small fw-semibold text-body-secondary me-2">Active Sort Priority:</span>
+    <span class="small fw-semibold text-body-secondary me-2">{{ 'EMP_LIST_SORT_PRIORITY' | translate }}</span>
     @for (entry of sortStack(); track entry.field; let i = $index) {
       <div class="sort-badge d-flex align-items-center gap-2 px-2.5 py-1.5 rounded border bg-body">
         <span class="sort-badge-index fw-bold text-primary">#{{ i + 1 }}</span>
         <span class="sort-badge-label small text-body">{{ entry.field }}</span>
         <app-icon [icon]="entry.direction === 'asc' ? APP_ICONS.SORT_UP : APP_ICONS.SORT_DOWN" [size]="14" class="text-primary" aria-hidden="true"></app-icon>
-        <button class="btn-sort-close d-inline-flex align-items-center justify-content-center p-0" type="button" (click)="removeSortEntry(i)" aria-label="Remove sort">
+        <button class="btn-sort-close d-inline-flex align-items-center justify-content-center p-0" type="button" (click)="removeSortEntry(i)" [attr.aria-label]="'REMOVE_SORT' | translate">
           <app-icon [icon]="APP_ICONS.CLOSE" [size]="12" aria-hidden="true"></app-icon>
         </button>
       </div>
     }
-    <button class="btn btn-clear-sort btn-sm ms-2 small fw-semibold text-decoration-none" type="button" (click)="clearSort()">Clear sort</button>
+    <button class="btn btn-clear-sort btn-sm ms-2 small fw-semibold text-decoration-none" type="button" (click)="clearSort()">{{ 'EMP_LIST_CLEAR_SORT' | translate }}</button>
   </div>
 }
 
@@ -195,26 +197,26 @@
   <div class="bulk-toolbar mb-4 p-3 rounded-4 d-flex flex-wrap align-items-center justify-content-between gap-3 shadow">
     <div class="d-flex align-items-center gap-2">
       <span class="bulk-indicator-dot"></span>
-      <strong class="bulk-text-count">{{ selectedIds().length }} selected</strong>
+      <strong class="bulk-text-count">{{ selectedIds().length }} {{ 'EMP_LIST_SELECTED' | translate }}</strong>
     </div>
     <div class="d-flex flex-wrap gap-2">
       <button *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-bulk-action" type="button" (click)="bulkSetStatus('Active')">
         <app-icon [icon]="APP_ICONS.SUCCESS" aria-hidden="true" [size]="16"></app-icon>
-        <span>Activate</span>
+        <span>{{ 'EMP_LIST_BULK_ACTIVATE_LABEL' | translate }}</span>
       </button>
       <button *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-bulk-action" type="button" (click)="bulkSetStatus('Inactive')">
         <app-icon [icon]="APP_ICONS.ERROR" aria-hidden="true" [size]="16"></app-icon>
-        <span>Deactivate</span>
+        <span>{{ 'EMP_LIST_BULK_DEACTIVATE_LABEL' | translate }}</span>
       </button>
       <button *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-bulk-action" type="button" (click)="bulkSetStatus('On Leave')">
         <app-icon [icon]="APP_ICONS.LEAVE" aria-hidden="true" [size]="16"></app-icon>
-        <span>On Leave</span>
+        <span>{{ 'EMP_LIST_BULK_LEAVE_LABEL' | translate }}</span>
       </button>
       <button *appPermission="{ module: 'employees', action: 'delete' }" class="btn btn-bulk-action-danger" type="button" (click)="confirmBulkDelete()">
         <app-icon [icon]="APP_ICONS.DELETE" aria-hidden="true" [size]="16"></app-icon>
-        <span>Delete</span>
+        <span>{{ 'EMP_LIST_BULK_DELETE_LABEL' | translate }}</span>
       </button>
-      <button class="btn btn-bulk-deselect ms-2" type="button" (click)="selectedIds.set([])">Deselect all</button>
+      <button class="btn btn-bulk-deselect ms-2" type="button" (click)="selectedIds.set([])">{{ 'EMP_LIST_DESELECT' | translate }}</button>
     </div>
   </div>
 }
@@ -236,7 +238,7 @@
   <!-- ── Pagination footer ──────────────────── -->
   <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3">
     <div class="small text-body-secondary fw-medium">
-      Showing <strong class="text-body">{{ rangeStart(pagedVal) }}</strong>–<strong class="text-body">{{ rangeEnd(pagedVal) }}</strong> of <strong class="text-body">{{ pagedVal.total }}</strong>
+      {{ 'EMP_LIST_SHOWING' | translate }} <strong class="text-body">{{ rangeStart(pagedVal) }}</strong>–<strong class="text-body">{{ rangeEnd(pagedVal) }}</strong> {{ 'EMP_LIST_OF' | translate }} <strong class="text-body">{{ pagedVal.total }}</strong>
     </div>
     <app-pagination
       [page]="filterForm.controls.page.value"
@@ -246,19 +248,19 @@
   </div>
 } @else {
   <div class="surface p-5 text-center text-body-secondary rounded-4">
-    <div class="spinner-border text-primary mb-3" role="status"><span class="visually-hidden">Loading…</span></div>
-    <p class="mb-0 fw-medium">Loading employees…</p>
+    <div class="spinner-border text-primary mb-3" role="status"><span class="visually-hidden">{{ 'EMP_LIST_LOADING' | translate }}</span></div>
+    <p class="mb-0 fw-medium">{{ 'EMP_LIST_LOADING_MSG' | translate }}</p>
   </div>
 }
 
 <!-- ── Save filter dialog (inline) ───────────── -->
-<app-modal [open]="showSaveDialog()" [title]="'Save filter'" (closed)="showSaveDialog.set(false)">
+<app-modal [open]="showSaveDialog()" [title]="'EMP_LIST_SAVE_FILTER_TITLE' | translate" (closed)="showSaveDialog.set(false)">
   <div class="mb-3">
-    <input #filterNameInput class="form-control" placeholder="Filter name…" [value]="filterNameDraft()" (input)="filterNameDraft.set(filterNameInput.value)" />
+    <input #filterNameInput class="form-control" [placeholder]="'EMP_LIST_FILTER_PLACEHOLDER' | translate" [value]="filterNameDraft()" (input)="filterNameDraft.set(filterNameInput.value)" />
   </div>
   <div class="d-flex justify-content-end gap-2">
-    <button class="btn btn-outline-secondary btn-sm" type="button" (click)="showSaveDialog.set(false)">Cancel</button>
-    <button class="btn btn-primary btn-sm" type="button" [disabled]="!filterNameDraft().trim()" (click)="confirmSaveFilter()">Save</button>
+    <button class="btn btn-outline-secondary btn-sm" type="button" (click)="showSaveDialog.set(false)">{{ 'COMMON_CANCEL' | translate }}</button>
+    <button class="btn btn-primary btn-sm" type="button" [disabled]="!filterNameDraft().trim()" (click)="confirmSaveFilter()">{{ 'COMMON_SAVE' | translate }}</button>
   </div>
 </app-modal>
 
@@ -294,11 +296,11 @@
   <div class="d-flex justify-content-end gap-1.5 flex-wrap">
     <a class="btn btn-sm btn-action-outline text-decoration-none" [routerLink]="['/admin/employees', row.id]">
       <app-icon [icon]="APP_ICONS.USER" [size]="14" class="me-1"></app-icon>
-      <span>View</span>
+      <span>{{ 'EMP_LIST_VIEW' | translate }}</span>
     </a>
     <a *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-sm btn-action-outline text-decoration-none" [routerLink]="['/admin/employees', row.id, 'edit']">
       <app-icon [icon]="APP_ICONS.EDIT" [size]="14" class="me-1"></app-icon>
-      <span>Edit</span>
+      <span>{{ 'EMP_LIST_EDIT' | translate }}</span>
     </a>
   </div>
 </ng-template>

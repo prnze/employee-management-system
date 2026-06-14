@@ -39,15 +39,15 @@ export class EmployeesStore {
   private readonly _pagedResult = signal<PagedResult<Employee> | null>(null);
 
   private readonly _columnsConfig = signal<ColumnDef[]>([
-    { key: 'employeeCode', label: 'Code',        sortable: true,  visible: true  },
-    { key: 'firstName',    label: 'Name',         sortable: true,  visible: true  },
-    { key: 'email',        label: 'Email',        sortable: true,  visible: true  },
-    { key: 'phone',        label: 'Phone',        sortable: false, visible: true  },
-    { key: 'department',   label: 'Department',   sortable: true,  visible: true  },
-    { key: 'designation',  label: 'Designation',  sortable: true,  visible: false },
-    { key: 'location',     label: 'Location',     sortable: true,  visible: true  },
-    { key: 'status',       label: 'Status',       sortable: true,  visible: true  },
-    { key: 'joinedAt',     label: 'Joined',       sortable: true,  visible: true  }
+    { key: 'employeeCode', label: 'EMP_DETAIL_CODE',        sortable: true,  visible: true  },
+    { key: 'firstName',    label: 'USER_NAME',              sortable: true,  visible: true  },
+    { key: 'email',        label: 'USER_EMAIL',             sortable: true,  visible: true  },
+    { key: 'phone',        label: 'USER_PHONE',             sortable: false, visible: true  },
+    { key: 'department',   label: 'EMP_DETAIL_DEPARTMENT',  sortable: true,  visible: true  },
+    { key: 'designation',  label: 'EMP_DETAIL_DESIGNATION', sortable: true,  visible: false },
+    { key: 'location',     label: 'PROFILE_LOCATION',       sortable: true,  visible: true  },
+    { key: 'status',       label: 'EMP_DETAIL_STATUS',      sortable: true,  visible: true  },
+    { key: 'joinedAt',     label: 'EMP_FORM_JOINED',        sortable: true,  visible: true  }
   ]);
 
   private readonly _filters = signal<EmployeeFilter>({

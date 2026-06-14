@@ -1,6 +1,20 @@
-    <main class="container py-5 text-center">
-      <h1>404</h1>
-      <p>{{ 'ERROR_404_MSG' | translate }}</p>
-      <a class="btn btn-primary" routerLink="/">{{ 'ERROR_404_HOME' | translate }}</a>
-    </main>
-  
+<main class="error-page-wrapper d-flex align-items-center justify-content-center">
+  <div class="error-card text-center p-5 rounded-4 shadow border">
+    <div class="error-illustration-wrapper mb-4">
+      <div class="error-pulse-glow bg-primary"></div>
+      <app-icon icon="travel_explore" class="error-icon text-primary" [size]="48" aria-hidden="true"></app-icon>
+    </div>
+    
+    <h1 class="h2 fw-bold text-body mb-2">{{ 'ERROR_404_TITLE' | translate }}</h1>
+    <p class="text-muted small mb-4 mx-auto" style="max-width: 340px;">
+      {{ 'ERROR_404_MSG' | translate }}
+    </p>
+    
+    <div class="d-flex justify-content-center gap-2">
+      <a class="btn btn-premium-primary px-4 py-2" routerLink="/">
+        <app-icon [icon]="APP_ICONS.DASHBOARD" [size]="16" class="me-1.5" aria-hidden="true"></app-icon>
+        <span>{{ 'ERROR_404_DASHBOARD' | translate }}</span>
+      </a>
+    </div>
+  </div>
+</main>

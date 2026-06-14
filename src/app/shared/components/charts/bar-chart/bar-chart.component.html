@@ -2,11 +2,11 @@
       @if (loading()) {
         <div class="d-flex align-items-center justify-content-center h-100 text-body-secondary">
           <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
-          Loading chart…
+          {{ 'CHART_LOADING' | translate }}
         </div>
       } @else if (chartData().datasets[0]?.data?.length === 0) {
         <div class="d-flex align-items-center justify-content-center h-100 text-body-secondary fst-italic">
-          No data available
+          {{ 'COMMON_NO_DATA' | translate }}
         </div>
       } @else {
         <canvas baseChart
@@ -14,7 +14,7 @@
           [data]="chartData()"
           [options]="options()"
           [plugins]="[]"
-          aria-label="Bar chart">
+          [attr.aria-label]="'CHART_BAR_LABEL' | translate">
         </canvas>
       }
     </div>

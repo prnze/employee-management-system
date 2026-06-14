@@ -1,102 +1,233 @@
-    <div class="d-flex align-items-center justify-content-between mb-4">
-      <div>
-        <h1 class="h3 mb-1">{{ 'ROLES_TITLE' | translate }}</h1>
-        <p class="text-body-secondary mb-0">{{ 'ROLES_SUBTITLE' | translate }}</p>
-      </div>
-      <span *appPermission="{ module: 'roles', action: 'manage' }" class="badge text-bg-success fs-6">{{ 'ROLES_LIVE_EDITING' | translate }}</span>
+<!-- ── Header & Welcome Banner ────────────────────────────────────────────── -->
+<div class="welcome-banner mb-4 p-4 rounded-4 position-relative overflow-hidden shadow-sm">
+  <div class="welcome-banner-glow"></div>
+  <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 fw-bold mb-1 welcome-title">{{ 'ROLES_HEADER_TITLE' | translate }}</h1>
+      <p class="welcome-subtitle mb-0 d-flex align-items-center gap-2 text-white-85">
+        <app-icon [icon]="APP_ICONS.LOCK" class="welcome-icon text-white-50" aria-hidden="true"></app-icon>
+        <span>{{ 'ROLES_HEADER_SUBTITLE' | translate }}</span>
+      </p>
     </div>
+    <span *appPermission="{ module: 'roles', action: 'manage' }" class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2 shadow-sm fw-semibold">
+      <span class="live-dot"></span>
+      <span>{{ 'ROLES_LIVE_EDITING' | translate }}</span>
+    </span>
+  </div>
+</div>
 
-    <!-- Role tabs -->
-    <ul class="nav nav-tabs mb-4" role="tablist">
-      @for (role of roles; track role) {
-        <li class="nav-item" role="presentation">
-          <button
-            class="nav-link"
-            [class.active]="selectedRole() === role"
-            type="button"
-            role="tab"
-            [attr.aria-selected]="selectedRole() === role"
-            (click)="selectedRole.set(role)"
-          >
-            {{ role }}
-            <span class="badge ms-2" [class.text-bg-primary]="selectedRole() === role" [class.text-bg-secondary]="selectedRole() !== role">
-              {{ permissionsService.getPermissions(role).length }}
-            </span>
+<!-- ── Sticky Module Selector / Toolbar Card ─────────────────────────────── -->
+<div class="card toolbar-card p-3 mb-4 shadow-sm border rounded-4">
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <!-- Module Search & Dropdown -->
+    <div class="d-flex align-items-center gap-3 flex-wrap flex-grow-1 min-w-0">
+      <div class="position-relative search-module-wrapper" style="width: min(280px, 100%);">
+        <app-icon [icon]="APP_ICONS.SEARCH" class="position-absolute start-3 text-muted search-icon" [size]="18" aria-hidden="true"></app-icon>
+        <input 
+          class="form-control form-control-sm ps-5" 
+          [placeholder]="'ROLES_SEARCH_MODULE' | translate" 
+          [value]="moduleSearchQuery()"
+          (input)="updateSearchQuery($event)"
+          [attr.aria-label]="'ROLES_SEARCH_MODULE' | translate" 
+        />
+      </div>
+      
+      <div class="dropdown">
+        <button class="btn btn-premium-secondary dropdown-toggle d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" [attr.aria-label]="'ROLES_SELECT_MODULE' | translate">
+          <app-icon [icon]="scopeIcon(selectedModule())" [size]="16" aria-hidden="true"></app-icon>
+          <span class="text-capitalize">{{ selectedModule() }}</span>
+        </button>
+        <ul class="dropdown-menu shadow border rounded-3 mt-2" style="max-height: 250px; overflow-y: auto;">
+          @for (mod of filteredModules(); track mod) {
+            <li>
+              <button class="dropdown-item d-flex align-items-center gap-2 py-2" type="button" (click)="selectedModule.set(mod)">
+                <app-icon [icon]="scopeIcon(mod)" [size]="16" aria-hidden="true"></app-icon>
+                <span class="text-capitalize">{{ mod }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Active Roles Counter & Info -->
+    <div class="d-flex align-items-center gap-3">
+      <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill fw-semibold shadow-sm">
+        {{ 'ROLES_ACTIVE_ROLES' | translate }} {{ roles.length }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main Layout: Matrix (Left) & Summary (Right) ───────────────────────── -->
+<div class="row g-4 mb-5">
+  <!-- Matrix Table Section -->
+  <div class="col-12 col-xl-9">
+    <div class="surface permissions-matrix-card p-4 rounded-4 shadow-sm border h-100">
+      <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom flex-wrap gap-3">
+        <div>
+          <h2 class="h5 fw-bold text-body mb-0 d-flex align-items-center gap-2">
+            <app-icon [icon]="scopeIcon(selectedModule())" class="text-primary" aria-hidden="true"></app-icon>
+            <span class="text-capitalize">{{ selectedModule() }}</span> {{ 'ROLES_MODULE_MATRIX' | translate }}
+          </h2>
+          <p class="text-muted small mb-0 mt-1">{{ 'ROLES_MATRIX_DESC' | translate }}</p>
+        </div>
+        
+        <!-- Bulk Operations -->
+        <div class="d-flex align-items-center gap-2 flex-wrap" *appPermission="{ module: 'roles', action: 'manage' }">
+          <button class="btn btn-premium-secondary btn-sm d-flex align-items-center gap-1.5" type="button" (click)="selectAllForModule()">
+            <app-icon [icon]="APP_ICONS.SUCCESS" [size]="14" aria-hidden="true"></app-icon>
+            <span>{{ 'ROLES_SELECT_ALL' | translate }}</span>
           </button>
-        </li>
-      }
-    </ul>
-
-    <!-- Permission matrix -->
-    <div class="surface p-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h5 mb-0">{{ selectedRole() }} permissions</h2>
-        <div class="d-flex gap-2" *appPermission="{ module: 'roles', action: 'manage' }">
-          <button class="btn btn-sm btn-outline-success" type="button" (click)="grantAll()">{{ 'ROLES_GRANT_ALL' | translate }}</button>
-          <button class="btn btn-sm btn-outline-danger" type="button" (click)="revokeAll()">{{ 'ROLES_REVOKE_ALL' | translate }}</button>
+          <button class="btn btn-premium-danger-outline btn-sm d-flex align-items-center gap-1.5" type="button" (click)="clearAllForModule()">
+            <app-icon [icon]="APP_ICONS.CLOSE" [size]="14" aria-hidden="true"></app-icon>
+            <span>{{ 'ROLES_CLEAR_ALL' | translate }}</span>
+          </button>
+          
+          <div class="dropdown">
+            <button class="btn btn-premium-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1.5" type="button" data-bs-toggle="dropdown" [attr.aria-label]="'ROLES_COPY_OPTIONS' | translate">
+              <app-icon [icon]="APP_ICONS.TRENDING_UP" [size]="14" aria-hidden="true"></app-icon>
+              <span>{{ 'ROLES_COPY_CLONE' | translate }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border rounded-3 mt-2">
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2 py-2" type="button" (click)="copyPermissions('Admin', 'Employee')">
+                  <span>{{ 'ROLES_COPY_ADMIN_EMP' | translate }}</span>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2 py-2" type="button" (click)="copyPermissions('Employee', 'Admin')">
+                  <span>{{ 'ROLES_COPY_EMP_ADMIN' | translate }}</span>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2 py-2" type="button" (click)="cloneRolePermissions()">
+                  <span>{{ 'ROLES_CLONE_FROM' | translate }}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
-      @for (group of groupedPermissions(); track group.scope) {
-        <div class="mb-4">
-          <h3 class="h6 text-uppercase text-body-secondary border-bottom pb-2 mb-3">
-            <app-icon [icon]="scopeIcon(group.scope)" class="me-2" aria-hidden="true"></app-icon>{{ group.scope }}
-          </h3>
-          <div class="row g-2">
-            @for (entry of group.entries; track entry.raw) {
-              <div class="col-sm-6 col-lg-4">
-                <div
-                  class="permission-card d-flex align-items-center gap-3 p-3 rounded border"
-                  [class.permission-card--granted]="isGranted(entry.raw)"
-                  [class.permission-card--denied]="!isGranted(entry.raw)"
-                >
-                  <div class="form-check form-switch mb-0">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      role="switch"
-                      [id]="'perm-' + entry.raw + '-' + selectedRole()"
-                      [checked]="isGranted(entry.raw)"
-                      [attr.aria-label]="'Toggle ' + entry.raw + ' for ' + selectedRole()"
-                      (change)="toggle(entry.raw)"
-                    />
-                  </div>
-                  <label class="mb-0 flex-grow-1" [for]="'perm-' + entry.raw + '-' + selectedRole()">
-                    <span class="fw-semibold d-block">{{ entry.action }}</span>
-                    <code class="small text-body-secondary">{{ entry.raw }}</code>
-                  </label>
-                  @if (isGranted(entry.raw)) {
-                    <span class="badge text-bg-success d-inline-flex align-items-center justify-content-center" style="width: 18px; height: 18px; padding: 0;">
-                      <app-icon [icon]="APP_ICONS.SUCCESS" [size]="12" aria-hidden="true"></app-icon>
-                    </span>
-                  } @else {
-                    <span class="badge text-bg-secondary d-inline-flex align-items-center justify-content-center" style="width: 18px; height: 18px; padding: 0;">
-                      <app-icon [icon]="APP_ICONS.ERROR" [size]="12" aria-hidden="true"></app-icon>
-                    </span>
-                  }
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-    </div>
-
-    <!-- Summary panel -->
-    <div class="row g-3 mt-2">
-      @for (role of roles; track role) {
-        <div class="col-md-6">
-          <div class="surface p-3 h-100">
-            <h3 class="h6 fw-semibold mb-2">{{ role }}</h3>
-            <div class="d-flex flex-wrap gap-1">
-              @for (perm of permissionsService.getPermissions(role); track perm) {
-                <span class="badge text-bg-primary">{{ perm }}</span>
+      <div class="table-responsive rounded-3 border">
+        <table class="table table-hover align-middle mb-0 matrix-table">
+          <thead>
+            <tr>
+              <th style="min-width: 200px;">{{ 'ROLES_ROLE_NAME' | translate }}</th>
+              @for (action of currentModuleActions(); track action) {
+                <th class="text-center text-uppercase small text-muted">{{ action }}</th>
               } @empty {
-                <span class="text-body-secondary fst-italic small">{{ 'USER_NO_EXTRA_PERMS' | translate }}</span>
+                <th class="text-center text-muted small py-3">{{ 'ROLES_NO_ACTIONS' | translate }}</th>
               }
-            </div>
-          </div>
-        </div>
-      }
+            </tr>
+          </thead>
+          <tbody>
+            @for (role of roles; track role) {
+              <tr [class.table-active]="selectedRole() === role" (click)="selectedRole.set(role)" style="cursor: pointer;">
+                <td>
+                  <div class="d-flex align-items-center gap-2.5">
+                    <app-icon [icon]="role === 'Admin' ? APP_ICONS.ROLE : APP_ICONS.USER" class="text-muted text-primary-emphasis" [size]="18" aria-hidden="true"></app-icon>
+                    <span class="fw-semibold text-body">{{ role }}</span>
+                  </div>
+                </td>
+                @for (action of currentModuleActions(); track action) {
+                  <td class="text-center">
+                    <div class="form-check form-switch d-inline-flex justify-content-center mb-0" (click)="$event.stopPropagation()">
+                      <input
+                        class="form-check-input matrix-switch"
+                        type="checkbox"
+                        role="switch"
+                        [id]="'switch-' + role + '-' + selectedModule() + '-' + action"
+                        [checked]="draftIsGranted(role, selectedModule() + ':' + action)"
+                        (change)="toggleDraftPermission(role, selectedModule() + ':' + action)"
+                        [attr.aria-label]="'ROLES_TOGGLE_PERMISSION' | translate"
+                      />
+                    </div>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
-  
+  </div>
+
+  <!-- Right Sidebar Summary Panel -->
+  <div class="col-12 col-xl-3">
+    <div class="card summary-panel-card p-4 rounded-4 shadow-sm border">
+      <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+        <app-icon [icon]="APP_ICONS.INFO" class="text-primary" aria-hidden="true"></app-icon>
+        <span>{{ 'ROLES_ACCESS_SUMMARY' | translate }}</span>
+      </h3>
+      
+      <div class="summary-details d-flex flex-column gap-3">
+        <div class="summary-row d-flex justify-content-between align-items-center border-bottom pb-2">
+          <span class="text-muted small">{{ 'ROLES_SELECTED_MODULE' | translate }}</span>
+          <span class="fw-bold text-capitalize d-inline-flex align-items-center gap-1.5">
+            <app-icon [icon]="scopeIcon(selectedModule())" [size]="14" aria-hidden="true"></app-icon>
+            {{ selectedModule() }}
+          </span>
+        </div>
+        
+        <div class="summary-row d-flex justify-content-between align-items-center border-bottom pb-2">
+          <span class="text-muted small">{{ 'ROLES_SELECTED_ROLE' | translate }}</span>
+          <span class="fw-bold text-primary">{{ selectedRole() }}</span>
+        </div>
+        
+        <div class="summary-row d-flex justify-content-between align-items-center border-bottom pb-2">
+          <span class="text-muted small">{{ 'ROLES_ACTIVE_ROLES_COUNT' | translate }}</span>
+          <span class="fw-bold">{{ roles.length }}</span>
+        </div>
+        
+        <div class="summary-row d-flex justify-content-between align-items-center border-bottom pb-2">
+          <span class="text-muted small">{{ 'ROLES_MODULE_ACTIONS' | translate }}</span>
+          <span class="fw-bold">{{ currentModuleActions().length }}</span>
+        </div>
+        
+        <div class="summary-row d-flex justify-content-between align-items-center border-bottom pb-2">
+          <span class="text-muted small">{{ 'ROLES_ACTIVE_GRANTS' | translate }}</span>
+          <span class="badge bg-success-subtle text-success fw-bold">{{ activeGrantsCount() }}</span>
+        </div>
+        
+        <div class="summary-row d-flex justify-content-between align-items-center">
+          <span class="text-muted small">{{ 'ROLES_DENIED_GRANTS' | translate }}</span>
+          <span class="badge bg-secondary-subtle text-secondary fw-bold">{{ deniedGrantsCount() }}</span>
+        </div>
+      </div>
+      
+      <!-- List of currently drafted permission keys for the selected role -->
+      <div class="mt-4 border-top pt-3">
+        <h4 class="small fw-bold text-muted mb-2">{{ selectedRole() }} {{ 'ROLES_ACTIVE_KEYS' | translate }}</h4>
+        <div class="d-flex flex-wrap gap-1.5 max-height-keys" style="max-height: 180px; overflow-y: auto;">
+          @for (perm of draftPermissions()[selectedRole()]; track perm) {
+            <span class="badge badge-key-chip rounded-pill">{{ perm }}</span>
+          } @empty {
+            <span class="text-muted fst-italic small">{{ 'ROLES_NO_PERMISSIONS' | translate }}</span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Sticky Footer for Pending Changes ────────────────────────────────── -->
+@if (pendingChangesCount() > 0) {
+  <div class="sticky-footer-bar shadow border-top p-3 d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-2">
+      <span class="pending-badge-dot bg-warning shadow-glow-warning"></span>
+      <span class="fw-bold text-body">
+        {{ pendingChangesCount() }} {{ 'ROLES_CHANGES_PENDING' | translate }}
+      </span>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-secondary px-4 btn-sm fw-semibold" type="button" (click)="discardChanges()">
+        {{ 'ROLES_DISCARD' | translate }}
+      </button>
+      <button class="btn btn-premium-primary px-4 btn-sm fw-semibold" type="button" (click)="saveChanges()">
+        {{ 'ROLES_SAVE_CHANGES' | translate }}
+      </button>
+    </div>
+  </div>
+}

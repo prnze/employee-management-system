@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BreadcrumbComponent } from '../layout-components/breadcrumb/breadcrumb.component';
 import { FooterComponent } from '../layout-components/footer/footer.component';
 import { NavItem, SidebarComponent } from '../layout-components/sidebar/sidebar.component';
@@ -11,7 +12,7 @@ import { ShellStateService } from '@core/services/shell-state.service';
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [RouterOutlet, SidebarComponent, TopNavbarComponent, BreadcrumbComponent, FooterComponent],
+  imports: [RouterOutlet, SidebarComponent, TopNavbarComponent, BreadcrumbComponent, FooterComponent, TranslatePipe],
   styleUrl: './admin-layout.component.scss',
   templateUrl: './admin-layout.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush

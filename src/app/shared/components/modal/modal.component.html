@@ -4,7 +4,9 @@
           <section class="modal-content">
             <header class="modal-header">
               <h2 class="modal-title fs-5">{{ title() }}</h2>
-              <button type="button" class="btn-close" aria-label="Close" (click)="closed.emit()"></button>
+              @if (closeable()) {
+                <button type="button" class="btn-close" [attr.aria-label]="'COMMON_CLOSE' | translate" (click)="closed.emit()"></button>
+              }
             </header>
             <div class="modal-body"><ng-content /></div>
           </section>

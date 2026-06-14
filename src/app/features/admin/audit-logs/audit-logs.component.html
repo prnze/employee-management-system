@@ -1,242 +1,352 @@
-    <!-- ── Header ────────────────────────────────────────────────── -->
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-      <div>
-        <h1 class="h3 mb-1">{{ 'AUDIT_TITLE' | translate }}</h1>
-        <p class="text-body-secondary small mb-0">
-          {{ filtered().length }} {{ 'COMMON_OF' | translate }} {{ svc.totalCount() }} {{ 'AUDIT_ENTRIES' | translate }}
-        </p>
+<!-- ── Header & Welcome Banner ────────────────────────────────────────────── -->
+<div class="welcome-banner mb-4 p-4 rounded-4 position-relative overflow-hidden shadow-sm">
+  <div class="welcome-banner-glow"></div>
+  <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 fw-bold mb-1 welcome-title">{{ 'AUDIT_HEADER_TITLE' | translate }}</h1>
+      <p class="welcome-subtitle mb-0 d-flex align-items-center gap-3 flex-wrap">
+        <span class="d-flex align-items-center gap-1.5">
+          <app-icon [icon]="APP_ICONS.AUDIT" class="welcome-icon text-white-50" aria-hidden="true"></app-icon>
+          <strong>{{ totalLogsCount() | number }}</strong> {{ 'AUDIT_TOTAL_LOGS' | translate }}
+        </span>
+        <span class="welcome-separator">·</span>
+        <span class="d-flex align-items-center gap-1.5 status-item text-danger">
+          <span class="kpi-bullet bg-danger shadow-glow-danger"></span>
+          <strong>{{ criticalEventsCount() | number }}</strong> {{ 'AUDIT_CRITICAL' | translate }}
+        </span>
+        <span class="welcome-separator">·</span>
+        <span class="d-flex align-items-center gap-1.5 status-item text-info">
+          <span class="kpi-bullet bg-info shadow-glow-info"></span>
+          <strong>{{ todayActivityCount() | number }}</strong> {{ 'AUDIT_TODAY' | translate }}
+        </span>
+      </p>
+    </div>
+    <div class="d-flex flex-wrap align-items-center gap-3">
+      <!-- View toggle -->
+      <div class="btn-group shadow-sm" role="group" [attr.aria-label]="'AUDIT_TITLE' | translate">
+        <button type="button" class="btn btn-premium-secondary d-inline-flex align-items-center gap-2" [class.active]="view() === 'table'" (click)="view.set('table')">
+          <app-icon [icon]="APP_ICONS.REPORTS" [size]="16" aria-hidden="true"></app-icon>
+          <span>{{ 'AUDIT_TABLE_VIEW' | translate }}</span>
+        </button>
+        <button type="button" class="btn btn-premium-secondary d-inline-flex align-items-center gap-2" [class.active]="view() === 'timeline'" (click)="view.set('timeline')">
+          <app-icon [icon]="APP_ICONS.AUDIT" [size]="16" aria-hidden="true"></app-icon>
+          <span>{{ 'AUDIT_TIMELINE' | translate }}</span>
+        </button>
       </div>
-      <div class="d-flex flex-wrap gap-2">
-        <!-- View toggle -->
-        <div class="btn-group btn-group-sm" role="group" [attr.aria-label]="'AUDIT_TITLE' | translate">
-          <button type="button" class="btn d-inline-flex align-items-center gap-1" [class.btn-primary]="view() === 'table'" [class.btn-outline-secondary]="view() !== 'table'" (click)="view.set('table')">
-            <app-icon [icon]="APP_ICONS.REPORTS" aria-hidden="true"></app-icon>
-            <span>{{ 'AUDIT_TABLE_VIEW' | translate }}</span>
+      <!-- Export -->
+      <div class="dropdown" *appPermission="{ module: 'audit', action: 'view' }">
+        <button class="btn btn-premium-secondary dropdown-toggle d-flex align-items-center gap-2 shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' [attr.aria-label]="'AUDIT_EXPORT' | translate">
+          <app-icon [icon]="APP_ICONS.DOWNLOAD" [size]="18" aria-hidden="true"></app-icon>
+          <span>{{ 'AUDIT_EXPORT' | translate }}</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow border rounded-3 mt-2">
+          <li>
+            <button class="dropdown-item d-inline-flex align-items-center gap-2 py-2" type="button" (click)="exportCsv()">
+              <app-icon [icon]="APP_ICONS.REPORTS" [size]="16" aria-hidden="true"></app-icon>
+              <span>{{ 'AUDIT_EXPORT_CSV' | translate }}</span>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item d-inline-flex align-items-center gap-2 py-2" type="button" (click)="exportExcel()">
+              <app-icon [icon]="APP_ICONS.DASHBOARD" [size]="16" aria-hidden="true"></app-icon>
+              <span>{{ 'AUDIT_EXPORT_EXCEL' | translate }}</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Filters Card ─────────────────────────────────────────────── -->
+<form [formGroup]="filterForm" class="surface filter-card p-4 mb-4" [attr.aria-label]="'COMMON_FILTER' | translate">
+  <div class="row g-3">
+    <!-- Global search -->
+    <div class="col-12 col-md-4">
+      <label class="form-label small fw-bold text-muted mb-1">{{ 'AUDIT_SEARCH' | translate }}</label>
+      <div class="position-relative search-input-wrapper">
+        <app-icon [icon]="APP_ICONS.SEARCH" class="position-absolute start-3 text-muted search-icon" [size]="18" aria-hidden="true"></app-icon>
+        <input class="form-control" [placeholder]="'AUDIT_SEARCH' | translate" formControlName="query" [attr.aria-label]="'COMMON_SEARCH' | translate" />
+        @if (filterForm.controls.query.value) {
+          <button class="btn btn-clear position-absolute end-2 top-50 translate-middle-y d-flex align-items-center justify-content-center" type="button" [attr.aria-label]="'COMMON_RESET' | translate" (click)="filterForm.controls.query.setValue('')">
+            <app-icon [icon]="APP_ICONS.CLOSE" [size]="16" aria-hidden="true"></app-icon>
           </button>
-          <button type="button" class="btn d-inline-flex align-items-center gap-1" [class.btn-primary]="view() === 'timeline'" [class.btn-outline-secondary]="view() !== 'timeline'" (click)="view.set('timeline')">
-            <app-icon [icon]="APP_ICONS.AUDIT" aria-hidden="true"></app-icon>
-            <span>{{ 'AUDIT_TIMELINE' | translate }}</span>
-          </button>
-        </div>
-        <!-- Export -->
-        <div class="dropdown" *appPermission="{ module: 'audit', action: 'view' }">
-          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" [attr.aria-label]="'AUDIT_EXPORT' | translate">{{ 'AUDIT_EXPORT' | translate }}</button>
-          <ul class="dropdown-menu">
-            <li><button class="dropdown-item d-inline-flex align-items-center gap-1" type="button" (click)="exportCsv()"><app-icon [icon]="APP_ICONS.REPORTS" aria-hidden="true"></app-icon><span>{{ 'AUDIT_EXPORT_CSV' | translate }}</span></button></li>
-            <li><button class="dropdown-item d-inline-flex align-items-center gap-1" type="button" (click)="exportExcel()"><app-icon [icon]="APP_ICONS.DASHBOARD" aria-hidden="true"></app-icon><span>{{ 'AUDIT_EXPORT_EXCEL' | translate }}</span></button></li>
-          </ul>
-        </div>
+        }
       </div>
     </div>
 
-    <!-- ── Filters ─────────────────────────────────────────────── -->
-    <form [formGroup]="filterForm" class="surface p-3 mb-3" [attr.aria-label]="'COMMON_FILTER' | translate">
-      <div class="row g-2 mb-2">
-        <!-- Global search -->
-        <div class="col-12 col-md-4">
-          <div class="input-group input-group-sm">
-            <span class="input-group-text"><app-icon [icon]="APP_ICONS.SEARCH" aria-hidden="true"></app-icon></span>
-            <input class="form-control" [placeholder]="'AUDIT_SEARCH' | translate" formControlName="query" [attr.aria-label]="'COMMON_SEARCH' | translate" />
-            @if (filterForm.controls.query.value) {
-              <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center" type="button" [attr.aria-label]="'COMMON_RESET' | translate" (click)="filterForm.controls.query.setValue('')">
-                <app-icon [icon]="APP_ICONS.CLOSE" aria-hidden="true"></app-icon>
-              </button>
+    <!-- Actor select -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+      <label class="form-label small fw-bold text-muted mb-1">{{ 'AUDIT_LABEL_ACTOR' | translate }}</label>
+      <select class="form-select" formControlName="actor" [attr.aria-label]="'AUDIT_ALL_ACTORS' | translate">
+        <option value="">{{ 'AUDIT_ALL_ACTORS' | translate }}</option>
+        @for (a of svc.actors(); track a) { <option [value]="a">{{ a }}</option> }
+      </select>
+    </div>
+
+    <!-- Action select -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-2">
+      <label class="form-label small fw-bold text-muted mb-1">{{ 'AUDIT_LABEL_ACTION' | translate }}</label>
+      <select class="form-select" formControlName="action" [attr.aria-label]="'AUDIT_ALL_ACTIONS' | translate">
+        <option value="">{{ 'AUDIT_ALL_ACTIONS' | translate }}</option>
+        @for (a of svc.actions(); track a) { <option [value]="a">{{ a }}</option> }
+      </select>
+    </div>
+
+    <!-- Severity select -->
+    <div class="col-12 col-sm-6 col-md-6 col-lg-2">
+      <label class="form-label small fw-bold text-muted mb-1">{{ 'AUDIT_LABEL_SEVERITY' | translate }}</label>
+      <select class="form-select" formControlName="severity" [attr.aria-label]="'AUDIT_ALL_SEVERITIES' | translate">
+        <option value="">{{ 'AUDIT_ALL_SEVERITIES' | translate }}</option>
+        @for (s of severities; track s) { <option [value]="s">{{ s }}</option> }
+      </select>
+    </div>
+
+    <!-- Category select -->
+    <div class="col-12 col-sm-6 col-md-6 col-lg-2">
+      <label class="form-label small fw-bold text-muted mb-1">{{ 'AUDIT_LABEL_CATEGORY' | translate }}</label>
+      <select class="form-select" formControlName="category" [attr.aria-label]="'AUDIT_ALL_CATEGORIES' | translate">
+        <option value="">{{ 'AUDIT_ALL_CATEGORIES' | translate }}</option>
+        @for (c of categories; track c) { <option [value]="c">{{ c }}</option> }
+      </select>
+    </div>
+
+    <!-- Date From -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <label class="form-label small fw-bold text-muted mb-1">{{ 'AUDIT_DATE_FROM' | translate }}</label>
+      <input class="form-control" type="date" formControlName="dateFrom" [attr.aria-label]="'AUDIT_DATE_FROM' | translate" />
+    </div>
+
+    <!-- Date To -->
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <label class="form-label small fw-bold text-muted mb-1">{{ 'AUDIT_DATE_TO' | translate }}</label>
+      <input class="form-control" type="date" formControlName="dateTo" [attr.aria-label]="'AUDIT_DATE_TO' | translate" />
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="col-12 col-md-4 col-lg-6 d-flex align-items-end justify-content-end">
+      <button *appPermission="{ module: 'audit', action: 'view' }" class="btn btn-outline-secondary btn-reset d-flex align-items-center gap-2 px-4 w-100 w-sm-auto" type="button" (click)="resetFilters()">
+        <app-icon [icon]="APP_ICONS.SORT_NONE" aria-hidden="true" [size]="16"></app-icon>
+        <span>{{ 'COMMON_RESET' | translate }}</span>
+      </button>
+    </div>
+  </div>
+</form>
+
+<!-- ── Active filter chips ────────────────────────────────────── -->
+<app-filter-chips
+  [chips]="activeChips()"
+  (remove)="clearChip($event)"
+  (clearAll)="resetFilters()"></app-filter-chips>
+
+<!-- ── Content ─────────────────────────────────────────────── -->
+@if (filtered().length === 0) {
+  <!-- Empty state -->
+  <div class="surface empty-card p-5 text-center text-body-secondary rounded-4 border mb-4">
+    <div class="empty-icon-wrapper mx-auto mb-3 d-flex align-items-center justify-content-center">
+      <app-icon [icon]="APP_ICONS.SEARCH" [size]="32" aria-hidden="true"></app-icon>
+    </div>
+    <h2 class="h5 fw-bold text-body">{{ 'AUDIT_NONE_FOUND' | translate }}</h2>
+    <p class="small text-muted mb-4 mx-auto" style="max-width: 320px;">{{ 'AUDIT_ADJUST' | translate }}</p>
+    <button class="btn btn-premium-primary btn-sm px-4 shadow-sm" type="button" (click)="resetFilters()">{{ 'AUDIT_CLEAR' | translate }}</button>
+  </div>
+
+} @else if (view() === 'table') {
+  <!-- ── Table view ──────────────────────────────────────────── -->
+  <app-table
+    class="d-block mb-4"
+    [rows]="pagedItems()"
+    [columns]="columns()"
+    [rowClickable]="true"
+    [loading]="loading()"
+    (rowClick)="openDrawer($event)"></app-table>
+
+} @else {
+  <!-- ── Timeline view ───────────────────────────────────────── -->
+  <div class="timeline-wrapper mb-4">
+    <div class="timeline-rail"></div>
+    @for (log of pagedItems(); track log.id) {
+      <div class="timeline-item-group" (click)="openDrawer(log)" style="cursor: pointer;">
+        <!-- Severity colored dot / marker -->
+        <div class="timeline-marker shadow-sm" [class]="'marker-' + log.severity.toLowerCase()">
+          <span class="timeline-marker-inner"></span>
+        </div>
+        
+        <div class="timeline-content-card shadow-sm">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+            <h3 class="h6 mb-0 fw-bold timeline-event-title d-flex align-items-center gap-2">
+              <span class="monospace action-code">{{ log.action }}</span>
+              <span class="badge badge-category">{{ log.category }}</span>
+            </h3>
+            <span class="timeline-time text-muted small">{{ log.createdAt | appDate:'medium' }}</span>
+          </div>
+          
+          <div class="timeline-details-grid">
+            <div class="timeline-detail-row">
+              <span class="detail-label">{{ 'AUDIT_TIMELINE_USER' | translate }}</span>
+              <span class="detail-value fw-semibold text-body">{{ log.actor }}</span>
+            </div>
+            <div class="timeline-detail-row">
+              <span class="detail-label">{{ 'AUDIT_TIMELINE_ENTITY' | translate }}</span>
+              <span class="detail-value text-body">{{ log.entity }}</span>
+            </div>
+            @if (log.severity === 'Critical') {
+              <div class="timeline-detail-row">
+                <span class="detail-label text-danger">{{ 'AUDIT_TIMELINE_SEVERITY' | translate }}</span>
+                <span class="detail-value fw-bold text-danger d-inline-flex align-items-center gap-1">
+                  <span class="kpi-bullet bg-danger shadow-glow-danger" style="width: 6px; height: 6px;"></span>
+                  {{ 'AUDIT_SEVERITY_CRITICAL' | translate }}
+                </span>
+              </div>
+            } @else {
+              <div class="timeline-detail-row">
+                <span class="detail-label">{{ 'AUDIT_TIMELINE_SEVERITY' | translate }}</span>
+                <span class="detail-value text-body">{{ log.severity }}</span>
+              </div>
+            }
+            @if (log.details) {
+              <p class="timeline-log-desc mb-0 mt-2 text-body-secondary small border-top pt-2">{{ log.details }}</p>
             }
           </div>
         </div>
-        <div class="col-6 col-md-2">
-          <select class="form-select form-select-sm" formControlName="actor" [attr.aria-label]="'AUDIT_ALL_ACTORS' | translate">
-            <option value="">{{ 'AUDIT_ALL_ACTORS' | translate }}</option>
-            @for (a of svc.actors(); track a) { <option [value]="a">{{ a }}</option> }
-          </select>
-        </div>
-        <div class="col-6 col-md-2">
-          <select class="form-select form-select-sm" formControlName="action" [attr.aria-label]="'AUDIT_ALL_ACTIONS' | translate">
-            <option value="">{{ 'AUDIT_ALL_ACTIONS' | translate }}</option>
-            @for (a of svc.actions(); track a) { <option [value]="a">{{ a }}</option> }
-          </select>
-        </div>
-        <div class="col-6 col-md-2">
-          <select class="form-select form-select-sm" formControlName="severity" [attr.aria-label]="'AUDIT_ALL_SEVERITIES' | translate">
-            <option value="">{{ 'AUDIT_ALL_SEVERITIES' | translate }}</option>
-            @for (s of severities; track s) { <option [value]="s">{{ s }}</option> }
-          </select>
-        </div>
-        <div class="col-6 col-md-2">
-          <select class="form-select form-select-sm" formControlName="category" [attr.aria-label]="'AUDIT_ALL_CATEGORIES' | translate">
-            <option value="">{{ 'AUDIT_ALL_CATEGORIES' | translate }}</option>
-            @for (c of categories; track c) { <option [value]="c">{{ c }}</option> }
-          </select>
-        </div>
-      </div>
-      <div class="row g-2">
-        <div class="col-6 col-md-2">
-          <label class="form-label small mb-1 text-body-secondary">{{ 'AUDIT_DATE_FROM' | translate }}</label>
-          <input class="form-control form-control-sm" type="date" formControlName="dateFrom" [attr.aria-label]="'AUDIT_DATE_FROM' | translate" />
-        </div>
-        <div class="col-6 col-md-2">
-          <label class="form-label small mb-1 text-body-secondary">{{ 'AUDIT_DATE_TO' | translate }}</label>
-          <input class="form-control form-control-sm" type="date" formControlName="dateTo" [attr.aria-label]="'AUDIT_DATE_TO' | translate" />
-        </div>
-        <div class="col-md-2 d-flex align-items-end">
-          <button *appPermission="{ module: 'audit', action: 'view' }" class="btn btn-outline-secondary btn-sm w-100" type="button" (click)="resetFilters()">{{ 'COMMON_RESET' | translate }}</button>
-        </div>
-      </div>
-    </form>
-
-    <!-- ── Active filter chips ────────────────────────────────────── -->
-    <app-filter-chips
-      [chips]="activeChips()"
-      (remove)="clearChip($event)"
-      (clearAll)="resetFilters()"></app-filter-chips>
-
-    <!-- ── Content ─────────────────────────────────────────────── -->
-    @if (filtered().length === 0) {
-      <!-- Empty state -->
-      <div class="surface p-5 text-center text-body-secondary">
-        <div class="fs-1 mb-3"><app-icon [icon]="APP_ICONS.SEARCH" [size]="48" aria-hidden="true"></app-icon></div>
-        <h2 class="h5">{{ 'AUDIT_NONE_FOUND' | translate }}</h2>
-        <p class="small mb-3">{{ 'AUDIT_ADJUST' | translate }}</p>
-        <button class="btn btn-outline-primary btn-sm" type="button" (click)="resetFilters()">{{ 'AUDIT_CLEAR' | translate }}</button>
-      </div>
-
-    } @else if (view() === 'table') {
-      <!-- ── Table view ──────────────────────────────────────────── -->
-      <app-table
-        class="d-block mb-3"
-        [rows]="pagedItems()"
-        [columns]="columns()"
-        [rowClickable]="true"
-        (rowClick)="openDrawer($event)"></app-table>
-
-    } @else {
-      <!-- ── Timeline view ───────────────────────────────────────── -->
-      <div class="surface p-3 mb-3">
-        <div class="position-relative" style="padding-left: 1.75rem">
-          <div class="timeline-line"></div>
-          @for (log of pagedItems(); track log.id) {
-            <div class="timeline-item d-flex gap-3" style="cursor:pointer" (click)="openDrawer(log)">
-              <span class="timeline-dot" [style.background]="severityColor(log.severity)"></span>
-              <div class="flex-grow-1 min-w-0 surface p-3 rounded mb-3">
-                <div class="d-flex align-items-start justify-content-between flex-wrap gap-1 mb-1">
-                  <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge sev-badge" [class]="severityClass(log.severity)">{{ log.severity }}</span>
-                    <span class="badge text-bg-secondary small">{{ log.category }}</span>
-                    <code class="small">{{ log.action }}</code>
-                  </div>
-                  <span class="text-body-secondary small text-nowrap">{{ log.createdAt | appDate:'medium' }}</span>
-                </div>
-                <p class="mb-1 small fw-semibold">{{ log.actor }} · <span class="text-body-secondary fw-normal">{{ log.entity }}</span></p>
-                @if (log.details) {
-                  <p class="mb-0 small text-body-secondary">{{ log.details }}</p>
-                }
-              </div>
-            </div>
-          }
-        </div>
       </div>
     }
+  </div>
+}
 
-    <!-- ── Pagination ─────────────────────────────────────────────── -->
-    <app-pagination
-      [page]="page()"
-      [pageSize]="pageSize"
-      [total]="filtered().length"
-      (pageChange)="setPage($event)"></app-pagination>
+<!-- ── Pagination ─────────────────────────────────────────────── -->
+<app-pagination
+  [page]="page()"
+  [pageSize]="pageSize"
+  [total]="filtered().length"
+  (pageChange)="setPage($event)"></app-pagination>
 
-    <!-- ── Detail Drawer ──────────────────────────────────────────── -->
-    @if (selectedLog()) {
-      <div class="drawer-backdrop" (click)="closeDrawer()" aria-hidden="true"></div>
-      <aside class="drawer p-4" role="dialog" aria-modal="true" [attr.aria-label]="('AUDIT_LOG_DETAIL' | translate) + ': ' + selectedLog()!.action">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-          <h2 class="h5 mb-0">{{ 'AUDIT_LOG_DETAIL' | translate }}</h2>
-          <button class="btn btn-outline-secondary btn-sm d-flex align-items-center justify-content-center" type="button" (click)="closeDrawer()" [attr.aria-label]="'COMMON_CLOSE' | translate">
-            <app-icon [icon]="APP_ICONS.CLOSE" aria-hidden="true"></app-icon>
-          </button>
+<!-- ── Detail Drawer ──────────────────────────────────────────── -->
+@if (selectedLog()) {
+  <div class="drawer-backdrop" (click)="closeDrawer()" aria-hidden="true"></div>
+  <aside class="drawer p-4" role="dialog" aria-modal="true" [attr.aria-label]="('AUDIT_LOG_DETAIL' | translate) + ': ' + selectedLog()!.action">
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+      <h2 class="h5 mb-0 fw-bold d-flex align-items-center gap-2">
+        <app-icon [icon]="APP_ICONS.AUDIT" class="text-primary" aria-hidden="true"></app-icon>
+        <span>{{ 'AUDIT_LOG_DETAIL' | translate }}</span>
+      </h2>
+      <button class="btn btn-action-close d-flex align-items-center justify-content-center" type="button" (click)="closeDrawer()" [attr.aria-label]="'COMMON_CLOSE' | translate">
+        <app-icon [icon]="APP_ICONS.CLOSE" aria-hidden="true"></app-icon>
+      </button>
+    </div>
+
+    @let log = selectedLog()!;
+
+    <div class="drawer-content d-flex flex-column gap-3">
+      <!-- Event Overview -->
+      <div class="drawer-section-card p-3 rounded-4 border">
+        <h3 class="section-title small text-muted text-uppercase tracking-wider mb-3">{{ 'AUDIT_EVENT_OVERVIEW' | translate }}</h3>
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="sev-badge" [class]="'badge-severity-' + log.severity.toLowerCase()">{{ log.severity }}</span>
+          <span class="badge badge-category">{{ log.category }}</span>
         </div>
-
-        @let log = selectedLog()!;
-
-        <div class="d-flex flex-wrap gap-2 mb-3">
-          <span class="badge fs-6" [class]="severityClass(log.severity)">{{ log.severity }}</span>
-          <span class="badge text-bg-secondary fs-6">{{ log.category }}</span>
+        <div class="overview-item mb-2">
+          <div class="text-body-secondary small mb-1">{{ 'AUDIT_ACTION' | translate }}</div>
+          <code class="action-code fs-6">{{ log.action }}</code>
         </div>
+        @if (log.details) {
+          <div class="overview-item">
+            <div class="text-body-secondary small mb-1">{{ 'AUDIT_DETAILS' | translate }}</div>
+            <div class="small text-body">{{ log.details }}</div>
+          </div>
+        }
+      </div>
 
-        <dl class="row row-cols-1 g-2 small">
-          <div class="col">
-            <dt class="text-body-secondary">{{ 'AUDIT_ACTION' | translate }}</dt>
-            <dd class="mb-0"><code>{{ log.action }}</code></dd>
+      <!-- Actor Information -->
+      <div class="drawer-section-card p-3 rounded-4 border">
+        <h3 class="section-title small text-muted text-uppercase tracking-wider mb-3">{{ 'AUDIT_ACTOR_INFO' | translate }}</h3>
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="text-body-secondary small mb-1">{{ 'AUDIT_ACTOR' | translate }}</div>
+            <div class="fw-semibold small text-body">{{ log.actor }}</div>
           </div>
-          <div class="col">
-            <dt class="text-body-secondary">{{ 'AUDIT_ACTOR' | translate }}</dt>
-            <dd class="mb-0 fw-semibold">{{ log.actor }}</dd>
-          </div>
-          <div class="col">
-            <dt class="text-body-secondary">{{ 'AUDIT_ENTITY' | translate }}</dt>
-            <dd class="mb-0">{{ log.entity }}</dd>
-          </div>
-          <div class="col">
-            <dt class="text-body-secondary">{{ 'AUDIT_TIMESTAMP' | translate }}</dt>
-            <dd class="mb-0">{{ log.createdAt | appDate:'full' }}</dd>
-          </div>
-          <div class="col">
-            <dt class="text-body-secondary">{{ 'AUDIT_IP_ADDRESS' | translate }}</dt>
-            <dd class="mb-0"><code>{{ log.ipAddress }}</code></dd>
+          <div class="col-6">
+            <div class="text-body-secondary small mb-1">{{ 'AUDIT_IP_ADDRESS' | translate }}</div>
+            <code class="small text-body">{{ log.ipAddress }}</code>
           </div>
           @if (log.sessionId) {
-            <div class="col">
-              <dt class="text-body-secondary">{{ 'AUDIT_SESSION' | translate }}</dt>
-              <dd class="mb-0"><code class="text-body-secondary">{{ log.sessionId }}</code></dd>
+            <div class="col-12">
+              <div class="text-body-secondary small mb-1">{{ 'AUDIT_SESSION' | translate }}</div>
+              <code class="small text-muted text-break">{{ log.sessionId }}</code>
             </div>
           }
-          @if (log.details) {
-            <div class="col">
-              <dt class="text-body-secondary">{{ 'AUDIT_DETAILS' | translate }}</dt>
-              <dd class="mb-0 text-body-secondary">{{ log.details }}</dd>
-            </div>
-          }
-          <div class="col">
-            <dt class="text-body-secondary">{{ 'AUDIT_LOG_ID' | translate }}</dt>
-            <dd class="mb-0"><code class="text-body-secondary small">{{ log.id }}</code></dd>
+        </div>
+      </div>
+
+      <!-- Affected Resources -->
+      <div class="drawer-section-card p-3 rounded-4 border">
+        <h3 class="section-title small text-muted text-uppercase tracking-wider mb-3">{{ 'AUDIT_AFFECTED_RESOURCES' | translate }}</h3>
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="text-body-secondary small mb-1">{{ 'AUDIT_ENTITY' | translate }}</div>
+            <div class="small fw-medium text-body">{{ log.entity }}</div>
           </div>
-        </dl>
-      </aside>
-    }
+        </div>
+      </div>
 
-    <!-- ── Custom cell templates for Table Framework ──────────────── -->
-    <ng-template #severityTpl let-row>
-      <span class="badge sev-badge" [class]="severityClass(row.severity)">{{ row.severity }}</span>
-    </ng-template>
+      <!-- Metadata -->
+      <div class="drawer-section-card p-3 rounded-4 border">
+        <h3 class="section-title small text-muted text-uppercase tracking-wider mb-3">{{ 'AUDIT_METADATA' | translate }}</h3>
+        <div class="row g-2">
+          <div class="col-12">
+            <div class="text-body-secondary small mb-1">{{ 'AUDIT_TIMESTAMP' | translate }}</div>
+            <div class="small text-body">{{ log.createdAt | appDate:'full' }}</div>
+          </div>
+          <div class="col-12 mt-2">
+            <div class="text-body-secondary small mb-1">{{ 'AUDIT_LOG_ID' | translate }}</div>
+            <code class="small text-muted text-break monospace">{{ log.id }}</code>
+          </div>
+        </div>
+      </div>
 
-    <ng-template #actorTpl let-row>
-      <span class="small fw-semibold">{{ row.actor }}</span>
-    </ng-template>
+      <!-- Raw Payload -->
+      <div class="drawer-section-card p-3 rounded-4 border">
+        <h3 class="section-title small text-muted text-uppercase tracking-wider mb-3">{{ 'AUDIT_RAW_PAYLOAD' | translate }}</h3>
+        <pre class="raw-payload-code p-2 rounded small text-break mb-0"><code class="language-json">{{ log | json }}</code></pre>
+      </div>
+    </div>
+  </aside>
+}
 
-    <ng-template #actionTpl let-row>
-      <code class="small">{{ row.action }}</code>
-    </ng-template>
+<!-- ── Custom cell templates for Table Framework ──────────────── -->
+<ng-template #severityTpl let-row>
+  <span class="sev-badge" [class]="'badge-severity-' + row.severity.toLowerCase()">{{ row.severity }}</span>
+</ng-template>
 
-    <ng-template #entityTpl let-row>
-      <span class="small text-body-secondary">{{ row.entity }}</span>
-    </ng-template>
+<ng-template #actorTpl let-row>
+  <span class="small fw-semibold text-body">{{ row.actor }}</span>
+</ng-template>
 
-    <ng-template #categoryTpl let-row>
-      <span class="badge text-bg-secondary small">{{ row.category }}</span>
-    </ng-template>
+<ng-template #actionTpl let-row>
+  <code class="small action-code">{{ row.action }}</code>
+</ng-template>
 
-    <ng-template #timeTpl let-row>
-      <span class="small text-body-secondary text-nowrap">{{ row.createdAt | appDate:'medium' }}</span>
-    </ng-template>
+<ng-template #entityTpl let-row>
+  <span class="small text-body-secondary">{{ row.entity }}</span>
+</ng-template>
 
-    <ng-template #ipTpl let-row>
-      <span class="small text-body-secondary">{{ row.ipAddress }}</span>
-    </ng-template>
+<ng-template #categoryTpl let-row>
+  <span class="badge badge-category">{{ row.category }}</span>
+</ng-template>
 
-    <ng-template #actionsTpl let-row>
-      <button *appPermission="{ module: 'audit', action: 'view' }" 
-              class="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center" 
-              type="button" 
-              (click)="openDrawer(row); $event.stopPropagation()">
-        <app-icon [icon]="APP_ICONS.ARROW_FORWARD" aria-hidden="true"></app-icon>
-      </button>
-    </ng-template>
+<ng-template #timeTpl let-row>
+  <span class="small text-body-secondary text-nowrap">{{ row.createdAt | appDate:'medium' }}</span>
+</ng-template>
+
+<ng-template #ipTpl let-row>
+  <span class="small text-body-secondary monospace">{{ row.ipAddress }}</span>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <button *appPermission="{ module: 'audit', action: 'view' }" 
+          class="btn btn-sm btn-action-outline d-inline-flex align-items-center justify-content-center" 
+          type="button" 
+          (click)="openDrawer(row); $event.stopPropagation()">
+    <app-icon [icon]="APP_ICONS.ARROW_FORWARD" aria-hidden="true"></app-icon>
+  </button>
+</ng-template>

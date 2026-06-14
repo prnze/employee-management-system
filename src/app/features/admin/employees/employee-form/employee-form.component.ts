@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Employee } from '@core/models/employee.models';
 import { EmployeeService } from '@core/services/employee.service';
 import { UnsavedChangesAware } from '@core/guards/unsaved-changes.guard';
@@ -8,7 +9,7 @@ import { UnsavedChangesAware } from '@core/guards/unsaved-changes.guard';
 @Component({
   selector: 'app-employee-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TranslatePipe],
   templateUrl: './employee-form.component.html',
   styleUrl: './employee-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

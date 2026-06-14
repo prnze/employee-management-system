@@ -6,11 +6,12 @@ export interface Language {
   name: string;
   /** BCP-47 locale for date/number formatting. */
   locale: string;
+  flag: string;
 }
 
 export const SUPPORTED_LANGUAGES: Language[] = [
-  { code: 'en', name: 'English', locale: 'en-GB' },
-  { code: 'de', name: 'Deutsch', locale: 'de-DE' }
+  { code: 'en', name: 'English', locale: 'en-GB', flag: '🇬🇧' },
+  { code: 'de', name: 'Deutsch', locale: 'de-DE', flag: '🇩🇪' }
 ];
 
 const STORAGE_KEY = 'ems_language';

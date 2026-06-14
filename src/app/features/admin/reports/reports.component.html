@@ -1,13 +1,297 @@
-    <h1 class="h3 mb-3">{{ 'REPORTS_TITLE' | translate }}</h1>
-    <section class="row g-3">
-      @for (key of reportKeys; track key) {
-        <article class="col-md-6 col-xl-3">
-          <div class="surface p-3">
-            <h2 class="h5">{{ key | translate }}</h2>
-            <p class="text-body-secondary">{{ 'REPORTS_MOCK_DESC' | translate }}</p>
-            <button class="btn btn-outline-primary">{{ 'REPORTS_GENERATE' | translate }}</button>
-          </div>
-        </article>
-      }
-    </section>
+<!-- ── Header & Welcome Banner ────────────────────────────────────────────── -->
+<div class="welcome-banner mb-4 p-4 rounded-4 position-relative overflow-hidden shadow-sm">
+  <div class="welcome-banner-glow"></div>
+  <div class="position-relative z-1 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 fw-bold mb-1 welcome-title">{{ 'REPORTS_HEADER_TITLE' | translate }}</h1>
+      <p class="welcome-subtitle mb-0 d-flex align-items-center gap-2 text-white-85">
+        <app-icon [icon]="APP_ICONS.REPORTS" class="welcome-icon text-white-50" aria-hidden="true"></app-icon>
+        <span>{{ 'REPORTS_HEADER_SUBTITLE' | translate }}</span>
+      </p>
+    </div>
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <span class="badge bg-white-15 text-white px-3 py-2 rounded-pill fw-semibold shadow-sm text-nowrap">
+        {{ 'REPORTS_TOTAL_REPORTS' | translate }} {{ reportCategories.length }}
+      </span>
+      <span class="badge bg-white-15 text-white px-3 py-2 rounded-pill fw-semibold shadow-sm text-nowrap">
+        {{ 'REPORTS_SCHEDULED' | translate }} {{ scheduledReports().length }}
+      </span>
+      <span class="badge bg-white-15 text-white px-3 py-2 rounded-pill fw-semibold shadow-sm text-nowrap">
+        {{ 'REPORTS_EXPORTS_TODAY' | translate }} {{ exportsCount() }}
+      </span>
+      <span class="badge bg-white-15 text-white px-3 py-2 rounded-pill fw-semibold shadow-sm text-nowrap">
+        {{ 'REPORTS_LAST_REFRESH' | translate }} {{ lastRefresh() }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Executive KPI Cards ────────────────────────────────────────────────── -->
+<section class="row g-3 mb-4" [attr.aria-label]="'REPORTS_EXECUTIVE_KPIS' | translate">
+  <!-- Total Employees -->
+  <div class="col-6 col-md-3">
+    <article class="kpi-card p-4 h-100 d-flex flex-column" style="--kpi-color: #0f6cbd;">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <span class="kpi-icon-wrapper d-flex align-items-center justify-content-center">
+          <app-icon [icon]="APP_ICONS.USERS" aria-hidden="true"></app-icon>
+        </span>
+        <span class="badge kpi-trend-badge align-self-start text-bg-success">{{ 'REPORTS_STEADY' | translate }}</span>
+      </div>
+      <p class="kpi-label mb-1">{{ 'REPORTS_TOTAL_EMPLOYEES' | translate }}</p>
+      <strong class="kpi-value mb-0 mt-auto">{{ totalEmployees() }}</strong>
+    </article>
+  </div>
+
+  <!-- Attendance Rate -->
+  <div class="col-6 col-md-3">
+    <article class="kpi-card p-4 h-100 d-flex flex-column" style="--kpi-color: #198754;">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <span class="kpi-icon-wrapper d-flex align-items-center justify-content-center">
+          <app-icon [icon]="APP_ICONS.CALENDAR" aria-hidden="true"></app-icon>
+        </span>
+        <span class="badge kpi-trend-badge align-self-start text-bg-success">+0.8%</span>
+      </div>
+      <p class="kpi-label mb-1">{{ 'REPORTS_ATTENDANCE_RATE' | translate }}</p>
+      <strong class="kpi-value mb-0 mt-auto">{{ attendanceRate() }}</strong>
+    </article>
+  </div>
+
+  <!-- Task Completion -->
+  <div class="col-6 col-md-3">
+    <article class="kpi-card p-4 h-100 d-flex flex-column" style="--kpi-color: #fd7e14;">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <span class="kpi-icon-wrapper d-flex align-items-center justify-content-center">
+          <app-icon [icon]="APP_ICONS.TASKS" aria-hidden="true"></app-icon>
+        </span>
+        <span class="badge kpi-trend-badge align-self-start text-bg-warning">+2.1%</span>
+      </div>
+      <p class="kpi-label mb-1">{{ 'REPORTS_TASK_COMPLETION' | translate }}</p>
+      <strong class="kpi-value mb-0 mt-auto">{{ taskCompletion() }}</strong>
+    </article>
+  </div>
+
+  <!-- Growth Rate -->
+  <div class="col-6 col-md-3">
+    <article class="kpi-card p-4 h-100 d-flex flex-column" style="--kpi-color: #6f42c1;">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <span class="kpi-icon-wrapper d-flex align-items-center justify-content-center">
+          <app-icon [icon]="APP_ICONS.TRENDING_UP" aria-hidden="true"></app-icon>
+        </span>
+        <span class="badge kpi-trend-badge align-self-start text-bg-success">+4.2%</span>
+      </div>
+      <p class="kpi-label mb-1">{{ 'REPORTS_ANNUAL_GROWTH' | translate }}</p>
+      <strong class="kpi-value mb-0 mt-auto">{{ growthRate() }}</strong>
+    </article>
+  </div>
+</section>
+
+<!-- ── Date Range Toolbar ────────────────────────────────────────────────── -->
+<div class="card toolbar-card p-3 mb-4 shadow-sm border rounded-4">
+  <div class="row g-2 align-items-end">
+    <div class="col-6 col-md-3">
+      <label class="form-label small fw-bold text-muted mb-1">{{ 'REPORTS_DATE_FROM' | translate }}</label>
+      <input class="form-control form-control-sm" type="date" [formControl]="dateFromControl" [attr.aria-label]="'REPORTS_DATE_FROM' | translate" />
+    </div>
+    <div class="col-6 col-md-3">
+      <label class="form-label small fw-bold text-muted mb-1">{{ 'REPORTS_DATE_TO' | translate }}</label>
+      <input class="form-control form-control-sm" type="date" [formControl]="dateToControl" [attr.aria-label]="'REPORTS_DATE_TO' | translate" />
+    </div>
+    <div class="col-12 col-md-4">
+      <label class="form-label small fw-bold text-muted mb-1">{{ 'REPORTS_DEPT_SCOPE' | translate }}</label>
+      <select class="form-select form-select-sm" [formControl]="deptControl" [attr.aria-label]="'REPORTS_DEPT_SCOPE' | translate">
+        <option value="">{{ 'REPORTS_ALL_DEPTS' | translate }}</option>
+        @for (d of employeeService.departments(); track d) {
+          <option [value]="d">{{ d }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-12 col-md-2">
+      <button class="btn btn-premium-primary w-100 btn-sm d-flex align-items-center justify-content-center gap-2" style="height: 38px;" type="button" (click)="generateReport()">
+        <app-icon [icon]="APP_ICONS.BOLT" [size]="16" aria-hidden="true"></app-icon>
+        <span>{{ 'REPORTS_REFRESH' | translate }}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Analytics Overview (Charts Section) ────────────────────────────────── -->
+@if (analytics(); as a) {
+  <section class="row g-4 mb-4" [attr.aria-label]="'REPORTS_ANALYTICS_OVERVIEW' | translate">
+    <!-- Employee Growth -->
+    <div class="col-12 col-lg-8">
+      <app-chart-card
+        [title]="'REPORTS_GROWTH_CHART' | translate"
+        [badge]="'REPORTS_LAST_12MO' | translate"
+        skeletonHeight="260px">
+        <app-line-chart
+          [dataPoints]="a.employeeGrowth"
+          [label]="'REPORTS_HEADCOUNT_LABEL' | translate"
+          color="#0f6cbd"
+          [yLabel]="'REPORTS_HEADCOUNT_Y' | translate"
+          height="260px" />
+      </app-chart-card>
+    </div>
+
+    <!-- Department Distribution -->
+    <div class="col-12 col-lg-4">
+      <app-chart-card
+        [title]="'REPORTS_DEPT_CHART' | translate"
+        [badge]="'REPORTS_LIVE_METRICS' | translate"
+        badgeClass="text-bg-success"
+        skeletonHeight="260px">
+        <app-doughnut-chart [dataPoints]="a.departmentDistribution" height="200px" />
+      </app-chart-card>
+    </div>
+
+    <!-- Monthly Activity -->
+    <div class="col-12 col-lg-6">
+      <app-chart-card
+        [title]="'REPORTS_MONTHLY_CHART' | translate"
+        [badge]="'REPORTS_LOGS_COUNT' | translate"
+        badgeClass="text-bg-secondary"
+        skeletonHeight="220px">
+        <app-bar-chart
+          [dataPoints]="a.monthlyActivity"
+          [label]="'REPORTS_LOG_ENTRIES' | translate"
+          [yLabel]="'REPORTS_LOGS_COUNT' | translate"
+          height="220px" />
+      </app-chart-card>
+    </div>
+
+    <!-- Status Breakdown -->
+    <div class="col-12 col-lg-6">
+      <app-chart-card
+        [title]="'REPORTS_STATUS_CHART' | translate"
+        [badge]="'REPORTS_LIVE_STATUS' | translate"
+        badgeClass="text-bg-success"
+        skeletonHeight="220px">
+        <app-doughnut-chart [dataPoints]="a.statusBreakdown" height="160px" />
+        <div slot="footer" class="d-flex flex-wrap justify-content-center gap-2 mt-3 small">
+          @for (s of a.statusBreakdown; track s.label) {
+            <span class="d-flex align-items-center gap-1">
+              <span class="rounded-circle" style="width:8px;height:8px;display:inline-block" [style.background]="s.color"></span>
+              {{ s.label }}&nbsp;<strong>{{ s.value }}</strong>
+            </span>
+          }
+        </div>
+      </app-chart-card>
+    </div>
+  </section>
+}
+
+<!-- ── Report Catalog Categories ─────────────────────────────────────────── -->
+<div class="surface p-4 rounded-4 shadow-sm border mb-4">
+  <h2 class="h5 fw-bold text-body mb-4 pb-2 border-bottom d-flex align-items-center gap-2">
+    <app-icon [icon]="APP_ICONS.REPORTS" class="text-primary" aria-hidden="true"></app-icon>
+    <span>{{ 'REPORTS_CATALOG_TITLE' | translate }}</span>
+  </h2>
   
+  <div class="row g-3">
+    @for (cat of reportCategories; track cat.id) {
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card report-catalog-card p-3 rounded-3 border h-100 d-flex flex-column">
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <span class="catalog-icon-wrapper d-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-3">
+              <app-icon [icon]="cat.icon" aria-hidden="true"></app-icon>
+            </span>
+            <h3 class="h6 fw-bold mb-0 text-body">{{ cat.name }}</h3>
+          </div>
+          <p class="text-muted small flex-grow-1 mb-3">{{ cat.desc }}</p>
+          <button class="btn btn-premium-secondary btn-sm w-100 d-flex align-items-center justify-content-center gap-1.5" type="button" (click)="generateCategoryReport(cat.id)">
+            <app-icon [icon]="APP_ICONS.DOWNLOAD" [size]="14" aria-hidden="true"></app-icon>
+            <span>{{ 'REPORTS_COMPILE_DOWNLOAD' | translate }}</span>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ── Scheduled Reports & Export Center Row ──────────────────────────────── -->
+<div class="row g-4 mb-4">
+  <!-- Scheduled Reports Panel -->
+  <div class="col-12 col-lg-8">
+    <div class="surface p-4 rounded-4 shadow-sm border h-100">
+      <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+        <app-icon [icon]="APP_ICONS.CALENDAR" class="text-primary" aria-hidden="true"></app-icon>
+        <span>{{ 'REPORTS_SCHEDULED_TITLE' | translate }}</span>
+      </h3>
+      <div class="d-flex flex-column gap-3">
+        @for (sr of scheduledReports(); track sr.name) {
+          <div class="d-flex align-items-center justify-content-between p-3 rounded-3 border bg-light-subtle flex-wrap gap-2">
+            <div>
+              <span class="fw-bold d-block text-body small">{{ sr.name }}</span>
+              <span class="text-muted small d-block">{{ sr.frequency }}</span>
+              <span class="text-muted xxs">{{ 'REPORTS_NEXT_EXECUTION' | translate }} {{ sr.nextRun }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge" [class.bg-success]="sr.status === 'Active'" [class.bg-secondary]="sr.status === 'Paused'">
+                {{ sr.status }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Center -->
+  <div class="col-12 col-lg-4">
+    <div class="surface p-4 rounded-4 shadow-sm border h-100">
+      <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+        <app-icon [icon]="APP_ICONS.DOWNLOAD" class="text-primary" aria-hidden="true"></app-icon>
+        <span>{{ 'REPORTS_EXPORT_CENTER' | translate }}</span>
+      </h3>
+      <div class="d-flex flex-column gap-2.5">
+        <!-- CSV -->
+        <button class="btn btn-action-outline d-flex align-items-center justify-content-between p-3 w-100 text-start rounded-3" type="button" (click)="exportGeneral('csv')">
+          <div class="d-flex align-items-center gap-2.5">
+            <app-icon [icon]="APP_ICONS.REPORTS" class="text-success" aria-hidden="true"></app-icon>
+            <div>
+              <span class="fw-bold d-block small text-body">{{ 'REPORTS_EXPORT_CSV' | translate }}</span>
+              <span class="text-muted xxs">{{ 'REPORTS_EXPORT_CSV_DESC' | translate }}</span>
+            </div>
+          </div>
+          <app-icon [icon]="APP_ICONS.ARROW_FORWARD" [size]="16" class="text-muted" aria-hidden="true"></app-icon>
+        </button>
+
+        <!-- Excel -->
+        <button class="btn btn-action-outline d-flex align-items-center justify-content-between p-3 w-100 text-start rounded-3" type="button" (click)="exportGeneral('excel')">
+          <div class="d-flex align-items-center gap-2.5">
+            <app-icon [icon]="APP_ICONS.DASHBOARD" class="text-primary" aria-hidden="true"></app-icon>
+            <div>
+              <span class="fw-bold d-block small text-body">{{ 'REPORTS_EXPORT_EXCEL' | translate }}</span>
+              <span class="text-muted xxs">{{ 'REPORTS_EXPORT_EXCEL_DESC' | translate }}</span>
+            </div>
+          </div>
+          <app-icon [icon]="APP_ICONS.ARROW_FORWARD" [size]="16" class="text-muted" aria-hidden="true"></app-icon>
+        </button>
+
+        <!-- PDF / Print -->
+        <button class="btn btn-action-outline d-flex align-items-center justify-content-between p-3 w-100 text-start rounded-3" type="button" (click)="exportGeneral('pdf')">
+          <div class="d-flex align-items-center gap-2.5">
+            <app-icon [icon]="APP_ICONS.SETTINGS" class="text-danger" aria-hidden="true"></app-icon>
+            <div>
+              <span class="fw-bold d-block small text-body">{{ 'REPORTS_EXPORT_PDF' | translate }}</span>
+              <span class="text-muted xxs">{{ 'REPORTS_EXPORT_PDF_DESC' | translate }}</span>
+            </div>
+          </div>
+          <app-icon [icon]="APP_ICONS.ARROW_FORWARD" [size]="16" class="text-muted" aria-hidden="true"></app-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Download History Roster ────────────────────────────────────────────── -->
+<div class="surface p-4 rounded-4 shadow-sm border mb-4">
+  <h3 class="h6 fw-bold mb-3 d-flex align-items-center gap-2 border-bottom pb-2">
+    <app-icon [icon]="APP_ICONS.AUDIT" class="text-primary" aria-hidden="true"></app-icon>
+    <span>{{ 'REPORTS_LOG_HISTORY' | translate }}</span>
+  </h3>
+  <app-table
+    [rows]="historyRows()"
+    [columns]="historyColumns"
+    [loading]="loading()"
+    class="d-block"></app-table>
+</div>

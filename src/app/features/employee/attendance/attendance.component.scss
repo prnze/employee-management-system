@@ -1,0 +1,411 @@
+.welcome-banner {
+  background: linear-gradient(135deg, #09477b 0%, #0f6cbd 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 108, 189, 0.15);
+
+  [data-bs-theme="dark"] & {
+    background: linear-gradient(135deg, #0d1624 0%, #152946 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(107, 184, 255, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .welcome-title {
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
+
+  .welcome-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+
+    .welcome-icon {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+  }
+}
+
+.bg-white-10 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.text-white-85 {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.checkin-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border) !important;
+  
+  [data-bs-theme="dark"] & {
+    background: #0f192a;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+.status-badge-glow-wrapper {
+  position: relative;
+  width: 14px;
+  height: 14px;
+}
+
+.status-badge-glow {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  
+  &.shadow-glow-success {
+    box-shadow: 0 0 10px #198754;
+  }
+  
+  &.shadow-glow-warning {
+    box-shadow: 0 0 10px #f59e0b;
+  }
+}
+
+.stat-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  
+  [data-bs-theme="dark"] & {
+    background: var(--app-surface);
+    border-color: var(--app-border) !important;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+}
+
+.calendar-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border) !important;
+
+  [data-bs-theme="dark"] & {
+    background: #0f192a;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-day-header {
+  font-weight: 700;
+  text-align: center;
+  font-size: 0.775rem;
+  color: var(--app-muted);
+  padding: 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--app-border);
+}
+
+.calendar-day-cell {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  min-height: 90px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  [data-bs-theme="dark"] & {
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  &:hover:not(.empty-cell) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.03);
+    border-color: var(--app-brand);
+  }
+
+  &.empty-cell {
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  &.today-cell {
+    border: 2px solid var(--app-brand) !important;
+    box-shadow: 0 0 10px rgba(15, 108, 189, 0.15);
+  }
+
+  &.present {
+    background-color: rgba(25, 135, 84, 0.03);
+    border-color: rgba(25, 135, 84, 0.15);
+    .day-status-badge {
+      color: #198754;
+      background: rgba(25, 135, 84, 0.1);
+    }
+  }
+
+  &.late {
+    background-color: rgba(245, 158, 11, 0.03);
+    border-color: rgba(245, 158, 11, 0.15);
+    .day-status-badge {
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+    }
+  }
+
+  &.absent {
+    background-color: rgba(239, 68, 68, 0.03);
+    border-color: rgba(239, 68, 68, 0.15);
+    .day-status-badge {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+  }
+
+  &.leave {
+    background-color: rgba(111, 66, 193, 0.03);
+    border-color: rgba(111, 66, 193, 0.15);
+    .day-status-badge {
+      color: #6f42c1;
+      background: rgba(111, 66, 193, 0.1);
+    }
+  }
+
+  &.holiday {
+    background-color: rgba(13, 110, 253, 0.03);
+    border-color: rgba(13, 110, 253, 0.15);
+    .day-status-badge {
+      color: #0d6efd;
+      background: rgba(13, 110, 253, 0.1);
+    }
+  }
+
+  &.weekend {
+    background-color: rgba(108, 117, 125, 0.01);
+    border-color: var(--app-border);
+    opacity: 0.6;
+    .day-status-badge {
+      color: var(--app-muted);
+      background: rgba(108, 117, 125, 0.05);
+    }
+  }
+}
+
+.day-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.day-status-badge {
+  font-size: 0.575rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 4px;
+  align-self: flex-start;
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+
+.day-times {
+  font-size: 0.675rem;
+  color: var(--app-muted);
+  font-family: monospace;
+}
+
+.time-in {
+  color: var(--app-text);
+}
+
+.leave-balance-card, .leave-request-card, .chart-wrapper-card, .table-wrapper-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border) !important;
+}
+
+.progress {
+  background-color: rgba(108, 117, 125, 0.1);
+  
+  [data-bs-theme="dark"] & {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.form-control, .form-select {
+  border-radius: 10px;
+  border: 1px solid var(--app-border);
+  background-color: var(--app-surface);
+  color: var(--app-text);
+  height: 36px;
+  font-size: 0.825rem;
+  
+  &:focus {
+    background-color: var(--app-surface);
+    color: var(--app-text);
+    border-color: var(--app-brand);
+    box-shadow: 0 0 0 3px rgba(15, 108, 189, 0.15);
+  }
+}
+
+.btn-premium-primary {
+  background: var(--app-brand);
+  color: #ffffff;
+  border: 1px solid var(--app-brand);
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  height: 36px;
+
+  [data-bs-theme="dark"] & {
+    color: #111827;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 0.95;
+    transform: translateY(-0.5px);
+  }
+}
+
+.btn-premium-success {
+  background: #198754;
+  color: #ffffff;
+  border: 1px solid #198754;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #157347;
+    border-color: #146c43;
+    transform: translateY(-1px);
+  }
+}
+
+.btn-premium-danger {
+  background: #dc3545;
+  color: #ffffff;
+  border: 1px solid #dc3545;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #bb2d3b;
+    border-color: #b02a37;
+    transform: translateY(-1px);
+  }
+}
+
+.btn-premium-secondary {
+  background: var(--app-surface);
+  color: var(--app-text);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--app-bg);
+    border-color: var(--app-brand);
+    color: var(--app-brand);
+  }
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Deep overrides inside ChartCardComponent or direct chart styles */
+::ng-deep app-line-chart {
+  canvas {
+    max-height: 230px !important;
+  }
+}
+
+.table {
+  thead th {
+    font-size: 0.8rem;
+    font-weight: 700;
+    background-color: var(--app-bg) !important;
+    border-bottom: 2px solid var(--app-border);
+    color: var(--app-muted);
+    padding: 0.85rem 1rem;
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: rgba(15, 108, 189, 0.01) !important;
+      
+      [data-bs-theme="dark"] & {
+        background-color: rgba(255, 255, 255, 0.01) !important;
+      }
+    }
+    
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--app-border);
+      font-size: 0.85rem;
+      color: var(--app-text);
+    }
+  }
+}
+
+@media (max-width: 991.98px) {
+  .calendar-grid {
+    gap: 4px;
+  }
+  .calendar-day-cell {
+    min-height: 60px;
+    padding: 4px;
+    
+    .day-status-badge {
+      font-size: 0.5rem;
+      padding: 0 2px;
+    }
+    .day-times {
+      font-size: 0.6rem;
+    }
+  }
+}
+
+@media (max-width: 575.98px) {
+  .calendar-day-cell {
+    min-height: 48px;
+    
+    .day-status-badge {
+      display: none;
+    }
+    .day-times {
+      display: none;
+    }
+  }
+}

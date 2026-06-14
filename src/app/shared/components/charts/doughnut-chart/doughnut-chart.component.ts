@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy, Component, computed, inject, input
 } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ChartConfiguration } from 'chart.js';
 import { DistributionPoint } from '@core/models/analytics.models';
 import { ChartConfigService } from '@core/services/chart-config.service';
@@ -10,7 +11,7 @@ import { ThemeService } from '@core/services/theme.service';
 @Component({
   selector: 'app-doughnut-chart',
   standalone: true,
-  imports: [BaseChartDirective],
+  imports: [BaseChartDirective, TranslatePipe],
   templateUrl: './doughnut-chart.component.html',
   styleUrl: './doughnut-chart.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

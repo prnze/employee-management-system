@@ -12,6 +12,7 @@ import { TableComponent } from '@shared/components/table/table.component';
 import { FilterChipsComponent } from '@shared/components/filter-chips/filter-chips.component';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { TableColumn } from '@core/models/table.models';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EmployeesStore, ColumnDef } from './employees.store';
 
 @Component({
@@ -19,7 +20,7 @@ import { EmployeesStore, ColumnDef } from './employees.store';
   standalone: true,
   imports: [
     ReactiveFormsModule, RouterLink, PaginationComponent, PhoneFormatPipe, AppDatePipe,
-    IconComponent, PermissionDirective, TableComponent, FilterChipsComponent, ModalComponent
+    IconComponent, PermissionDirective, TableComponent, FilterChipsComponent, ModalComponent, TranslatePipe
   ],
   styleUrl: './employee-list.component.scss',
   templateUrl: './employee-list.component.html',
@@ -42,15 +43,15 @@ export class EmployeeListComponent {
   readonly tableColumns = computed<TableColumn<Employee>[]>(() => {
     const config = this.columnsConfig();
     return [
-      { key: 'employeeCode', label: 'Code', sortable: true, cellTemplate: this.codeTpl(), visible: config.find(c => c.key === 'employeeCode')?.visible },
-      { key: 'firstName', label: 'Name', sortable: true, cellTemplate: this.nameTpl(), visible: config.find(c => c.key === 'firstName')?.visible },
-      { key: 'email', label: 'Email', sortable: true, visible: config.find(c => c.key === 'email')?.visible },
-      { key: 'phone', label: 'Phone', cellTemplate: this.phoneTpl(), visible: config.find(c => c.key === 'phone')?.visible },
-      { key: 'department', label: 'Department', cellTemplate: this.deptTpl(), sortable: true, visible: config.find(c => c.key === 'department')?.visible },
-      { key: 'designation', label: 'Designation', sortable: true, visible: config.find(c => c.key === 'designation')?.visible },
-      { key: 'location', label: 'Location', sortable: true, visible: config.find(c => c.key === 'location')?.visible },
-      { key: 'status', label: 'Status', cellTemplate: this.statusTpl(), sortable: true, visible: config.find(c => c.key === 'status')?.visible },
-      { key: 'joinedAt', label: 'Joined', cellTemplate: this.joinedTpl(), sortable: true, visible: config.find(c => c.key === 'joinedAt')?.visible },
+      { key: 'employeeCode', label: 'EMP_DETAIL_CODE', sortable: true, cellTemplate: this.codeTpl(), visible: config.find(c => c.key === 'employeeCode')?.visible },
+      { key: 'firstName', label: 'USER_NAME', sortable: true, cellTemplate: this.nameTpl(), visible: config.find(c => c.key === 'firstName')?.visible },
+      { key: 'email', label: 'USER_EMAIL', sortable: true, visible: config.find(c => c.key === 'email')?.visible },
+      { key: 'phone', label: 'USER_PHONE', cellTemplate: this.phoneTpl(), visible: config.find(c => c.key === 'phone')?.visible },
+      { key: 'department', label: 'EMP_DETAIL_DEPARTMENT', cellTemplate: this.deptTpl(), sortable: true, visible: config.find(c => c.key === 'department')?.visible },
+      { key: 'designation', label: 'EMP_DETAIL_DESIGNATION', sortable: true, visible: config.find(c => c.key === 'designation')?.visible },
+      { key: 'location', label: 'PROFILE_LOCATION', sortable: true, visible: config.find(c => c.key === 'location')?.visible },
+      { key: 'status', label: 'EMP_DETAIL_STATUS', cellTemplate: this.statusTpl(), sortable: true, visible: config.find(c => c.key === 'status')?.visible },
+      { key: 'joinedAt', label: 'EMP_FORM_JOINED', cellTemplate: this.joinedTpl(), sortable: true, visible: config.find(c => c.key === 'joinedAt')?.visible },
       { key: 'actions', label: '', cellTemplate: this.actionsTpl(), headerClass: 'text-end', cellClass: 'text-end' }
     ];
   });

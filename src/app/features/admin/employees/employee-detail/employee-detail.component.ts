@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Employee } from '@core/models/employee.models';
 import { EmployeeService } from '@core/services/employee.service';
 import { DialogService } from '@core/services/dialog.service';
@@ -9,7 +10,7 @@ import { PermissionDirective } from '@shared/directives/permission.directive';
 @Component({
   selector: 'app-employee-detail',
   standalone: true,
-  imports: [RouterLink, PhoneFormatPipe, PermissionDirective],
+  imports: [RouterLink, PhoneFormatPipe, PermissionDirective, TranslatePipe],
   templateUrl: './employee-detail.component.html',
   styleUrl: './employee-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

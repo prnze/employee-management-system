@@ -1,4 +1,4 @@
-<aside class="sidebar p-3 d-flex flex-column h-100" [class.sidebar--collapsed]="shell.sidebarCollapsed()" aria-label="Primary navigation">
+<aside class="sidebar p-3 d-flex flex-column h-100" [class.sidebar--collapsed]="shell.sidebarCollapsed()" [attr.aria-label]="'PRIMARY_NAVIGATION' | translate">
   <!-- User Information Panel -->
   @if (user(); as u) {
     <div class="user-panel p-3 mb-4 rounded-3 d-flex align-items-center gap-3 border transition-all">

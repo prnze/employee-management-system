@@ -1,5 +1,5 @@
 import {
-  ChangeDetectionStrategy, Component, computed, inject, ViewChild
+  ChangeDetectionStrategy, Component, computed, inject, ViewChild, signal
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -15,17 +15,19 @@ import { AppDatePipe } from '@shared/pipes/app-date.pipe';
 import { IconComponent } from '@shared/components/icon/icon.component';
 import { APP_ICONS } from '@core/constants/icon.constants';
 import { ShellStateService } from '@core/services/shell-state.service';
+import { ChangePasswordComponent } from '@features/auth/change-password/change-password.component';
 
 @Component({
   selector: 'app-top-navbar',
   standalone: true,
-  imports: [InitialsPipe, RouterLink, AppDatePipe, TranslatePipe, LanguageTransitionComponent, IconComponent],
+  imports: [InitialsPipe, RouterLink, AppDatePipe, TranslatePipe, LanguageTransitionComponent, IconComponent, ChangePasswordComponent],
   styleUrl: './top-navbar.component.scss',
   templateUrl: './top-navbar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TopNavbarComponent {
   readonly APP_ICONS = APP_ICONS;
+  readonly showChangePasswordModal = signal(false);
   @ViewChild('langTransition') private langTransition!: LanguageTransitionComponent;
 
   readonly shell         = inject(ShellStateService);

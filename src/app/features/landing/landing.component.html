@@ -1,0 +1,126 @@
+<div class="landing-wrapper min-vh-100 d-flex flex-column position-relative">
+  <!-- Interactive Three.js background canvas container -->
+  <div #canvasContainer class="threejs-canvas-container position-absolute top-0 start-0 w-100 h-100 z-0"></div>
+
+  <!-- Header -->
+  <header class="navbar navbar-expand-lg px-4 py-3 border-bottom position-relative z-3">
+    <div class="container-fluid max-width-container d-flex align-items-center justify-content-between">
+      <!-- Logo -->
+      <a class="navbar-brand fw-bold text-primary text-decoration-none fs-4 d-flex align-items-center gap-2" routerLink="/">
+        <span class="logo-icon-wrapper d-flex align-items-center justify-content-center">
+          <app-icon icon="bolt" [size]="24" aria-hidden="true"></app-icon>
+        </span>
+        <span class="logo-text">{{ 'APP_TITLE' | translate }}</span>
+      </a>
+
+      <!-- Log In action button -->
+      <a class="btn btn-premium-primary px-4 fw-semibold" routerLink="/login">
+        {{ 'LANDING_LOG_IN' | translate }}
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="flex-grow-1 d-flex flex-column position-relative z-2">
+    <section class="hero-section text-center px-3 py-5 my-auto">
+      <div class="container max-width-container">
+        <!-- Badge -->
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-full hero-badge mb-4">
+          <span class="pulse-dot"></span>
+          <span class="badge-text fw-bold text-uppercase tracking-wider small">v2.1.0 Release</span>
+        </div>
+
+        <h1 class="display-3 fw-bold hero-title mb-3">
+          {{ 'LANDING_HERO_TITLE' | translate }}
+        </h1>
+        <p class="lead hero-subtitle text-body-secondary mx-auto mb-5">
+          {{ 'LANDING_HERO_SUBTITLE' | translate }}
+        </p>
+
+        <div class="d-flex justify-content-center gap-3 flex-wrap mb-5">
+          <a class="btn btn-premium-primary btn-lg px-5 py-3 fw-semibold text-decoration-none" routerLink="/login">
+            {{ 'LANDING_GET_STARTED' | translate }}
+          </a>
+          <button class="btn btn-outline-secondary btn-lg px-5 py-3 fw-semibold" type="button" (click)="watchDemo()">
+            {{ 'LANDING_WATCH_DEMO' | translate }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section py-5 bg-body-tertiary border-top border-bottom">
+      <div class="container max-width-container">
+        <div class="row g-4">
+          <!-- Card 1 -->
+          <div class="col-12 col-md-4">
+            <div class="card feature-card h-100 p-4 rounded-4 shadow-sm border bg-body">
+              <div class="feature-icon-wrapper bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center mb-3">
+                <app-icon icon="group" [size]="24" aria-hidden="true"></app-icon>
+              </div>
+              <h3 class="h5 fw-bold text-body mb-2">{{ 'LANDING_FEATURE_1_TITLE' | translate }}</h3>
+              <p class="text-body-secondary small mb-0">{{ 'LANDING_FEATURE_1_DESC' | translate }}</p>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div class="col-12 col-md-4">
+            <div class="card feature-card h-100 p-4 rounded-4 shadow-sm border bg-body">
+              <div class="feature-icon-wrapper bg-info-subtle text-info rounded-3 d-flex align-items-center justify-content-center mb-3">
+                <app-icon icon="monitoring" [size]="24" aria-hidden="true"></app-icon>
+              </div>
+              <h3 class="h5 fw-bold text-body mb-2">{{ 'LANDING_FEATURE_2_TITLE' | translate }}</h3>
+              <p class="text-body-secondary small mb-0">{{ 'LANDING_FEATURE_2_DESC' | translate }}</p>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div class="col-12 col-md-4">
+            <div class="card feature-card h-100 p-4 rounded-4 shadow-sm border bg-body">
+              <div class="feature-icon-wrapper bg-success-subtle text-success rounded-3 d-flex align-items-center justify-content-center mb-3">
+                <app-icon icon="security" [size]="24" aria-hidden="true"></app-icon>
+              </div>
+              <h3 class="h5 fw-bold text-body mb-2">{{ 'LANDING_FEATURE_3_TITLE' | translate }}</h3>
+              <p class="text-body-secondary small mb-0">{{ 'LANDING_FEATURE_3_DESC' | translate }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats-section py-4 bg-body text-center">
+      <div class="container max-width-container">
+        <div class="row g-4 align-items-center justify-content-around">
+          <div class="col-6 col-md-4">
+            <div class="stat-item">
+              <strong class="d-block fs-3 fw-bold text-primary mb-1">10K+</strong>
+              <span class="text-body-secondary small fw-medium">{{ 'LANDING_STAT_1' | translate }}</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="stat-item">
+              <strong class="d-block fs-3 fw-bold text-info mb-1">250+</strong>
+              <span class="text-body-secondary small fw-medium">{{ 'LANDING_STAT_2' | translate }}</span>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="stat-item">
+              <strong class="d-block fs-3 fw-bold text-success mb-1">99.9%</strong>
+              <span class="text-body-secondary small fw-medium">{{ 'LANDING_STAT_3' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer py-3 border-top position-relative z-3">
+    <div class="container max-width-container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 text-muted small">
+      <span>{{ 'FOOTER_COPY' | translate }}</span>
+      <div class="d-flex gap-3">
+        <a class="text-muted text-decoration-none hover-primary" href="#">Privacy Policy</a>
+        <a class="text-muted text-decoration-none hover-primary" href="#">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+</div>

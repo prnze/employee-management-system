@@ -4,12 +4,13 @@ import { TranslateModule } from '@ngx-translate/core';
 import { TableColumn } from '@core/models/table.models';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { IconComponent } from '../icon/icon.component';
+import { LoaderComponent } from '../loader/loader.component';
 import { APP_ICONS } from '@core/constants/icon.constants';
 
 @Component({
   selector: 'app-table',
   standalone: true,
-  imports: [NgTemplateOutlet, TranslateModule, EmptyStateComponent, IconComponent],
+  imports: [NgTemplateOutlet, TranslateModule, EmptyStateComponent, IconComponent, LoaderComponent],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -19,8 +20,10 @@ export class TableComponent<T extends { id: string }> {
   readonly rows = input.required<T[]>();
   readonly columns = input.required<TableColumn<T>[]>();
   readonly selectedIds = input<string[]>([]);
+  readonly selectedSet = computed(() => new Set(this.selectedIds()));
   readonly selectable = input<boolean>(false);
   readonly rowClickable = input<boolean>(false);
+  readonly loading = input<boolean>(false);
   readonly sortStack = input<{ field: string; direction: 'asc' | 'desc' }[]>([]);
   readonly emptyTitle = input<string>('AUDIT_NONE_FOUND');
   readonly emptyMessage = input<string>('AUDIT_ADJUST');
@@ -32,7 +35,7 @@ export class TableComponent<T extends { id: string }> {
   readonly visibleColumns = computed(() => this.columns().filter((column) => column.visible !== false));
 
   allSelected(): boolean {
-    return this.rows().length > 0 && this.rows().every((row) => this.selectedIds().includes(row.id));
+    return this.rows().length > 0 && this.rows().every((row) => this.selectedSet().has(row.id));
   }
 
   toggleAll(): void {
@@ -41,7 +44,7 @@ export class TableComponent<T extends { id: string }> {
 
   toggleRow(row: T): void {
     const current = this.selectedIds();
-    this.selectionChange.emit(current.includes(row.id) ? current.filter((id) => id !== row.id) : [...current, row.id]);
+    this.selectionChange.emit(this.selectedSet().has(row.id) ? current.filter((id) => id !== row.id) : [...current, row.id]);
   }
 
   trackById(row: T): string {

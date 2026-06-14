@@ -7,14 +7,14 @@
     <span class="logo-icon-wrapper d-flex align-items-center justify-content-center">
       <app-icon icon="bolt" [size]="20" aria-hidden="true"></app-icon>
     </span>
-    <span class="logo-text">EMS</span>
+    <span class="logo-text">{{ 'APP_SHORT' | translate }}</span>
   </a>
 
   <!-- Desktop Sidebar Toggle -->
   <button class="btn btn-toggle-sidebar btn-sm d-none d-md-flex align-items-center justify-content-center me-2"
     type="button"
     (click)="shell.toggleSidebar()"
-    [attr.aria-label]="shell.sidebarCollapsed() ? 'Expand Sidebar' : 'Collapse Sidebar'">
+    [attr.aria-label]="shell.sidebarCollapsed() ? ('NAV_EXPAND_SIDEBAR' | translate) : ('NAV_COLLAPSE_SIDEBAR' | translate)">
     <app-icon [icon]="shell.sidebarCollapsed() ? 'menu_open' : 'menu'" aria-hidden="true" [size]="18"></app-icon>
   </button>
 
@@ -28,7 +28,7 @@
   <!-- Search Area (SaaS Search Box Visual) -->
   <div class="d-none d-lg-flex align-items-center position-relative search-container ms-2 me-auto">
     <app-icon [icon]="APP_ICONS.SEARCH" class="position-absolute search-icon" [size]="16" aria-hidden="true"></app-icon>
-    <input type="text" class="form-control search-input" placeholder="Search... (⌘K)" disabled>
+    <input type="text" class="form-control search-input" [placeholder]="'NAV_SEARCH_PLACEHOLDER' | translate" disabled>
   </div>
 
   <!-- Current Page Title & Breadcrumb Trail (Align right/center dynamically if needed, or left next to sidebar buttons) -->
@@ -36,7 +36,7 @@
     <h1 class="h6 mb-0 text-body fw-bold page-header-title">{{ shell.pageTitle() }}</h1>
     @if (shell.breadcrumbs().length > 0) {
       <span class="text-muted opacity-50">/</span>
-      <nav aria-label="breadcrumb">
+      <nav [attr.aria-label]="'BREADCRUMB_LABEL' | translate">
         <ol class="breadcrumb mb-0 small-breadcrumb">
           @for (crumb of shell.breadcrumbs(); track crumb.label; let last = $last) {
             <li class="breadcrumb-item" [class.active]="last" [attr.aria-current]="last ? 'page' : null">
@@ -59,18 +59,18 @@
       <button class="btn btn-navbar-action btn-sm dropdown-toggle d-flex align-items-center gap-2"
         type="button" data-bs-toggle="dropdown" aria-expanded="false"
         [attr.aria-label]="'LANG_SELECT' | translate">
-        <app-icon [icon]="APP_ICONS.LANGUAGE" aria-hidden="true" [size]="18"></app-icon>
-        <span class="d-none d-md-inline small-lang-text fw-medium">{{ langSvc.currentLanguage().name }}</span>
+        <span class="lang-flag fs-5">{{ langSvc.currentLanguage().flag }}</span>
+        <span class="d-none d-md-inline small-lang-text fw-semibold">{{ langSvc.currentLanguage().name }}</span>
       </button>
       <ul class="dropdown-menu dropdown-menu-end shadow-sm border border-opacity-10 rounded-3 mt-2">
         @for (lang of languages; track lang.code) {
           <li>
-            <button class="dropdown-item d-flex align-items-center gap-2 py-2"
+            <button class="dropdown-item d-flex align-items-center gap-2.5 py-2"
               type="button"
               [class.active]="lang.code === langSvc.currentCode()"
               (click)="switchLanguage(lang.code)">
-              <app-icon [icon]="APP_ICONS.LANGUAGE" aria-hidden="true" [size]="16"></app-icon>
-              <span class="small fw-medium">{{ lang.code === 'en' ? ('LANG_ENGLISH' | translate) : ('LANG_GERMAN' | translate) }}</span>
+              <span class="lang-flag fs-5">{{ lang.flag }}</span>
+              <span class="small fw-semibold">{{ lang.name }}</span>
             </button>
           </li>
         }
@@ -191,15 +191,15 @@
         <div class="profile-actions d-flex flex-column gap-1 w-100">
           <a class="btn btn-sm btn-profile-item text-start d-flex align-items-center gap-2" routerLink="/profile">
             <app-icon icon="person" [size]="16"></app-icon>
-            <span>Profile</span>
+            <span>{{ 'NAV_PROFILE_LINK' | translate }}</span>
           </a>
-          <a class="btn btn-sm btn-profile-item text-start d-flex align-items-center gap-2" routerLink="/account/change-password">
+          <button class="btn btn-sm btn-profile-item text-start d-flex align-items-center gap-2" type="button" (click)="showChangePasswordModal.set(true)">
             <app-icon icon="lock" [size]="16"></app-icon>
-            <span>Change Password</span>
-          </a>
+            <span>{{ 'NAV_CHANGE_PASSWORD' | translate }}</span>
+          </button>
           <button class="btn btn-sm btn-profile-item-danger text-start d-flex align-items-center gap-2" type="button" (click)="logout()">
             <app-icon icon="logout" [size]="16"></app-icon>
-            <span>Logout</span>
+            <span>{{ 'NAV_LOGOUT' | translate }}</span>
           </button>
         </div>
       </div>
@@ -209,9 +209,11 @@
     <button class="btn btn-navbar-action btn-sm logout-btn ms-1 d-flex align-items-center justify-content-center text-danger-hover"
       type="button"
       (click)="logout()"
-      title="Logout"
-      aria-label="Logout">
+      [title]="'NAV_LOGOUT' | translate"
+      [attr.aria-label]="'NAV_LOGOUT' | translate">
       <app-icon icon="logout" aria-hidden="true" [size]="18"></app-icon>
     </button>
   </div>
 </header>
+
+<app-change-password-modal [open]="showChangePasswordModal()" (closed)="showChangePasswordModal.set(false)" />

@@ -12,8 +12,8 @@
     <!-- Mobile Sidebar Drawer (Offcanvas) -->
     <div class="offcanvas offcanvas-start" [class.show]="shell.mobileSidebarOpen()" [style.visibility]="shell.mobileSidebarOpen() ? 'visible' : 'hidden'" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
       <div class="offcanvas-header">
-        <h2 class="offcanvas-title fs-5" id="mobileSidebarLabel">Navigation</h2>
-        <button class="btn-close" type="button" (click)="shell.closeMobileSidebar()" aria-label="Close"></button>
+        <h2 class="offcanvas-title fs-5" id="mobileSidebarLabel">{{ 'NAV_NAVIGATION' | translate }}</h2>
+        <button class="btn-close" type="button" (click)="shell.closeMobileSidebar()" [attr.aria-label]="'COMMON_CLOSE' | translate"></button>
       </div>
       <div class="offcanvas-body p-0">
         <app-sidebar [items]="items" />
