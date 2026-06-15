@@ -1,50 +1,19 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { delay, Observable, of, throwError } from 'rxjs';
+import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import { User, UserFilter, UserRequest, UserSortEntry, UserStatus } from '@core/models/user.models';
 import { AppRole } from '@core/constants/roles.constant';
 import { AuditService } from './audit.service';
 import { NotificationService } from './notification.service';
 import { AuthStateService } from '@core/auth/auth-state.service';
-
-const SEED_USERS: User[] = [
-  {
-    id: 'u1', fullName: 'Avery Admin', email: 'admin@ems.local', role: 'Admin', status: 'Active',
-    phone: '+91 98765 43210', department: 'Management',
-    lastLoginAt: '2026-06-03T08:30:00Z', createdAt: '2024-01-15T09:00:00Z',
-    extraPermissions: [], forcePasswordReset: false
-  },
-  {
-    id: 'u2', fullName: 'Emerson Employee', email: 'employee@ems.local', role: 'Employee', status: 'Active',
-    phone: '+91 91234 56789', department: 'Engineering',
-    lastLoginAt: '2026-06-02T15:45:00Z', createdAt: '2024-03-20T10:30:00Z',
-    extraPermissions: [], forcePasswordReset: false
-  },
-  {
-    id: 'u3', fullName: 'Priya Manager', email: 'priya.manager@ems.local', role: 'Admin', status: 'Active',
-    phone: '+91 88001 12345', department: 'HR',
-    lastLoginAt: '2026-06-01T12:00:00Z', createdAt: '2024-06-01T08:00:00Z',
-    extraPermissions: ['reports:view'], forcePasswordReset: false
-  },
-  {
-    id: 'u4', fullName: 'Raj Sharma', email: 'raj.sharma@ems.local', role: 'Employee', status: 'Inactive',
-    phone: '+91 77009 98765', department: 'Finance',
-    lastLoginAt: '2025-12-15T10:00:00Z', createdAt: '2023-11-10T09:00:00Z',
-    extraPermissions: [], forcePasswordReset: false
-  },
-  {
-    id: 'u5', fullName: 'Sneha Patil', email: 'sneha.patil@ems.local', role: 'Employee', status: 'Locked',
-    phone: '+91 93400 11223', department: 'Design',
-    lastLoginAt: '2026-05-20T14:30:00Z', createdAt: '2024-09-05T11:00:00Z',
-    extraPermissions: [], forcePasswordReset: true
-  }
-];
+import { SupabaseService } from './supabase.service';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private readonly store     = signal<User[]>(SEED_USERS);
+  private readonly store     = signal<User[]>([]);
   private readonly audit     = inject(AuditService);
   private readonly notif     = inject(NotificationService);
   private readonly authState = inject(AuthStateService);
+  private readonly supabase  = inject(SupabaseService);
 
   // ── Read signals ───────────────────────────────────────────────────────────
   readonly users       = this.store.asReadonly();
@@ -52,6 +21,29 @@ export class UserService {
   readonly activeCount = computed(() => this.store().filter((u) => u.status === 'Active').length);
   readonly lockedCount = computed(() => this.store().filter((u) => u.status === 'Locked').length);
   readonly adminCount  = computed(() => this.store().filter((u) => u.role === 'Admin').length);
+
+  constructor() {
+    this.loadUsers();
+  }
+
+  private loadUsers(): void {
+    from(
+      this.supabase.client
+        .from('users')
+        .select('*')
+    ).subscribe({
+      next: ({ data, error }) => {
+        if (error) {
+          console.error('Failed to load users from Supabase:', error);
+        } else if (data) {
+          this.store.set(data.map((u: any) => this.mapDbToUser(u)));
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load users:', err);
+      }
+    });
+  }
 
   // ── Filtering & sorting ───────────────────────────────────────────────────
   filtered(filter: UserFilter, sort: UserSortEntry[]): User[] {
@@ -86,46 +78,94 @@ export class UserService {
 
   // ── CRUD ──────────────────────────────────────────────────────────────────
   create(req: UserRequest): Observable<User> {
-    if (this.store().some((u) => u.email === req.email)) {
-      return throwError(() => new Error(`Email ${req.email} is already registered`));
-    }
-    const user: User = {
-      ...req,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      extraPermissions: req.extraPermissions ?? [],
-      forcePasswordReset: req.forcePasswordReset ?? false
-    };
-    this.store.update((u) => [user, ...u]);
-    this.audit.record(this.actor(), 'CREATE', `User ${user.email}`, { category: 'Permissions', details: `Created user ${user.fullName} (${user.role})` });
-    this.notif.push({ title: 'User created', message: `${user.fullName} has been added as ${user.role}.`, type: 'Success', category: 'System', priority: 'Low' });
-    return of(user).pipe(delay(250));
+    return throwError(() => new Error('User creation is disabled in Phase 1.'));
   }
 
   update(id: string, req: Partial<UserRequest>): Observable<User> {
-    const existing = this.store().find((u) => u.id === id);
-    if (!existing) return throwError(() => new Error('User not found'));
-    if (req.email && req.email !== existing.email && this.store().some((u) => u.email === req.email)) {
-      return throwError(() => new Error(`Email ${req.email} is already in use`));
+    const dbFields: any = {};
+    if (req.fullName !== undefined) {
+      const parts = (req.fullName || '').trim().split(/\s+/);
+      dbFields.first_name = parts[0] || '';
+      dbFields.last_name = parts.slice(1).join(' ') || '';
     }
-    const updated: User = { ...existing, ...req };
-    this.store.update((u) => u.map((x) => x.id === id ? updated : x));
-    this.audit.record(this.actor(), 'UPDATE', `User ${updated.email}`, { category: 'Permissions', details: `Updated user ${updated.fullName}` });
-    return of(updated).pipe(delay(250));
+    if (req.email !== undefined) {
+      dbFields.email = req.email;
+    }
+    if (req.role !== undefined) {
+      dbFields.role = req.role === 'Admin' ? 'ADMIN' : 'EMPLOYEE';
+    }
+    if (req.status !== undefined) {
+      dbFields.status = req.status === 'Active' ? 'ACTIVE' : (req.status === 'Locked' ? 'LOCKED' : 'INACTIVE');
+    }
+    if (req.extraPermissions !== undefined) {
+      dbFields.extra_permissions = req.extraPermissions;
+    }
+    if (req.forcePasswordReset !== undefined) {
+      dbFields.force_password_reset = req.forcePasswordReset;
+    }
+    if (req.phone !== undefined) {
+      dbFields.phone = req.phone || null;
+    }
+    if (req.department !== undefined) {
+      dbFields.department = req.department || null;
+    }
+
+    return from(
+      this.supabase.client
+        .from('users')
+        .update(dbFields)
+        .eq('id', id)
+        .select()
+        .single()
+    ).pipe(
+      switchMap(({ data, error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        const updatedUser = this.mapDbToUser(data);
+        this.store.update((users) => users.map((u) => u.id === id ? updatedUser : u));
+        this.audit.record(this.actor(), 'UPDATE', `User ${updatedUser.email}`, { category: 'Permissions', details: `Updated user ${updatedUser.fullName}` });
+        return of(updatedUser);
+      })
+    );
   }
 
   delete(id: string): Observable<boolean> {
     const user = this.store().find((u) => u.id === id);
-    this.store.update((u) => u.filter((x) => x.id !== id));
-    this.audit.record(this.actor(), 'DELETE', `User ${user?.email ?? id}`, { category: 'Permissions', severity: 'Warning' });
-    this.notif.push({ title: 'User deleted', message: `Account for ${user?.fullName ?? id} was permanently removed.`, type: 'Warning', category: 'Security', priority: 'High' });
-    return of(true).pipe(delay(200));
+    return from(
+      this.supabase.client
+        .from('users')
+        .delete()
+        .eq('id', id)
+    ).pipe(
+      switchMap(({ error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        this.store.update((u) => u.filter((x) => x.id !== id));
+        this.audit.record(this.actor(), 'DELETE', `User ${user?.email ?? id}`, { category: 'Permissions', severity: 'Warning' });
+        this.notif.push({ title: 'User deleted', message: `Account for ${user?.fullName ?? id} was permanently removed.`, type: 'Warning', category: 'Security', priority: 'High' });
+        return of(true);
+      })
+    );
   }
 
   bulkDelete(ids: string[]): Observable<boolean> {
-    this.store.update((u) => u.filter((x) => !ids.includes(x.id)));
-    this.audit.record(this.actor(), 'BULK_DELETE', `${ids.length} users`, { category: 'Permissions', severity: 'Warning' });
-    return of(true).pipe(delay(250));
+    return from(
+      this.supabase.client
+        .from('users')
+        .delete()
+        .in('id', ids)
+    ).pipe(
+      switchMap(({ error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        this.store.update((u) => u.filter((x) => !ids.includes(x.id)));
+        this.audit.record(this.actor(), 'BULK_DELETE', `${ids.length} users`, { category: 'Permissions', severity: 'Warning' });
+        return of(true);
+      })
+    );
   }
 
   // ── Status transitions ────────────────────────────────────────────────────
@@ -134,9 +174,22 @@ export class UserService {
   }
 
   bulkSetStatus(ids: string[], status: UserStatus): Observable<boolean> {
-    this.store.update((u) => u.map((x) => ids.includes(x.id) ? { ...x, status } : x));
-    this.audit.record(this.actor(), 'BULK_STATUS_UPDATE', `${ids.length} users → ${status}`, { category: 'Permissions' });
-    return of(true).pipe(delay(250));
+    const dbStatus = status === 'Active' ? 'ACTIVE' : (status === 'Locked' ? 'LOCKED' : 'INACTIVE');
+    return from(
+      this.supabase.client
+        .from('users')
+        .update({ status: dbStatus })
+        .in('id', ids)
+    ).pipe(
+      switchMap(({ error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        this.store.update((users) => users.map((x) => ids.includes(x.id) ? { ...x, status } : x));
+        this.audit.record(this.actor(), 'BULK_STATUS_UPDATE', `${ids.length} users → ${status}`, { category: 'Permissions' });
+        return of(true);
+      })
+    );
   }
 
   lock(id: string): Observable<User> {
@@ -181,6 +234,23 @@ export class UserService {
     if (!user) return throwError(() => new Error('User not found'));
     this.audit.record(this.actor(), 'ROLE_CHANGE', `User ${user.email}`, { category: 'Permissions', severity: 'Warning', details: `Role changed from ${user.role} to ${role}` });
     return this.update(id, { role });
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  private mapDbToUser(dbUser: any): User {
+    return {
+      id: dbUser.id,
+      fullName: `${dbUser.first_name || ''} ${dbUser.last_name || ''}`.trim() || dbUser.email,
+      email: dbUser.email,
+      role: dbUser.role === 'ADMIN' ? 'Admin' : 'Employee',
+      status: dbUser.status === 'ACTIVE' ? 'Active' : (dbUser.status === 'LOCKED' ? 'Locked' : 'Inactive'),
+      lastLoginAt: dbUser.last_login_at || undefined,
+      createdAt: dbUser.created_at || undefined,
+      extraPermissions: dbUser.extra_permissions || [],
+      forcePasswordReset: dbUser.force_password_reset || false,
+      phone: dbUser.phone || undefined,
+      department: dbUser.department || undefined
+    };
   }
 
   private actor(): string {

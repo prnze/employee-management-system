@@ -31,10 +31,10 @@
           </li>
         </ul>
       </div>
-      <!-- New User Button -->
-      <button class="btn btn-premium-primary d-flex align-items-center gap-2" type="button" (click)="openCreate()">
+      <!-- New User Button (Disabled in Phase 1) -->
+      <button class="btn btn-premium-primary d-flex align-items-center gap-2" type="button" [disabled]="true" title="Provisioning available in Phase 2">
         <app-icon [icon]="APP_ICONS.ADD" aria-hidden="true"></app-icon>
-        <span>{{ 'USER_CREATE_TITLE' | translate }}</span>
+        <span>Provisioning available in Phase 2</span>
       </button>
     </div>
   </div>
