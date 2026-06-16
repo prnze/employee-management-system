@@ -19,6 +19,7 @@ export class NotificationListStore {
 
   // Core State
   private readonly _loading = signal<boolean>(false);
+  private readonly _error = signal<string>('');
   private readonly _page = signal<number>(1);
   private readonly _filters = signal<NotificationFilter>({
     query: '',
@@ -37,6 +38,7 @@ export class NotificationListStore {
 
   // Readonly Public Signals
   readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
   readonly page = this._page.asReadonly();
   readonly filters = this._filters.asReadonly();
 
@@ -85,6 +87,20 @@ export class NotificationListStore {
     this._loading.set(loading);
   }
 
+  loadNotifications(): void {
+    this._loading.set(true);
+    this._error.set('');
+    this.svc.getNotifications().subscribe({
+      next: () => {
+        this._loading.set(false);
+      },
+      error: (err: Error) => {
+        this._error.set(err.message);
+        this._loading.set(false);
+      }
+    });
+  }
+
   setPage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this._page.set(page);
@@ -97,7 +113,9 @@ export class NotificationListStore {
   }
 
   markRead(id: string): void {
-    this.svc.markRead(id);
+    this.svc.markAsRead(id).subscribe({
+      error: (err: Error) => this._error.set(err.message)
+    });
   }
 
   markAllRead(): void {
@@ -108,7 +126,9 @@ export class NotificationListStore {
       icon: APP_ICONS.SUCCESS
     }).then((confirmed) => {
       if (confirmed) {
-        this.svc.markAllRead();
+        this.svc.markAllAsRead().subscribe({
+          error: (err: Error) => this._error.set(err.message)
+        });
       }
     });
   }
@@ -121,7 +141,9 @@ export class NotificationListStore {
       icon: APP_ICONS.DELETE
     }).then((confirmed) => {
       if (confirmed) {
-        this.svc.delete(id);
+        this.svc.deleteNotification(id).subscribe({
+          error: (err: Error) => this._error.set(err.message)
+        });
       }
     });
   }

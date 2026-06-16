@@ -1,33 +1,8 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import { AuditFilter, AuditLog, AuditSeverity } from '@core/models/notification.models';
-
-const NOW = Date.now();
-const mins  = (n: number) => new Date(NOW - n * 60000).toISOString();
-const hours = (n: number) => new Date(NOW - n * 3600000).toISOString();
-const days  = (n: number) => new Date(NOW - n * 86400000).toISOString();
-
-const SEED_LOGS: AuditLog[] = [
-  { id: 'al01', actor: 'Avery Admin',      action: 'LOGIN',               entity: 'Auth',                severity: 'Info',     category: 'Auth',        details: 'Successful login from Chrome 125 / Windows 11',                          createdAt: mins(5),    ipAddress: '10.0.0.8',  sessionId: 'sess-001' },
-  { id: 'al02', actor: 'Avery Admin',      action: 'CREATE',              entity: 'Employee EMP-1010',   severity: 'Info',     category: 'Employee',    details: 'Vikas Iyer onboarded to Product department',                             createdAt: mins(22),   ipAddress: '10.0.0.8',  sessionId: 'sess-001' },
-  { id: 'al03', actor: 'Avery Admin',      action: 'PERMISSION_CHANGE',   entity: 'Role: Employee',      severity: 'Warning',  category: 'Permissions', details: 'Added permission employees:read to Employee role',                        createdAt: hours(1),   ipAddress: '10.0.0.8',  sessionId: 'sess-001' },
-  { id: 'al04', actor: 'Emerson Employee', action: 'LOGIN',               entity: 'Auth',                severity: 'Info',     category: 'Auth',        details: 'Successful login from Safari / macOS',                                   createdAt: hours(2),   ipAddress: '192.168.1.45' },
-  { id: 'al05', actor: 'Avery Admin',      action: 'UPDATE',              entity: 'Employee EMP-1001',   severity: 'Info',     category: 'Employee',    details: 'Designation changed: Senior Engineer → Frontend Lead',                   createdAt: hours(3),   ipAddress: '10.0.0.8',  sessionId: 'sess-001' },
-  { id: 'al06', actor: 'Avery Admin',      action: 'BULK_STATUS_UPDATE',  entity: '3 employees',         severity: 'Warning',  category: 'Employee',    details: 'Status updated to On Leave for EMP-1003, EMP-1009, EMP-1004',           createdAt: hours(5),   ipAddress: '10.0.0.8',  sessionId: 'sess-001' },
-  { id: 'al07', actor: 'System',           action: 'LOGIN',               entity: 'Auth',                severity: 'Error',    category: 'Auth',        details: 'Failed login attempt for admin@ems.local — wrong password (attempt 3)', createdAt: hours(6),   ipAddress: '203.45.67.1' },
-  { id: 'al08', actor: 'Avery Admin',      action: 'EXPORT',              entity: 'Employee list',       severity: 'Info',     category: 'Export',      details: 'Exported 10 employee records as CSV',                                   createdAt: hours(8),   ipAddress: '10.0.0.8',  sessionId: 'sess-001' },
-  { id: 'al09', actor: 'Avery Admin',      action: 'ROLE_CHANGE',         entity: 'Role: Admin',         severity: 'Critical', category: 'Permissions', details: 'Added permission settings:manage to Admin role',                         createdAt: hours(10),  ipAddress: '10.0.0.8',  sessionId: 'sess-001' },
-  { id: 'al10', actor: 'Emerson Employee', action: 'PASSWORD_CHANGE',     entity: 'Auth',                severity: 'Info',     category: 'Auth',        details: 'Password changed successfully',                                          createdAt: hours(12),  ipAddress: '192.168.1.45' },
-  { id: 'al11', actor: 'Avery Admin',      action: 'DELETE',              entity: 'Employee EMP-1008',   severity: 'Warning',  category: 'Employee',    details: 'Employee record permanently removed',                                    createdAt: days(1),    ipAddress: '10.0.0.8',  sessionId: 'sess-000' },
-  { id: 'al12', actor: 'System',           action: 'BULK_DELETE',         entity: '2 employee records',  severity: 'Warning',  category: 'Employee',    details: 'Bulk delete triggered by Avery Admin',                                   createdAt: days(1),    ipAddress: '10.0.0.8',  sessionId: 'sess-000' },
-  { id: 'al13', actor: 'Avery Admin',      action: 'LOGOUT',              entity: 'Auth',                severity: 'Info',     category: 'Auth',        details: 'Session ended normally',                                                 createdAt: days(2),    ipAddress: '10.0.0.8',  sessionId: 'sess-000' },
-  { id: 'al14', actor: 'Emerson Employee', action: 'LOGOUT',              entity: 'Auth',                severity: 'Info',     category: 'Auth',        details: 'Session ended normally',                                                 createdAt: days(2),    ipAddress: '192.168.1.45' },
-  { id: 'al15', actor: 'System',           action: 'LOGIN',               entity: 'Auth',                severity: 'Critical', category: 'Auth',        details: 'Brute-force pattern detected — IP temporarily blocked',                  createdAt: days(3),    ipAddress: '91.23.104.7' },
-  { id: 'al16', actor: 'Avery Admin',      action: 'PERMISSION_CHANGE',   entity: 'Role: Employee',      severity: 'Warning',  category: 'Permissions', details: 'Removed permission reports:view from Employee role',                     createdAt: days(4),    ipAddress: '10.0.0.8' },
-  { id: 'al17', actor: 'Avery Admin',      action: 'CREATE',              entity: 'Employee EMP-1005',   severity: 'Info',     category: 'Employee',    details: 'Priya Sharma onboarded to Engineering department',                       createdAt: days(5),    ipAddress: '10.0.0.8' },
-  { id: 'al18', actor: 'Avery Admin',      action: 'EXPORT',              entity: 'Audit logs',          severity: 'Info',     category: 'Export',      details: 'Exported audit log as Excel',                                            createdAt: days(6),    ipAddress: '10.0.0.8' },
-  { id: 'al19', actor: 'Emerson Employee', action: 'VIEW',                entity: 'Employee EMP-1001',   severity: 'Info',     category: 'Employee',    details: 'Viewed Maya Patel profile',                                              createdAt: days(7),    ipAddress: '192.168.1.45' },
-  { id: 'al20', actor: 'System',           action: 'LOGIN',               entity: 'Auth',                severity: 'Error',    category: 'Auth',        details: 'Failed login for unknown@ems.local — account not found',                 createdAt: days(10),   ipAddress: '34.120.8.99' }
-];
+import { SupabaseService } from './supabase.service';
+import { AuthStateService } from '@core/auth/auth-state.service';
 
 /** Infer the appropriate severity for common action+context combinations. */
 function inferSeverity(action: string, entity: string): AuditSeverity {
@@ -49,12 +24,45 @@ function inferCategory(action: string, entity: string): AuditLog['category'] {
 
 @Injectable({ providedIn: 'root' })
 export class AuditService {
-  private readonly logsSignal = signal<AuditLog[]>(SEED_LOGS);
+  private readonly supabase = inject(SupabaseService);
+  private readonly authState = inject(AuthStateService);
+
+  private readonly logsSignal = signal<AuditLog[]>([]);
+  private hasLoaded = false;
 
   readonly logs        = this.logsSignal.asReadonly();
   readonly totalCount  = computed(() => this.logsSignal().length);
   readonly actors      = computed(() => Array.from(new Set(this.logsSignal().map((l) => l.actor))).sort());
   readonly actions     = computed(() => Array.from(new Set(this.logsSignal().map((l) => l.action))).sort());
+
+  constructor() {
+    this.getAuditLogs().subscribe({
+      error: (err) => console.error('Failed to load audit logs from Supabase:', err)
+    });
+  }
+
+  getAuditLogs(force = false): Observable<AuditLog[]> {
+    if (this.hasLoaded && !force) {
+      return of(this.logsSignal());
+    }
+
+    return from(
+      this.supabase.client
+        .from('audit_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+    ).pipe(
+      switchMap(({ data, error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        const mapped = (data ?? []).map((row: any) => this.mapDbToAuditLog(row));
+        this.logsSignal.set(mapped);
+        this.hasLoaded = true;
+        return of(mapped);
+      })
+    );
+  }
 
   /**
    * Record a new audit entry.
@@ -80,7 +88,30 @@ export class AuditService {
       createdAt: new Date().toISOString(),
       ipAddress: '127.0.0.1'
     };
+
+    // Optimistic local update
     this.logsSignal.update((logs) => [entry, ...logs].slice(0, 500));
+
+    // Persist asynchronously in the background
+    from(
+      this.supabase.client
+        .from('audit_logs')
+        .insert(this.mapAuditLogToDb(entry))
+        .select()
+        .single()
+    ).subscribe({
+      next: ({ data, error }) => {
+        if (error) {
+          console.error('Failed to persist audit log in Supabase:', error);
+        } else if (data) {
+          const created = this.mapDbToAuditLog(data);
+          this.logsSignal.update((logs) =>
+            logs.map((l) => (l.id === entry.id ? created : l))
+          );
+        }
+      },
+      error: (err) => console.error('Error writing audit log to Supabase:', err)
+    });
   }
 
   /** Returns logs matching the given filter, newest-first. */
@@ -100,5 +131,42 @@ export class AuditService {
 
   static severityOrder(s: AuditSeverity): number {
     return { Critical: 4, Error: 3, Warning: 2, Info: 1 }[s] ?? 0;
+  }
+
+  private mapDbToAuditLog(row: any): AuditLog {
+    const meta = row.metadata ?? {};
+    return {
+      id: row.id,
+      actor: meta.actor_name ?? 'System',
+      action: row.action,
+      entity: row.entity_type,
+      severity: (meta.severity ?? 'Info') as AuditSeverity,
+      category: (meta.category ?? 'System') as AuditLog['category'],
+      details: row.description,
+      createdAt: row.created_at,
+      ipAddress: meta.ip_address ?? '127.0.0.1',
+      sessionId: meta.session_id
+    };
+  }
+
+  private mapAuditLogToDb(log: Partial<AuditLog>): Record<string, any> {
+    const meta: any = {
+      actor_name: log.actor ?? 'System',
+      severity: log.severity ?? 'Info',
+      category: log.category ?? 'System',
+      ip_address: log.ipAddress ?? '127.0.0.1'
+    };
+    if (log.sessionId) {
+      meta.session_id = log.sessionId;
+    }
+
+    return {
+      id: log.id,
+      user_id: this.authState.user()?.id || null,
+      action: log.action,
+      entity_type: log.entity,
+      description: log.details,
+      metadata: meta
+    };
   }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AppNotification, NotificationCategory, NotificationPriority } from '@core/models/notification.models';
@@ -25,10 +25,14 @@ const PAGE_SIZE = 8;
   templateUrl: './notification-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NotificationListComponent {
+export class NotificationListComponent implements OnInit {
   readonly APP_ICONS = APP_ICONS;
   readonly store = inject(NotificationListStore);
   readonly svc = inject(NotificationService);
+
+  ngOnInit(): void {
+    this.store.loadNotifications();
+  }
 
   readonly categories: NotificationCategory[] = ['System', 'Security', 'Employee', 'Attendance', 'Tasks'];
   readonly priorities: NotificationPriority[]  = ['Critical', 'High', 'Medium', 'Low'];

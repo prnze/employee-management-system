@@ -120,16 +120,17 @@ export class EmployeesStore {
   readonly allEmployees = this.employeeService.employees;
 
   constructor() {
-    // Combine form changes and sort stack updates into a single stream to fetch employees list
+    // Combine form changes, sort stack updates, and live employees signal into a single stream to fetch employees list
     combineLatest([
       this.filterForm.valueChanges.pipe(
         startWith(this.filterForm.getRawValue()),
         debounceTime(220)
       ),
-      toObservable(this.sortStack)
+      toObservable(this.sortStack),
+      toObservable(this.allEmployees)
     ])
       .pipe(
-        switchMap(([rawForm, sortStack]) => {
+        switchMap(([rawForm, sortStack, employees]) => {
           const raw = rawForm as EmployeeFilter;
           this.patchFilters(raw);
           return this.employeeService.list({ ...raw, sortStack });

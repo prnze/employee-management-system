@@ -665,6 +665,8 @@
   "EMP_LIST_LOADING_MSG": "Mitarbeiter werden geladen…",
   "EMP_LIST_SAVE_FILTER_TITLE": "Filter speichern",
   "EMP_LIST_FILTER_PLACEHOLDER": "Filtername…",
+  "EMP_LIST_NONE_FOUND": "Keine Mitarbeiter gefunden",
+  "EMP_LIST_ADJUST": "Versuchen Sie, Ihre Suche oder Filter anzupassen.",
 
   "USER_LESS": "Weniger",
   "USER_MORE_FILTERS_SHORT": "Mehr Filter",

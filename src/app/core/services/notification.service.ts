@@ -1,133 +1,261 @@
-import { computed, Injectable, signal } from '@angular/core';
-import { AppNotification, NotificationCategory, NotificationFilter, NotificationPriority } from '@core/models/notification.models';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { from, Observable, of, switchMap, throwError } from 'rxjs';
+import {
+  AppNotification,
+  NotificationCategory,
+  NotificationFilter,
+  NotificationPriority,
+  NotificationType
+} from '@core/models/notification.models';
+import { AuthStateService } from '@core/auth/auth-state.service';
+import { SupabaseService } from './supabase.service';
 
-const SEED_NOTIFICATIONS: AppNotification[] = [
-  {
-    id: 'n1', title: 'System maintenance scheduled',
-    message: 'The system will undergo maintenance on June 10 from 02:00–04:00 UTC. Please save your work.',
-    type: 'Warning', category: 'System', priority: 'High', read: false,
-    createdAt: new Date(Date.now() - 5 * 60000).toISOString()
-  },
-  {
-    id: 'n2', title: 'New login from unknown device',
-    message: 'A login was detected from a new device (Windows 11 / Chrome 125) in Bengaluru, India.',
-    type: 'Error', category: 'Security', priority: 'Critical', read: false,
-    createdAt: new Date(Date.now() - 22 * 60000).toISOString(), link: '/account/change-password'
-  },
-  {
-    id: 'n3', title: 'Maya Patel profile updated',
-    message: 'Employee EMP-1001 updated their designation from Senior Engineer to Frontend Lead.',
-    type: 'Info', category: 'Employee', priority: 'Low', read: false,
-    createdAt: new Date(Date.now() - 2 * 3600000).toISOString(), link: '/admin/employees/e1'
-  },
-  {
-    id: 'n4', title: 'Attendance anomaly detected',
-    message: 'Dev Nair (EMP-1004) has not checked in for 3 consecutive working days.',
-    type: 'Warning', category: 'Attendance', priority: 'Medium', read: false,
-    createdAt: new Date(Date.now() - 5 * 3600000).toISOString()
-  },
-  {
-    id: 'n5', title: 'Q2 self-review due in 7 days',
-    message: 'The quarterly self-review submission deadline is June 10. Please complete yours.',
-    type: 'Info', category: 'Tasks', priority: 'Medium', read: true,
-    createdAt: new Date(Date.now() - 24 * 3600000).toISOString(), link: '/employee/tasks'
-  },
-  {
-    id: 'n6', title: 'Payroll processed successfully',
-    message: 'May 2026 payroll for 44 employees has been processed and credited.',
-    type: 'Success', category: 'System', priority: 'Low', read: true,
-    createdAt: new Date(Date.now() - 2 * 86400000).toISOString()
-  },
-  {
-    id: 'n7', title: '3 new employees onboarded',
-    message: 'Priya Sharma, Arjun Reddy, and Kavya Nambiar have completed onboarding.',
-    type: 'Success', category: 'Employee', priority: 'Low', read: true,
-    createdAt: new Date(Date.now() - 3 * 86400000).toISOString()
-  },
-  {
-    id: 'n8', title: 'Password policy update',
-    message: 'The organisation\'s password policy now requires a minimum of 12 characters. Please update yours.',
-    type: 'Warning', category: 'Security', priority: 'High', read: false,
-    createdAt: new Date(Date.now() - 4 * 86400000).toISOString(), link: '/account/change-password'
-  },
-  {
-    id: 'n9', title: 'Leave request approved',
-    message: 'Your leave request for June 20–22 has been approved by your manager.',
-    type: 'Success', category: 'Attendance', priority: 'Low', read: true,
-    createdAt: new Date(Date.now() - 5 * 86400000).toISOString()
-  },
-  {
-    id: 'n10', title: 'Safety compliance training overdue',
-    message: 'Annual safety compliance training was due on May 31. Please complete it immediately.',
-    type: 'Error', category: 'Tasks', priority: 'Critical', read: false,
-    createdAt: new Date(Date.now() - 7 * 86400000).toISOString(), link: '/employee/tasks'
-  },
-  {
-    id: 'n11', title: 'Database backup completed',
-    message: 'Weekly database backup completed successfully at 03:00 UTC.',
-    type: 'Success', category: 'System', priority: 'Low', read: true,
-    createdAt: new Date(Date.now() - 7 * 86400000).toISOString()
-  },
-  {
-    id: 'n12', title: 'Bulk status update performed',
-    message: 'Admin Avery updated the status of 5 employees to On Leave.',
-    type: 'Info', category: 'Employee', priority: 'Medium', read: true,
-    createdAt: new Date(Date.now() - 10 * 86400000).toISOString()
-  }
-];
+export type NotificationRequest = Omit<AppNotification, 'id' | 'createdAt' | 'read'> & {
+  userId?: string;
+  read?: boolean;
+};
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
-  private readonly store = signal<AppNotification[]>(SEED_NOTIFICATIONS);
+  private readonly supabase = inject(SupabaseService);
+  private readonly authState = inject(AuthStateService);
+  private readonly store = signal<AppNotification[]>([]);
+  private hasLoaded = false;
 
-  // ── Read-only views ──────────────────────────────────────────────────────────
-  readonly all       = this.store.asReadonly();
-  readonly unread    = computed(() => this.store().filter((n) => !n.read));
+  // Read-only views
+  readonly all = this.store.asReadonly();
+  readonly unread = computed(() => this.store().filter((n) => !n.read));
   readonly unreadCount = computed(() => this.unread().length);
 
-  // ── Filtering ────────────────────────────────────────────────────────────────
+  constructor() {
+    this.getNotifications().subscribe({
+      error: (err) => console.error('Failed to load notifications from Supabase:', err)
+    });
+  }
+
+  getNotifications(force = false): Observable<AppNotification[]> {
+    if (this.hasLoaded && !force) {
+      return of(this.store());
+    }
+
+    return from(
+      this.supabase.client
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false })
+    ).pipe(
+      switchMap(({ data, error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        const notifications = (data ?? []).map((row: any) => this.mapDbToNotification(row));
+        this.store.set(notifications);
+        this.hasLoaded = true;
+        return of(notifications);
+      })
+    );
+  }
+
+  // Filtering
   filtered(filter: NotificationFilter): AppNotification[] {
-    const q    = filter.query.trim().toLowerCase();
+    const q = filter.query.trim().toLowerCase();
     return this.store().filter((n) => {
       if (q && !`${n.title} ${n.message}`.toLowerCase().includes(q)) return false;
       if (filter.category && n.category !== filter.category) return false;
       if (filter.priority && n.priority !== filter.priority) return false;
-      if (filter.status === 'read'   && !n.read)  return false;
-      if (filter.status === 'unread' &&  n.read)  return false;
+      if (filter.status === 'read' && !n.read) return false;
+      if (filter.status === 'unread' && n.read) return false;
       return true;
     });
   }
 
-  // ── Mutations ────────────────────────────────────────────────────────────────
+  createNotification(notification: NotificationRequest): Observable<AppNotification> {
+    return from(
+      this.supabase.client
+        .from('notifications')
+        .insert(this.mapNotificationToDb(notification))
+        .select()
+        .single()
+    ).pipe(
+      switchMap(({ data, error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        const created = this.mapDbToNotification(data, notification);
+        this.store.update((items) => [created, ...items.filter((item) => item.id !== created.id)]);
+        return of(created);
+      })
+    );
+  }
+
+  updateNotification(id: string, notification: Partial<NotificationRequest>): Observable<AppNotification> {
+    return from(
+      this.supabase.client
+        .from('notifications')
+        .update(this.mapNotificationToDb(notification))
+        .eq('id', id)
+        .select()
+        .single()
+    ).pipe(
+      switchMap(({ data, error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        const current = this.store().find((item) => item.id === id);
+        const updated = this.mapDbToNotification(data, { ...current, ...notification });
+        this.store.update((items) => items.map((item) => item.id === id ? updated : item));
+        return of(updated);
+      })
+    );
+  }
+
+  deleteNotification(id: string): Observable<boolean> {
+    return from(
+      this.supabase.client
+        .from('notifications')
+        .delete()
+        .eq('id', id)
+    ).pipe(
+      switchMap(({ error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        this.store.update((items) => items.filter((n) => n.id !== id));
+        return of(true);
+      })
+    );
+  }
+
+  markAsRead(id: string): Observable<AppNotification> {
+    return this.updateNotification(id, { read: true });
+  }
+
+  markAllAsRead(): Observable<boolean> {
+    const unreadIds = this.unread().map((item) => item.id);
+    if (unreadIds.length === 0) {
+      return of(true);
+    }
+
+    return from(
+      this.supabase.client
+        .from('notifications')
+        .update({ is_read: true })
+        .in('id', unreadIds)
+    ).pipe(
+      switchMap(({ error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        this.store.update((items) => items.map((n) => ({ ...n, read: true })));
+        return of(true);
+      })
+    );
+  }
+
+  bulkDelete(ids: string[]): Observable<boolean> {
+    return from(
+      this.supabase.client
+        .from('notifications')
+        .delete()
+        .in('id', ids)
+    ).pipe(
+      switchMap(({ error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message));
+        }
+        this.store.update((items) => items.filter((n) => !ids.includes(n.id)));
+        return of(true);
+      })
+    );
+  }
+
+  // Backwards-compatible mutation APIs used by existing components/services.
   markRead(id: string): void {
-    this.store.update((items) => items.map((n) => n.id === id ? { ...n, read: true } : n));
+    this.markAsRead(id).subscribe({
+      error: (err) => console.error('Failed to mark notification as read:', err)
+    });
   }
 
   markAllRead(): void {
-    this.store.update((items) => items.map((n) => ({ ...n, read: true })));
+    this.markAllAsRead().subscribe({
+      error: (err) => console.error('Failed to mark all notifications as read:', err)
+    });
   }
 
   delete(id: string): void {
-    this.store.update((items) => items.filter((n) => n.id !== id));
+    this.deleteNotification(id).subscribe({
+      error: (err) => console.error('Failed to delete notification:', err)
+    });
   }
 
   deleteAll(ids: string[]): void {
-    this.store.update((items) => items.filter((n) => !ids.includes(n.id)));
+    this.bulkDelete(ids).subscribe({
+      error: (err) => console.error('Failed to delete notifications:', err)
+    });
   }
 
   /** Push a new notification (used by other services to inject live events). */
   push(notification: Omit<AppNotification, 'id' | 'createdAt' | 'read'>): void {
-    const n: AppNotification = {
-      ...notification,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      read: false
-    };
-    this.store.update((items) => [n, ...items]);
+    this.createNotification(notification).subscribe({
+      error: (err) => console.error('Failed to create notification:', err)
+    });
   }
 
-  // ── Helpers ──────────────────────────────────────────────────────────────────
+  // Helpers
   static priorityOrder(p: NotificationPriority): number {
     return { Critical: 4, High: 3, Medium: 2, Low: 1 }[p] ?? 0;
+  }
+
+  private mapDbToNotification(row: any, fallback?: Partial<NotificationRequest | AppNotification>): AppNotification {
+    const type = this.mapType(row.type ?? fallback?.type);
+    const fb = fallback as any;
+
+    return {
+      id: row.id,
+      title: row.title ?? fb?.title ?? '',
+      message: row.message ?? fb?.message ?? '',
+      type,
+      category: fb?.category ?? this.categoryFromType(type),
+      priority: fb?.priority ?? this.priorityFromType(type),
+      read: Boolean(row.is_read ?? fb?.read),
+      createdAt: row.created_at ?? fb?.createdAt ?? new Date().toISOString(),
+      link: fb?.link
+    };
+  }
+
+  private mapNotificationToDb(notification: Partial<NotificationRequest>): Record<string, unknown> {
+    const dbFields: Record<string, unknown> = {};
+    if (notification.userId !== undefined) dbFields['user_id'] = notification.userId;
+    if (notification.userId === undefined && this.authState.user()?.id) dbFields['user_id'] = this.authState.user()!.id;
+    if (notification.title !== undefined) dbFields['title'] = notification.title;
+    if (notification.message !== undefined) dbFields['message'] = notification.message;
+    if (notification.type !== undefined) dbFields['type'] = notification.type;
+    if (notification.read !== undefined) dbFields['is_read'] = notification.read;
+    return dbFields;
+  }
+
+  private mapType(type: unknown): NotificationType {
+    const normalized = String(type ?? '').toLowerCase();
+    const typeMap: Record<string, NotificationType> = {
+      info: 'Info',
+      success: 'Success',
+      warning: 'Warning',
+      error: 'Error'
+    };
+    return typeMap[normalized] ?? 'Info';
+  }
+
+  private categoryFromType(type: NotificationType): NotificationCategory {
+    return type === 'Error' ? 'Security' : 'System';
+  }
+
+  private priorityFromType(type: NotificationType): NotificationPriority {
+    const map: Record<NotificationType, NotificationPriority> = {
+      Error: 'Critical',
+      Warning: 'High',
+      Info: 'Medium',
+      Success: 'Low'
+    };
+    return map[type];
   }
 }

@@ -2,6 +2,7 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { UserService } from './user.service';
 import { SupabaseService } from './supabase.service';
+import { NotificationService } from './notification.service';
 
 const SEED_USERS_DB = [
   {
@@ -76,6 +77,28 @@ class MockSupabaseService {
   };
 }
 
+import { AuditService } from './audit.service';
+
+class MockNotificationService {
+  readonly all = () => [];
+  readonly unread = () => [];
+  readonly unreadCount = () => 0;
+  push() {}
+  markRead() {}
+  markAllRead() {}
+  delete() {}
+  deleteAll() {}
+}
+
+class MockAuditService {
+  readonly logs = () => [];
+  readonly totalCount = () => 0;
+  readonly actors = () => [];
+  readonly actions = () => [];
+  record() {}
+  filtered() { return []; }
+}
+
 describe('UserService', () => {
   let service: UserService;
 
@@ -83,7 +106,9 @@ describe('UserService', () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
-        { provide: SupabaseService, useClass: MockSupabaseService }
+        { provide: SupabaseService, useClass: MockSupabaseService },
+        { provide: NotificationService, useClass: MockNotificationService },
+        { provide: AuditService, useClass: MockAuditService }
       ]
     });
     service = TestBed.inject(UserService);

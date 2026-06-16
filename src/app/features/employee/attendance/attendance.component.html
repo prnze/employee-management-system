@@ -18,6 +18,20 @@
 </div>
 
 <!-- ── Today's Check-in Action Card ─────────────────────────────────────── -->
+@if (loading()) {
+  <div class="alert alert-info d-flex align-items-center gap-2 mb-4" role="status">
+    <app-icon [icon]="APP_ICONS.INFO" aria-hidden="true"></app-icon>
+    <span>{{ 'COMMON_LOADING' | translate }}</span>
+  </div>
+}
+
+@if (error()) {
+  <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+    <app-icon [icon]="APP_ICONS.WARNING" aria-hidden="true"></app-icon>
+    <span>{{ error() }}</span>
+  </div>
+}
+
 <div class="card checkin-card mb-4 border rounded-4 overflow-hidden shadow-sm">
   <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap gap-4">
     <div class="d-flex align-items-center gap-3">
@@ -54,7 +68,7 @@
 
     <div>
       @if (isCheckedIn()) {
-        <button class="btn btn-premium-danger d-flex align-items-center gap-2 px-4 py-2.5" type="button" (click)="checkOut()">
+        <button class="btn btn-premium-danger d-flex align-items-center gap-2 px-4 py-2.5" type="button" (click)="checkOut()" [disabled]="loading()">
           <app-icon [icon]="APP_ICONS.CLOSE" [size]="18" aria-hidden="true"></app-icon>
           <span>{{ 'ATTEND_CHECK_OUT_BTN' | translate }}</span>
         </button>
@@ -64,7 +78,7 @@
           <span>{{ 'ATTEND_SHIFT_LOGGED' | translate }}</span>
         </button>
       } @else {
-        <button class="btn btn-premium-success d-flex align-items-center gap-2 px-4 py-2.5" type="button" (click)="checkIn()">
+        <button class="btn btn-premium-success d-flex align-items-center gap-2 px-4 py-2.5" type="button" (click)="checkIn()" [disabled]="loading()">
           <app-icon [icon]="APP_ICONS.BOLT" [size]="18" aria-hidden="true"></app-icon>
           <span>{{ 'ATTEND_CHECK_IN_BTN' | translate }}</span>
         </button>

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
 import { SupabaseService } from '@core/services/supabase.service';
+import { AuditService } from '@core/services/audit.service';
 
 const mockSupabaseClient = {
   auth: {
@@ -58,13 +59,23 @@ const mockSupabaseService = {
   client: mockSupabaseClient
 };
 
+class MockAuditService {
+  readonly logs = () => [];
+  readonly totalCount = () => 0;
+  readonly actors = () => [];
+  readonly actions = () => [];
+  record() {}
+  filtered() { return []; }
+}
+
 describe('AuthService', () => {
   let service: AuthService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        { provide: SupabaseService, useValue: mockSupabaseService }
+        { provide: SupabaseService, useValue: mockSupabaseService },
+        { provide: AuditService, useClass: MockAuditService }
       ]
     });
     service = TestBed.inject(AuthService);

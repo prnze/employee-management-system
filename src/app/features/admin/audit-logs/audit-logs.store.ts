@@ -23,6 +23,7 @@ export class AuditLogsStore {
 
   // Core State
   private readonly _loading = signal<boolean>(false);
+  private readonly _error = signal<string>('');
   readonly view = signal<'table' | 'timeline'>('table');
   private readonly _page = signal<number>(1);
   private readonly _selectedLog = signal<AuditLog | null>(null);
@@ -49,6 +50,7 @@ export class AuditLogsStore {
 
   // Readonly Public Signals
   readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
   readonly page = this._page.asReadonly();
   readonly selectedLog = this._selectedLog.asReadonly();
   readonly filters = this._filters.asReadonly();
@@ -90,6 +92,20 @@ export class AuditLogsStore {
   }
 
   // Mutations/Actions
+  loadAuditLogs(): void {
+    this._loading.set(true);
+    this._error.set('');
+    this.svc.getAuditLogs().subscribe({
+      next: () => {
+        this._loading.set(false);
+      },
+      error: (err: Error) => {
+        this._error.set(err.message);
+        this._loading.set(false);
+      }
+    });
+  }
+
   setView(view: 'table' | 'timeline'): void {
     this.view.set(view);
   }

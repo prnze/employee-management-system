@@ -1,5 +1,5 @@
 import {
-  ChangeDetectionStrategy, Component, inject, viewChild, TemplateRef, computed
+  ChangeDetectionStrategy, Component, inject, viewChild, TemplateRef, computed, OnInit
 } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuditLog, AuditSeverity } from '@core/models/notification.models';
@@ -30,10 +30,14 @@ const PAGE_SIZE = 15;
   templateUrl: './audit-logs.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AuditLogsComponent {
+export class AuditLogsComponent implements OnInit {
   readonly APP_ICONS = APP_ICONS;
   readonly store = inject(AuditLogsStore);
   readonly svc = inject(AuditService);
+
+  ngOnInit(): void {
+    this.store.loadAuditLogs();
+  }
 
   readonly pageSize = PAGE_SIZE;
 

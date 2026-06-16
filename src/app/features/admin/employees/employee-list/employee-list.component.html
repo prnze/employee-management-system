@@ -231,6 +231,8 @@
       [selectedIds]="selectedIds()"
       [selectable]="true"
       [sortStack]="sortStack()"
+      [emptyTitle]="'EMP_LIST_NONE_FOUND'"
+      [emptyMessage]="'EMP_LIST_ADJUST'"
       (selectionChange)="selectedIds.set($event)"
       (sort)="addSort($event)"></app-table>
   </div>

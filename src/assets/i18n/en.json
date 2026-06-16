@@ -665,6 +665,8 @@
   "EMP_LIST_LOADING_MSG": "Loading employees…",
   "EMP_LIST_SAVE_FILTER_TITLE": "Save filter",
   "EMP_LIST_FILTER_PLACEHOLDER": "Filter name…",
+  "EMP_LIST_NONE_FOUND": "No employees found",
+  "EMP_LIST_ADJUST": "Try adjusting your search or filters.",
 
   "USER_LESS": "Less",
   "USER_MORE_FILTERS_SHORT": "More filters",
