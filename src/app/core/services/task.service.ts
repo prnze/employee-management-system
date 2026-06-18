@@ -50,11 +50,12 @@ export class TaskService implements OnDestroy {
     }
   }
 
-  getTasks(): Observable<TaskItem[]> {
+  getTasks(employeeId: string): Observable<TaskItem[]> {
     return from(
       this.supabase.client
         .from('tasks')
         .select('*')
+        .eq('employee_id', employeeId)
         .order('created_at', { ascending: false })
     ).pipe(
       switchMap(({ data, error }) => {

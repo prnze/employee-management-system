@@ -8,6 +8,7 @@ import { UnsavedChangesAware } from '@core/guards/unsaved-changes.guard';
 import { EmployeeService } from '@core/services/employee.service';
 import { UserService } from '@core/services/user.service';
 import { StorageService } from '@core/services/storage.service';
+import { CurrentEmployeeService } from '@core/services/current-employee.service';
 import { AnalyticsService } from '@core/services/analytics.service';
 import { ToastService } from '@core/services/toast.service';
 import { IconComponent } from '@shared/components/icon/icon.component';
@@ -39,6 +40,7 @@ export class ProfileComponent implements UnsavedChangesAware {
   readonly employeeService = inject(EmployeeService);
   private readonly userService = inject(UserService);
   private readonly storageService = inject(StorageService);
+  private readonly currentEmployee = inject(CurrentEmployeeService);
   private readonly analyticsService = inject(AnalyticsService);
   private readonly toast = inject(ToastService);
 
@@ -114,9 +116,11 @@ export class ProfileComponent implements UnsavedChangesAware {
     if (!currentUser) return;
 
     this.isSaving.set(true);
-    const avatarOwnerId = this.matchedEmployee()?.id ?? currentUser.id;
-    this.uploadAvatarIfSelected(avatarOwnerId).pipe(
-      switchMap((avatarUrl) => {
+    this.currentEmployee.resolve().pipe(
+      switchMap((employeeId) => this.uploadAvatarIfSelected(employeeId).pipe(
+        map((avatarUrl) => ({ employeeId, avatarUrl }))
+      )),
+      switchMap(({ employeeId, avatarUrl }) => {
         const resolvedAvatarUrl = avatarUrl ?? currentUser.avatarUrl;
         const userUpdate$ = this.userService.update(currentUser.id, {
           fullName: val.fullName,
@@ -124,16 +128,13 @@ export class ProfileComponent implements UnsavedChangesAware {
           phone: val.phone,
           avatarUrl: resolvedAvatarUrl
         });
-        const employee = this.matchedEmployee();
-        const employeeUpdate$ = employee
-          ? this.employeeService.update(employee.id, {
-              firstName: val.fullName.trim().split(/\s+/)[0] ?? '',
-              lastName: val.fullName.trim().split(/\s+/).slice(1).join(' '),
-              email: val.email,
-              phone: val.phone,
-              avatarUrl: resolvedAvatarUrl
-            })
-          : of(null);
+        const employeeUpdate$ = this.employeeService.update(employeeId, {
+          firstName: val.fullName.trim().split(/\s+/)[0] ?? '',
+          lastName: val.fullName.trim().split(/\s+/).slice(1).join(' '),
+          email: val.email,
+          phone: val.phone,
+          avatarUrl: resolvedAvatarUrl
+        });
         return forkJoin({ user: userUpdate$, employee: employeeUpdate$ }).pipe(
           map((result) => ({ ...result, avatarUrl: resolvedAvatarUrl }))
         );

@@ -15,6 +15,7 @@ export interface AppNotification {
   priority: NotificationPriority;
   read: boolean;
   createdAt: string;
+  updatedAt?: string;
   /** Optional deep-link for the notification action. */
   link?: string;
 }

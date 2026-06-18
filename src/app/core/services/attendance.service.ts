@@ -45,11 +45,12 @@ export class AttendanceService implements OnDestroy {
     }
   }
 
-  getAttendance(): Observable<AttendanceRecord[]> {
+  getAttendance(employeeId: string): Observable<AttendanceRecord[]> {
     return from(
       this.supabase.client
         .from('attendance')
         .select('*')
+        .eq('employee_id', employeeId)
         .order('date', { ascending: false })
     ).pipe(
       switchMap(({ data, error }) => {

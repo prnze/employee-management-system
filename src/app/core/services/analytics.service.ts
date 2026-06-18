@@ -7,6 +7,7 @@ import {
 } from '@core/models/analytics.models';
 import { SupabaseService } from './supabase.service';
 import { AuthStateService } from '@core/auth/auth-state.service';
+import { CurrentEmployeeService } from './current-employee.service';
 
 /** Generates the last N month labels ending at the current month. */
 function lastMonthLabels(n: number): string[] {
@@ -24,6 +25,7 @@ function lastWeekLabels(n: number): string[] {
 export class AnalyticsService {
   private readonly supabase = inject(SupabaseService);
   private readonly authState = inject(AuthStateService);
+  private readonly currentEmployee = inject(CurrentEmployeeService);
 
   adminAnalytics(): Observable<AdminAnalytics> {
     return forkJoin({
@@ -95,25 +97,12 @@ export class AnalyticsService {
   }
 
   employeeAnalytics(): Observable<EmployeeAnalytics> {
-    const userEmail = this.authState.user()?.email;
-    if (!userEmail) {
+    if (!this.authState.user()) {
       return throwError(() => new Error('User not authenticated'));
     }
 
-    return from(
-      this.supabase.client
-        .from('employees')
-        .select('*')
-        .eq('email', userEmail)
-        .maybeSingle()
-    ).pipe(
-      switchMap(({ data: employee, error: empErr }) => {
-        if (empErr || !employee) {
-          return of(this.getFallbackEmployeeAnalytics());
-        }
-
-        const employeeId = employee.id;
-
+    return this.currentEmployee.resolve().pipe(
+      switchMap((employeeId) => {
         return forkJoin({
           attRes: from(this.supabase.client.from('attendance').select('*').eq('employee_id', employeeId)),
           tskRes: from(this.supabase.client.from('tasks').select('*').eq('employee_id', employeeId))

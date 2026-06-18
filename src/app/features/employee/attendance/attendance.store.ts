@@ -2,9 +2,10 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MonthlyDataPoint } from '@core/models/analytics.models';
 import { AttendanceRecord, AttendanceRequest, CalendarDay } from '@core/models/attendance.models';
-import { AuthStateService } from '@core/auth/auth-state.service';
 import { AttendanceService } from '@core/services/attendance.service';
+import { CurrentEmployeeService } from '@core/services/current-employee.service';
 import { ToastService } from '@core/services/toast.service';
+import { switchMap } from 'rxjs';
 
 interface LeaveBalance {
   name: string;
@@ -16,7 +17,7 @@ interface LeaveBalance {
 @Injectable({ providedIn: 'root' })
 export class AttendanceStore {
   private readonly attendanceService = inject(AttendanceService);
-  private readonly authState = inject(AuthStateService);
+  private readonly currentEmployee = inject(CurrentEmployeeService);
   private readonly toast = inject(ToastService);
   private hasLoaded = false;
 
@@ -138,7 +139,9 @@ export class AttendanceStore {
     if (this.hasLoaded && !force) return;
     this.loading.set(true);
     this.error.set('');
-    this.attendanceService.getAttendance().subscribe({
+    this.currentEmployee.resolve().pipe(
+      switchMap((employeeId) => this.attendanceService.getAttendance(employeeId))
+    ).subscribe({
       next: () => {
         this.hasLoaded = true;
         this.loading.set(false);
@@ -177,20 +180,21 @@ export class AttendanceStore {
 
   checkIn(): void {
     const today = this.todayDate();
-    const request: AttendanceRequest = {
-      employeeId: this.employeeId(),
-      date: today,
-      in: this.currentTime(),
-      out: null,
-      status: 'Present'
-    };
-
-    const existing = this.todayRecord();
-    const action = existing?.id
-      ? this.attendanceService.updateAttendance(existing.id, request)
-      : this.attendanceService.createAttendance(request);
-
-    action.subscribe({
+    this.currentEmployee.resolve().pipe(
+      switchMap((employeeId) => {
+        const request: AttendanceRequest = {
+          employeeId,
+          date: today,
+          in: this.currentTime(),
+          out: null,
+          status: 'Present'
+        };
+        const existing = this.todayRecord();
+        return existing?.id
+          ? this.attendanceService.updateAttendance(existing.id, request)
+          : this.attendanceService.createAttendance(request);
+      })
+    ).subscribe({
       next: (record) => this.toast.showToast('Successfully checked in today at ' + record.in, 'success'),
       error: (err: Error) => this.toast.showToast(err.message, 'error')
     });
@@ -221,48 +225,26 @@ export class AttendanceStore {
 
     this.isSubmittingLeave.set(true);
     const formVal = leaveForm.getRawValue();
-    const requests = this.buildLeaveRequests(formVal.startDate, formVal.endDate);
-
-    if (!requests.length) {
-      this.isSubmittingLeave.set(false);
-      this.toast.showToast('No work days found in the selected leave range.', 'warning');
-      return;
-    }
-
-    let remaining = requests.length;
-    let failed = false;
-
-    requests.forEach((request) => {
-      const existing = this.attendanceRecords().find((record) => record.date === request.date);
-      const action = existing?.id
-        ? this.attendanceService.updateAttendance(existing.id, request)
-        : this.attendanceService.createAttendance(request);
-
-      action.subscribe({
-        next: () => {
-          remaining--;
-          if (remaining === 0 && !failed) {
-            this.incrementLeaveBalance(formVal.leaveType);
-            this.toast.showToast('Leave request submitted and saved.', 'success');
-            leaveForm.reset({ leaveType: 'Annual', startDate: '', endDate: '', reason: '' });
-            this.isSubmittingLeave.set(false);
-          }
-        },
-        error: (err: Error) => {
-          if (!failed) {
-            failed = true;
-            this.toast.showToast(err.message, 'error');
-            this.isSubmittingLeave.set(false);
-          }
+    this.currentEmployee.resolve().subscribe({
+      next: (employeeId) => {
+        const requests = this.buildLeaveRequests(formVal.startDate, formVal.endDate, employeeId);
+        if (!requests.length) {
+          this.isSubmittingLeave.set(false);
+          this.toast.showToast('No work days found in the selected leave range.', 'warning');
+          return;
         }
-      });
+        this.saveLeaveRequests(requests, formVal.leaveType, leaveForm);
+      },
+      error: (err: Error) => {
+        this.toast.showToast(err.message, 'error');
+        this.isSubmittingLeave.set(false);
+      }
     });
   }
 
-  private buildLeaveRequests(startDate: string, endDate: string): AttendanceRequest[] {
+  private buildLeaveRequests(startDate: string, endDate: string, employeeId: string): AttendanceRequest[] {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const employeeId = this.employeeId();
     const requests: AttendanceRequest[] = [];
 
     for (let day = new Date(start); day <= end; day.setDate(day.getDate() + 1)) {
@@ -281,6 +263,37 @@ export class AttendanceStore {
     return requests;
   }
 
+  private saveLeaveRequests(requests: AttendanceRequest[], leaveType: string, leaveForm: FormGroup): void {
+    let remaining = requests.length;
+    let failed = false;
+
+    requests.forEach((request) => {
+      const existing = this.attendanceRecords().find((record) => record.date === request.date);
+      const action = existing?.id
+        ? this.attendanceService.updateAttendance(existing.id, request)
+        : this.attendanceService.createAttendance(request);
+
+      action.subscribe({
+        next: () => {
+          remaining--;
+          if (remaining === 0 && !failed) {
+            this.incrementLeaveBalance(leaveType);
+            this.toast.showToast('Leave request submitted and saved.', 'success');
+            leaveForm.reset({ leaveType: 'Annual', startDate: '', endDate: '', reason: '' });
+            this.isSubmittingLeave.set(false);
+          }
+        },
+        error: (err: Error) => {
+          if (!failed) {
+            failed = true;
+            this.toast.showToast(err.message, 'error');
+            this.isSubmittingLeave.set(false);
+          }
+        }
+      });
+    });
+  }
+
   private incrementLeaveBalance(leaveType: string): void {
     const leaveNameMap: Record<string, string> = {
       Annual: 'Annual Leave',
@@ -295,10 +308,6 @@ export class AttendanceStore {
         : balance
       )
     );
-  }
-
-  private employeeId(): string {
-    return this.authState.user()?.id ?? '';
   }
 
   private currentTime(): string {

@@ -1,11 +1,14 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { TaskItem, TaskStatus } from '@core/models/task.models';
 import { TaskService } from '@core/services/task.service';
+import { CurrentEmployeeService } from '@core/services/current-employee.service';
 import { ToastService } from '@core/services/toast.service';
+import { switchMap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class TasksStore {
   private readonly taskService = inject(TaskService);
+  private readonly currentEmployee = inject(CurrentEmployeeService);
   private readonly toast = inject(ToastService);
   private hasLoaded = false;
 
@@ -32,7 +35,9 @@ export class TasksStore {
     if (this.hasLoaded && !force) return;
     this.loading.set(true);
     this.error.set('');
-    this.taskService.getTasks().subscribe({
+    this.currentEmployee.resolve().pipe(
+      switchMap((employeeId) => this.taskService.getTasks(employeeId))
+    ).subscribe({
       next: () => {
         this.hasLoaded = true;
         this.loading.set(false);

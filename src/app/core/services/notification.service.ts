@@ -10,7 +10,7 @@ import {
 import { AuthStateService } from '@core/auth/auth-state.service';
 import { SupabaseService } from './supabase.service';
 
-export type NotificationRequest = Omit<AppNotification, 'id' | 'createdAt' | 'read'> & {
+export type NotificationRequest = Omit<AppNotification, 'id' | 'createdAt' | 'updatedAt' | 'read'> & {
   userId?: string;
   read?: boolean;
 };
@@ -262,6 +262,7 @@ export class NotificationService implements OnDestroy {
       priority: fb?.priority ?? this.priorityFromType(type),
       read: Boolean(row.is_read ?? fb?.read),
       createdAt: row.created_at ?? fb?.createdAt ?? new Date().toISOString(),
+      updatedAt: row.updated_at ?? fb?.updatedAt,
       link: fb?.link
     };
   }
