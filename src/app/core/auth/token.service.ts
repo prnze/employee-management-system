@@ -1,7 +1,7 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { STORAGE_KEYS } from '@core/constants/storage-keys.constant';
 import { StoredTokenSession } from '@core/models/session.models';
-import { StorageService } from '@core/services/storage.service';
+import { LocalStorageService } from '@core/services/local-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
@@ -19,7 +19,7 @@ export class TokenService {
     return expiresAt ? Date.now() >= new Date(expiresAt).getTime() : false;
   });
 
-  constructor(private readonly storage: StorageService) {
+  constructor(private readonly storage: LocalStorageService) {
     this.restore();
   }
 

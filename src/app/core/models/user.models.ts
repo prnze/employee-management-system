@@ -16,6 +16,7 @@ export interface User {
   forcePasswordReset?: boolean;
   phone?: string;
   department?: string;
+  avatarUrl?: string;
 }
 
 export interface Role {

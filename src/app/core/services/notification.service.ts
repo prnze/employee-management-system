@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal, OnDestroy } from '@angular/core';
 import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import {
   AppNotification,
@@ -16,11 +16,12 @@ export type NotificationRequest = Omit<AppNotification, 'id' | 'createdAt' | 're
 };
 
 @Injectable({ providedIn: 'root' })
-export class NotificationService {
+export class NotificationService implements OnDestroy {
   private readonly supabase = inject(SupabaseService);
   private readonly authState = inject(AuthStateService);
   private readonly store = signal<AppNotification[]>([]);
   private hasLoaded = false;
+  private realtimeChannel?: any;
 
   // Read-only views
   readonly all = this.store.asReadonly();
@@ -31,6 +32,48 @@ export class NotificationService {
     this.getNotifications().subscribe({
       error: (err) => console.error('Failed to load notifications from Supabase:', err)
     });
+
+    if (typeof this.supabase.client.channel === 'function') {
+      this.realtimeChannel = this.supabase.client
+        .channel('notifications-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'notifications' },
+          (payload: any) => this.handleRealtimeEvent(payload)
+        )
+        .subscribe();
+    }
+  }
+
+  private handleRealtimeEvent(payload: any): void {
+    const currentUserId = this.authState.user()?.id;
+    if (payload.new && payload.new.user_id && payload.new.user_id !== currentUserId) {
+      return;
+    }
+
+    if (payload.eventType === 'INSERT') {
+      const newNotif = this.mapDbToNotification(payload.new);
+      this.store.update((items) => {
+        if (items.some((item) => item.id === newNotif.id)) return items;
+        return [newNotif, ...items];
+      });
+    } else if (payload.eventType === 'UPDATE') {
+      const updatedNotif = this.mapDbToNotification(payload.new);
+      this.store.update((items) =>
+        items.map((item) => (item.id === updatedNotif.id ? updatedNotif : item))
+      );
+    } else if (payload.eventType === 'DELETE') {
+      const deletedId = payload.old?.id;
+      if (deletedId) {
+        this.store.update((items) => items.filter((item) => item.id !== deletedId));
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.realtimeChannel && typeof this.supabase.client.removeChannel === 'function') {
+      this.supabase.client.removeChannel(this.realtimeChannel);
+    }
   }
 
   getNotifications(force = false): Observable<AppNotification[]> {

@@ -82,12 +82,24 @@ export class AuthService {
   }
 
   changePassword(request: ChangePasswordRequest): Observable<boolean> {
+    const userId = this.authState.user()?.id;
     return from(
       this.supabase.client.auth.updateUser({ password: request.newPassword })
     ).pipe(
-      map(({ error }) => {
+      switchMap(({ error }) => {
         if (error) throw error;
-        return true;
+        if (!userId) return of(true);
+        return from(
+          this.supabase.client
+            .from('users')
+            .update({ force_password_reset: false })
+            .eq('id', userId)
+        ).pipe(
+          map(({ error: dbErr }) => {
+            if (dbErr) console.warn('Failed to update force_password_reset flag:', dbErr);
+            return true;
+          })
+        );
       })
     );
   }
@@ -166,7 +178,8 @@ export class AuthService {
           fullName: `${dbUser.first_name || ''} ${dbUser.last_name || ''}`.trim() || dbUser.email,
           role: mappedRole,
           permissions: ROLE_PERMISSIONS[mappedRole],
-          avatarUrl: dbUser.avatar_url || undefined
+          avatarUrl: dbUser.avatar_url || undefined,
+          forcePasswordReset: dbUser.force_password_reset || false
         };
       })
     );

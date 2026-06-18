@@ -14,6 +14,7 @@ export interface Employee {
   status: EmployeeStatus;
   joinedAt: string;
   salary: number;
+  avatarUrl?: string;
 }
 
 export type EmployeeRequest = Omit<Employee, 'id' | 'employeeCode'>;

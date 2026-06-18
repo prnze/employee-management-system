@@ -184,7 +184,7 @@
             <app-icon icon="lock" [size]="16"></app-icon>
             <span>{{ 'NAV_CHANGE_PASSWORD' | translate }}</span>
           </button>
-          <button class="btn btn-premium-primary px-4 fw-semibold" type="submit" [disabled]="form.invalid">
+          <button class="btn btn-premium-primary px-4 fw-semibold" type="submit" [disabled]="form.invalid || isSaving()">
             {{ 'PROFILE_SAVE' | translate }}
           </button>
         </div>
@@ -223,4 +223,3 @@
 </div>
 
 <app-change-password-modal [open]="showChangePasswordModal()" (closed)="showChangePasswordModal.set(false)" />
-

@@ -7,6 +7,7 @@ export interface AuthUser {
   role: AppRole;
   avatarUrl?: string;
   permissions: string[];
+  forcePasswordReset?: boolean;
 }
 
 export interface LoginRequest {

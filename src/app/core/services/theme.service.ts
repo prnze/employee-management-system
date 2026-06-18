@@ -1,14 +1,14 @@
 import { DOCUMENT } from '@angular/common';
 import { effect, inject, Injectable, signal } from '@angular/core';
 import { STORAGE_KEYS } from '@core/constants/storage-keys.constant';
-import { StorageService } from './storage.service';
+import { LocalStorageService } from './local-storage.service';
 
 export type AppTheme = 'light' | 'dark';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly document = inject(DOCUMENT);
-  private readonly storage = inject(StorageService);
+  private readonly storage = inject(LocalStorageService);
   private readonly themeSignal = signal<AppTheme>('light');
   readonly theme = this.themeSignal.asReadonly();
 

@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal, OnDestroy } from '@angular/core';
 import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import { User, UserFilter, UserRequest, UserSortEntry, UserStatus } from '@core/models/user.models';
 import { AppRole } from '@core/constants/roles.constant';
@@ -8,8 +8,9 @@ import { AuthStateService } from '@core/auth/auth-state.service';
 import { SupabaseService } from './supabase.service';
 
 @Injectable({ providedIn: 'root' })
-export class UserService {
+export class UserService implements OnDestroy {
   private readonly store     = signal<User[]>([]);
+  private realtimeChannel?: any;
   private readonly audit     = inject(AuditService);
   private readonly notif     = inject(NotificationService);
   private readonly authState = inject(AuthStateService);
@@ -24,6 +25,32 @@ export class UserService {
 
   constructor() {
     this.loadUsers();
+
+    if (typeof this.supabase.client.channel === 'function') {
+      this.realtimeChannel = this.supabase.client
+        .channel('users-realtime')
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'users' },
+          (payload: any) => this.handleRealtimeEvent(payload)
+        )
+        .subscribe();
+    }
+  }
+
+  private handleRealtimeEvent(payload: any): void {
+    if (payload.eventType === 'UPDATE') {
+      const updatedUser = this.mapDbToUser(payload.new);
+      this.store.update((users) =>
+        users.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+      );
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.realtimeChannel && typeof this.supabase.client.removeChannel === 'function') {
+      this.supabase.client.removeChannel(this.realtimeChannel);
+    }
   }
 
   private loadUsers(): void {
@@ -78,7 +105,34 @@ export class UserService {
 
   // ── CRUD ──────────────────────────────────────────────────────────────────
   create(req: UserRequest): Observable<User> {
-    return throwError(() => new Error('User creation is disabled in Phase 1.'));
+    const parts = (req.fullName || '').trim().split(/\s+/);
+    const firstName = parts[0] || '';
+    const lastName = parts.slice(1).join(' ') || '';
+
+    return from(
+      this.supabase.client.functions.invoke('create-user', {
+        body: {
+          email: req.email,
+          first_name: firstName,
+          last_name: lastName,
+          role: req.role === 'Admin' ? 'ADMIN' : 'EMPLOYEE',
+          status: req.status === 'Active' ? 'ACTIVE' : (req.status === 'Locked' ? 'LOCKED' : 'INACTIVE'),
+          phone: req.phone || null,
+          department: req.department || null,
+          extra_permissions: req.extraPermissions || []
+        }
+      })
+    ).pipe(
+      switchMap(({ data, error }) => {
+        if (error) {
+          return throwError(() => new Error(error.message || 'Failed to invoke create-user edge function'));
+        }
+        const createdUser = this.mapDbToUser(data);
+        this.store.update((users) => [createdUser, ...users]);
+        this.audit.record(this.actor(), 'CREATE', `User ${createdUser.email}`, { category: 'Permissions', details: `Created user account for ${createdUser.fullName}` });
+        return of(createdUser);
+      })
+    );
   }
 
   update(id: string, req: Partial<UserRequest>): Observable<User> {
@@ -108,6 +162,9 @@ export class UserService {
     }
     if (req.department !== undefined) {
       dbFields.department = req.department || null;
+    }
+    if (req.avatarUrl !== undefined) {
+      dbFields.avatar_url = req.avatarUrl || null;
     }
 
     return from(
@@ -249,7 +306,8 @@ export class UserService {
       extraPermissions: dbUser.extra_permissions || [],
       forcePasswordReset: dbUser.force_password_reset || false,
       phone: dbUser.phone || undefined,
-      department: dbUser.department || undefined
+      department: dbUser.department || undefined,
+      avatarUrl: dbUser.avatar_url || undefined
     };
   }
 

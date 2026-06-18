@@ -39,6 +39,28 @@ const SEED_USERS_DB = [
 
 class MockSupabaseService {
   readonly client = {
+    functions: {
+      invoke: (name: string, options: any) => {
+        if (name === 'create-user') {
+          const body = options.body;
+          const mockCreatedUser = {
+            id: 'new-auth-id',
+            first_name: body.first_name,
+            last_name: body.last_name,
+            email: body.email,
+            role: body.role,
+            status: body.status,
+            phone: body.phone,
+            department: body.department,
+            extra_permissions: body.extra_permissions,
+            force_password_reset: true,
+            created_at: new Date().toISOString()
+          };
+          return Promise.resolve({ data: mockCreatedUser, error: null });
+        }
+        return Promise.resolve({ data: null, error: new Error('Unknown function') });
+      }
+    },
     from: (table: string) => {
       return {
         select: () => Promise.resolve({ data: JSON.parse(JSON.stringify(SEED_USERS_DB)), error: null }),
@@ -134,13 +156,18 @@ describe('UserService', () => {
     expect(service.adminCount()).toBe(admins);
   });
 
-  it('should reject create action with disabled error', (done) => {
+  it('should create a new user via edge function', (done) => {
     service.create({
       fullName: 'Test User', email: 'test.new@ems.local', role: 'Employee',
-      status: 'Active', extraPermissions: [], forcePasswordReset: false
+      status: 'Active', extraPermissions: [], forcePasswordReset: true,
+      phone: '+91 99999 88888', department: 'Engineering'
     }).subscribe({
-      error: (err: Error) => {
-        expect(err.message).toContain('disabled');
+      next: (user) => {
+        expect(user.fullName).toBe('Test User');
+        expect(user.email).toBe('test.new@ems.local');
+        expect(user.role).toBe('Employee');
+        expect(user.status).toBe('Active');
+        expect(user.forcePasswordReset).toBeTrue();
         done();
       }
     });

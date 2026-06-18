@@ -43,8 +43,12 @@ export class LoginComponent {
     this.error.set('');
     this.auth.login(this.form.getRawValue()).subscribe({
       next: ({ user }) => {
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-        void this.router.navigateByUrl(returnUrl ?? (user.role === 'Admin' ? '/admin/dashboard' : '/employee/dashboard'));
+        if (user.forcePasswordReset) {
+          void this.router.navigateByUrl('/auth/change-password');
+        } else {
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          void this.router.navigateByUrl(returnUrl ?? (user.role === 'Admin' ? '/admin/dashboard' : '/employee/dashboard'));
+        }
       },
       error: (error: Error) => { this.error.set(error.message); this.loading.set(false); }
     });

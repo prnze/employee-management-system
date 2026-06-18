@@ -7,7 +7,12 @@ export const authGuard: CanActivateFn = (_route, state) => {
   const authState = inject(AuthStateService);
   const tokens = inject(TokenService);
   const router = inject(Router);
-  return authState.isAuthenticated() && tokens.hasTokens()
-    ? true
-    : router.createUrlTree(['/auth/login'], { queryParams: { returnUrl: state.url } });
+  
+  if (authState.isAuthenticated() && tokens.hasTokens()) {
+    if (authState.user()?.forcePasswordReset && !state.url.includes('change-password')) {
+      return router.createUrlTree(['/auth/change-password']);
+    }
+    return true;
+  }
+  return router.createUrlTree(['/auth/login'], { queryParams: { returnUrl: state.url } });
 };

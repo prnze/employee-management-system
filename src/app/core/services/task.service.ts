@@ -1,14 +1,54 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, OnDestroy } from '@angular/core';
 import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import { TaskItem, TaskPriority, TaskRequest, TaskStatus } from '@core/models/task.models';
 import { SupabaseService } from './supabase.service';
 
 @Injectable({ providedIn: 'root' })
-export class TaskService {
+export class TaskService implements OnDestroy {
   private readonly supabase = inject(SupabaseService);
   private readonly store = signal<TaskItem[]>([]);
+  private realtimeChannel?: any;
 
   readonly tasks = this.store.asReadonly();
+
+  constructor() {
+    if (typeof this.supabase.client.channel === 'function') {
+      this.realtimeChannel = this.supabase.client
+        .channel('tasks-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'tasks' },
+          (payload: any) => this.handleRealtimeEvent(payload)
+        )
+        .subscribe();
+    }
+  }
+
+  private handleRealtimeEvent(payload: any): void {
+    if (payload.eventType === 'INSERT') {
+      const newTask = this.mapDbToTask(payload.new);
+      this.store.update((tasks) => {
+        if (tasks.some((t) => t.id === newTask.id)) return tasks;
+        return [newTask, ...tasks];
+      });
+    } else if (payload.eventType === 'UPDATE') {
+      const updatedTask = this.mapDbToTask(payload.new);
+      this.store.update((tasks) =>
+        tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+      );
+    } else if (payload.eventType === 'DELETE') {
+      const deletedId = payload.old?.id;
+      if (deletedId) {
+        this.store.update((tasks) => tasks.filter((t) => t.id !== deletedId));
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.realtimeChannel && typeof this.supabase.client.removeChannel === 'function') {
+      this.supabase.client.removeChannel(this.realtimeChannel);
+    }
+  }
 
   getTasks(): Observable<TaskItem[]> {
     return from(

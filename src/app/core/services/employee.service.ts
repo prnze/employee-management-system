@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal, OnDestroy } from '@angular/core';
 import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import { Employee, EmployeeFilter, EmployeeRequest, EmployeeStatus, SortEntry } from '@core/models/employee.models';
 import { PagedResult } from '@core/models/table.models';
@@ -7,11 +7,12 @@ import { AuditService } from './audit.service';
 import { SupabaseService } from './supabase.service';
 
 @Injectable({ providedIn: 'root' })
-export class EmployeeService {
+export class EmployeeService implements OnDestroy {
   private readonly employeesSignal = signal<Employee[]>([]);
   private readonly supabase = inject(SupabaseService);
   private readonly audit = inject(AuditService);
   private readonly authState = inject(AuthStateService);
+  private realtimeChannel?: any;
 
   readonly employees   = this.employeesSignal.asReadonly();
   readonly departments = computed(() => Array.from(new Set(this.employeesSignal().map((e) => e.department))).sort());
@@ -20,6 +21,45 @@ export class EmployeeService {
 
   constructor() {
     this.loadEmployees();
+
+    if (typeof this.supabase.client.channel === 'function') {
+      this.realtimeChannel = this.supabase.client
+        .channel('employees-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'employees' },
+          (payload: any) => this.handleRealtimeEvent(payload)
+        )
+        .subscribe();
+    }
+  }
+
+  private handleRealtimeEvent(payload: any): void {
+    if (payload.eventType === 'INSERT') {
+      const newEmp = this.mapDbToEmployee(payload.new);
+      this.employeesSignal.update((items) => {
+        if (items.some((e) => e.id === newEmp.id)) return items;
+        return [newEmp, ...items];
+      });
+    } else if (payload.eventType === 'UPDATE') {
+      const updatedEmp = this.mapDbToEmployee(payload.new);
+      this.employeesSignal.update((items) =>
+        items.map((e) => (e.id === updatedEmp.id ? updatedEmp : e))
+      );
+    } else if (payload.eventType === 'DELETE') {
+      const deletedId = payload.old?.id;
+      if (deletedId) {
+        this.employeesSignal.update((items) =>
+          items.filter((e) => e.id !== deletedId)
+        );
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.realtimeChannel && typeof this.supabase.client.removeChannel === 'function') {
+      this.supabase.client.removeChannel(this.realtimeChannel);
+    }
   }
 
   private loadEmployees(): void {
@@ -130,7 +170,7 @@ export class EmployeeService {
     );
   }
 
-  update(id: string, request: EmployeeRequest): Observable<Employee> {
+  update(id: string, request: Partial<EmployeeRequest>): Observable<Employee> {
     const dbFields = this.mapEmployeeToDb(request);
     return from(
       this.supabase.client
@@ -225,7 +265,8 @@ export class EmployeeService {
       location: dbEmployee.location,
       status: dbEmployee.status === 'ACTIVE' ? 'Active' : (dbEmployee.status === 'ON_LEAVE' ? 'On Leave' : 'Inactive'),
       joinedAt: dbEmployee.joined_at,
-      salary: dbEmployee.salary
+      salary: dbEmployee.salary,
+      avatarUrl: dbEmployee.avatar_url || undefined
     };
   }
 
@@ -244,6 +285,7 @@ export class EmployeeService {
     }
     if (req.joinedAt !== undefined) dbFields.joined_at = req.joinedAt;
     if (req.salary !== undefined) dbFields.salary = req.salary;
+    if (req.avatarUrl !== undefined) dbFields.avatar_url = req.avatarUrl || null;
     return dbFields;
   }
 

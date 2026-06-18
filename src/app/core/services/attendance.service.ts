@@ -1,14 +1,49 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, OnDestroy } from '@angular/core';
 import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import { AttendanceRecord, AttendanceRequest, AttendanceStatus } from '@core/models/attendance.models';
 import { SupabaseService } from './supabase.service';
 
 @Injectable({ providedIn: 'root' })
-export class AttendanceService {
+export class AttendanceService implements OnDestroy {
   private readonly supabase = inject(SupabaseService);
   private readonly store = signal<AttendanceRecord[]>([]);
+  private realtimeChannel?: any;
 
   readonly records = this.store.asReadonly();
+
+  constructor() {
+    if (typeof this.supabase.client.channel === 'function') {
+      this.realtimeChannel = this.supabase.client
+        .channel('attendance-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'attendance' },
+          (payload: any) => this.handleRealtimeEvent(payload)
+        )
+        .subscribe();
+    }
+  }
+
+  private handleRealtimeEvent(payload: any): void {
+    if (payload.eventType === 'INSERT') {
+      const newRecord = this.mapDbToAttendance(payload.new);
+      this.store.update((records) => {
+        if (records.some((r) => r.id === newRecord.id)) return records;
+        return [newRecord, ...records];
+      });
+    } else if (payload.eventType === 'UPDATE') {
+      const updatedRecord = this.mapDbToAttendance(payload.new);
+      this.store.update((records) =>
+        records.map((r) => (r.id === updatedRecord.id ? updatedRecord : r))
+      );
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.realtimeChannel && typeof this.supabase.client.removeChannel === 'function') {
+      this.supabase.client.removeChannel(this.realtimeChannel);
+    }
+  }
 
   getAttendance(): Observable<AttendanceRecord[]> {
     return from(

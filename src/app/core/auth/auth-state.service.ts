@@ -1,7 +1,7 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { AuthUser } from '@core/models/auth.models';
 import { STORAGE_KEYS } from '@core/constants/storage-keys.constant';
-import { StorageService } from '@core/services/storage.service';
+import { LocalStorageService } from '@core/services/local-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthStateService {
@@ -12,7 +12,7 @@ export class AuthStateService {
   readonly role = computed(() => this.userSignal()?.role ?? null);
   readonly permissions = computed(() => this.userSignal()?.permissions ?? []);
 
-  constructor(private readonly storage: StorageService) {
+  constructor(private readonly storage: LocalStorageService) {
     this.userSignal.set(this.storage.get<AuthUser>(STORAGE_KEYS.user, localStorage) ?? this.storage.get<AuthUser>(STORAGE_KEYS.user, sessionStorage));
   }
 
@@ -20,6 +20,18 @@ export class AuthStateService {
     this.userSignal.set(user);
     this.storage.remove(STORAGE_KEYS.user);
     this.storage.set(STORAGE_KEYS.user, user, rememberMe ? localStorage : sessionStorage);
+  }
+
+  updateUser(partial: Partial<AuthUser>): void {
+    const current = this.userSignal();
+    if (!current) return;
+    const updated = { ...current, ...partial };
+    this.userSignal.set(updated);
+    if (localStorage.getItem(STORAGE_KEYS.user)) {
+      this.storage.set(STORAGE_KEYS.user, updated, localStorage);
+    } else if (sessionStorage.getItem(STORAGE_KEYS.user)) {
+      this.storage.set(STORAGE_KEYS.user, updated, sessionStorage);
+    }
   }
 
   clear(): void {

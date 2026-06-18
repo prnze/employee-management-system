@@ -1,5 +1,6 @@
-import { inject, Injectable, signal, computed } from '@angular/core';
-import { forkJoin, from, of } from 'rxjs';
+import { inject, Injectable, signal, computed, OnDestroy } from '@angular/core';
+import { forkJoin, from, of, Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { AnalyticsService } from '@core/services/analytics.service';
 import { EmployeeService } from '@core/services/employee.service';
 import { SupabaseService } from '@core/services/supabase.service';
@@ -17,10 +18,51 @@ export interface ReportHistoryRow {
 @Injectable({
   providedIn: 'root'
 })
-export class ReportsStore {
+export class ReportsStore implements OnDestroy {
   private readonly analyticsSvc = inject(AnalyticsService);
   private readonly employeeSvc = inject(EmployeeService);
   private readonly supabase = inject(SupabaseService);
+  private realtimeChannel?: any;
+  private readonly refresh$ = new Subject<void>();
+
+  constructor() {
+    this.refresh$.pipe(debounceTime(300)).subscribe(() => {
+      this.loadReports(true);
+    });
+
+    if (typeof this.supabase.client.channel === 'function') {
+      this.realtimeChannel = this.supabase.client
+        .channel('dashboard-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'employees' },
+          () => this.refresh$.next()
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'attendance' },
+          () => this.refresh$.next()
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'tasks' },
+          () => this.refresh$.next()
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'audit_logs' },
+          () => this.refresh$.next()
+        )
+        .subscribe();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.realtimeChannel && typeof this.supabase.client.removeChannel === 'function') {
+      this.supabase.client.removeChannel(this.realtimeChannel);
+    }
+    this.refresh$.complete();
+  }
 
   // Core State
   private readonly _loading = signal<boolean>(false);
