@@ -77,6 +77,19 @@ export class AuditService {
     entity: string,
     opts: { severity?: AuditSeverity; category?: AuditLog['category']; details?: string } = {}
   ): void {
+    void this.recordAsync(actor, action, entity, opts);
+  }
+
+  /**
+   * Record an audit entry and resolve after the database write finishes.
+   * Authentication uses this to ensure logout is logged before sign-out.
+   */
+  async recordAsync(
+    actor: string,
+    action: string,
+    entity: string,
+    opts: { severity?: AuditSeverity; category?: AuditLog['category']; details?: string } = {}
+  ): Promise<void> {
     const entry: AuditLog = {
       id: crypto.randomUUID(),
       actor,
@@ -92,26 +105,27 @@ export class AuditService {
     // Optimistic local update
     this.logsSignal.update((logs) => [entry, ...logs].slice(0, 500));
 
-    // Persist asynchronously in the background
-    from(
-      this.supabase.client
+    try {
+      const { data, error } = await this.supabase.client
         .from('audit_logs')
         .insert(this.mapAuditLogToDb(entry))
         .select()
-        .single()
-    ).subscribe({
-      next: ({ data, error }) => {
-        if (error) {
-          console.error('Failed to persist audit log in Supabase:', error);
-        } else if (data) {
-          const created = this.mapDbToAuditLog(data);
-          this.logsSignal.update((logs) =>
-            logs.map((l) => (l.id === entry.id ? created : l))
-          );
-        }
-      },
-      error: (err) => console.error('Error writing audit log to Supabase:', err)
-    });
+        .single();
+
+      if (error) {
+        console.error('Failed to persist audit log in Supabase:', error);
+        return;
+      }
+
+      if (data) {
+        const created = this.mapDbToAuditLog(data);
+        this.logsSignal.update((logs) =>
+          logs.map((log) => (log.id === entry.id ? created : log))
+        );
+      }
+    } catch (error) {
+      console.error('Error writing audit log to Supabase:', error);
+    }
   }
 
   /** Returns logs matching the given filter, newest-first. */

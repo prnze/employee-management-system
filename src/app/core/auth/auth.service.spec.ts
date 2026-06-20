@@ -60,6 +60,7 @@ const mockSupabaseService = {
 };
 
 class MockAuditService {
+  recordAsync = jasmine.createSpy('recordAsync').and.returnValue(Promise.resolve());
   readonly logs = () => [];
   readonly totalCount = () => 0;
   readonly actors = () => [];
@@ -70,6 +71,7 @@ class MockAuditService {
 
 describe('AuthService', () => {
   let service: AuthService;
+  let audit: MockAuditService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -79,14 +81,42 @@ describe('AuthService', () => {
       ]
     });
     service = TestBed.inject(AuthService);
+    audit = TestBed.inject(AuditService) as unknown as MockAuditService;
   });
 
   it('authenticates the admin mock user', (done) => {
     service.login({ email: 'admin@ems.local', password: 'Admin@123', rememberMe: false }).subscribe((result) => {
       expect(result.user.role).toBe('Admin');
       expect(result.accessToken).toContain('mock-access-token');
+      expect(audit.recordAsync).toHaveBeenCalledWith(
+        'Avery Admin',
+        'LOGIN',
+        'Auth',
+        { category: 'Auth', details: 'User logged in' }
+      );
       done();
     });
+  });
+
+  it('records logout before signing out', async () => {
+    let resolveAudit!: () => void;
+    audit.recordAsync.and.returnValue(new Promise<void>((resolve) => {
+      resolveAudit = resolve;
+    }));
+    mockSupabaseClient.auth.signOut.calls.reset();
+
+    service.logout();
+    expect(audit.recordAsync).toHaveBeenCalledWith(
+      jasmine.any(String),
+      'LOGOUT',
+      'Auth',
+      { category: 'Auth', details: 'User logged out' }
+    );
+    expect(mockSupabaseClient.auth.signOut).not.toHaveBeenCalled();
+
+    resolveAudit();
+    await Promise.resolve();
+    expect(mockSupabaseClient.auth.signOut).toHaveBeenCalled();
   });
 
   it('rejects invalid credentials', (done) => {

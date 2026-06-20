@@ -2,16 +2,12 @@ import { computed, inject, Injectable, signal, OnDestroy } from '@angular/core';
 import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import { Employee, EmployeeFilter, EmployeeRequest, EmployeeStatus, SortEntry } from '@core/models/employee.models';
 import { PagedResult } from '@core/models/table.models';
-import { AuthStateService } from '@core/auth/auth-state.service';
-import { AuditService } from './audit.service';
 import { SupabaseService } from './supabase.service';
 
 @Injectable({ providedIn: 'root' })
 export class EmployeeService implements OnDestroy {
   private readonly employeesSignal = signal<Employee[]>([]);
   private readonly supabase = inject(SupabaseService);
-  private readonly audit = inject(AuditService);
-  private readonly authState = inject(AuthStateService);
   private realtimeChannel?: any;
 
   readonly employees   = this.employeesSignal.asReadonly();
@@ -164,7 +160,6 @@ export class EmployeeService implements OnDestroy {
         }
         const createdEmployee = this.mapDbToEmployee(data);
         this.employeesSignal.update((items) => [createdEmployee, ...items]);
-        this.audit.record(this.actor(), 'CREATE', `Employee ${createdEmployee.employeeCode}`);
         return of(createdEmployee);
       })
     );
@@ -186,14 +181,12 @@ export class EmployeeService implements OnDestroy {
         }
         const updated = this.mapDbToEmployee(data);
         this.employeesSignal.update((items) => items.map((item) => (item.id === id ? updated : item)));
-        this.audit.record(this.actor(), 'UPDATE', `Employee ${updated.employeeCode}`);
         return of(updated);
       })
     );
   }
 
   delete(id: string): Observable<boolean> {
-    const employee = this.employeesSignal().find((item) => item.id === id);
     return from(
       this.supabase.client
         .from('employees')
@@ -205,7 +198,6 @@ export class EmployeeService implements OnDestroy {
           return throwError(() => new Error(error.message));
         }
         this.employeesSignal.update((items) => items.filter((item) => item.id !== id));
-        this.audit.record(this.actor(), 'DELETE', `Employee ${employee?.employeeCode ?? id}`);
         return of(true);
       })
     );
@@ -223,7 +215,6 @@ export class EmployeeService implements OnDestroy {
           return throwError(() => new Error(error.message));
         }
         this.employeesSignal.update((items) => items.filter((item) => !ids.includes(item.id)));
-        this.audit.record(this.actor(), 'BULK_DELETE', `${ids.length} employee records`);
         return of(true);
       })
     );
@@ -244,7 +235,6 @@ export class EmployeeService implements OnDestroy {
         this.employeesSignal.update((items) =>
           items.map((item) => (ids.includes(item.id) ? { ...item, status } : item))
         );
-        this.audit.record(this.actor(), 'BULK_STATUS_UPDATE', `${ids.length} employees → ${status}`);
         return of(true);
       })
     );
@@ -289,7 +279,4 @@ export class EmployeeService implements OnDestroy {
     return dbFields;
   }
 
-  private actor(): string {
-    return this.authState.user()?.fullName ?? 'System';
-  }
 }

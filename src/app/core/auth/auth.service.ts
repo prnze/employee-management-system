@@ -32,7 +32,7 @@ export class AuthService {
         }
         const session = data.session;
         return this.fetchProfile(session.user.id).pipe(
-          map((user) => {
+          switchMap((user) => {
             const response: LoginResponse = {
               user,
               accessToken: session.access_token,
@@ -41,8 +41,12 @@ export class AuthService {
             };
             this.tokenService.setTokens(response.accessToken, response.refreshToken, request.rememberMe, response.expiresAt);
             this.authState.setUser(response.user, request.rememberMe);
-            this.audit.record(response.user.fullName, 'LOGIN', 'Auth');
-            return response;
+            return from(
+              this.audit.recordAsync(user.fullName, 'LOGIN', 'Auth', {
+                category: 'Auth',
+                details: 'User logged in'
+              })
+            ).pipe(map(() => response));
           })
         );
       })
@@ -51,10 +55,15 @@ export class AuthService {
 
   logout(): void {
     const actor = this.authState.user()?.fullName ?? 'Unknown user';
-    this.audit.record(actor, 'LOGOUT', 'Auth');
+    const auditWrite = this.audit.recordAsync(actor, 'LOGOUT', 'Auth', {
+      category: 'Auth',
+      details: 'User logged out'
+    });
+
     this.authState.clear();
     this.tokenService.clear();
-    void this.supabase.client.auth.signOut();
+
+    void auditWrite.finally(() => this.supabase.client.auth.signOut());
   }
 
   forgotPassword(email: string): Observable<boolean> {
