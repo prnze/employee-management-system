@@ -64,7 +64,7 @@ export class TopNavbarComponent {
   );
 
   readonly notificationsRoute = computed(() =>
-    this.authState.role() === 'Admin' ? '/admin/notifications' : '/employee/notifications'
+    this.authState.role() === 'Admin' ? '/ems/admin/notifications' : '/ems/employee/notifications'
   );
 
   switchLanguage(code: string): void {
@@ -94,6 +94,6 @@ export class TopNavbarComponent {
 
   logout(): void {
     this.auth.logout();
-    void this.router.navigateByUrl('/auth/login');
+    void this.router.navigateByUrl('/ems/auth/login');
   }
 }

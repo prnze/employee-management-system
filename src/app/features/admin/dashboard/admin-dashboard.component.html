@@ -10,11 +10,11 @@
       </p>
     </div>
     <div class="d-flex gap-2">
-      <a class="btn btn-premium-primary d-flex align-items-center gap-2" routerLink="/admin/employees/create">
+      <a class="btn btn-premium-primary d-flex align-items-center gap-2" routerLink="/ems/admin/employees/create">
         <app-icon [icon]="APP_ICONS.ADD" aria-hidden="true"></app-icon>
         <span>{{ 'ADMIN_DASHBOARD_NEW_EMP' | translate }}</span>
       </a>
-      <a class="btn btn-premium-secondary d-flex align-items-center gap-2" routerLink="/admin/reports">
+      <a class="btn btn-premium-secondary d-flex align-items-center gap-2" routerLink="/ems/admin/reports">
         <app-icon [icon]="APP_ICONS.REPORTS" aria-hidden="true"></app-icon>
         <span>{{ 'ADMIN_DASHBOARD_REPORTS' | translate }}</span>
       </a>
@@ -142,23 +142,23 @@
           <span>{{ 'ADMIN_DASHBOARD_QUICK' | translate }}</span>
         </h2>
         <div class="d-grid gap-2 flex-grow-1 justify-content-stretch align-content-start">
-          <a class="btn btn-action-primary" routerLink="/admin/employees/create">
+          <a class="btn btn-action-primary" routerLink="/ems/admin/employees/create">
             <app-icon [icon]="APP_ICONS.ADD" aria-hidden="true"></app-icon>
             <span>{{ 'ADMIN_DASHBOARD_CREATE_EMP' | translate }}</span>
           </a>
-          <a class="btn btn-action-outline" routerLink="/admin/employees">
+          <a class="btn btn-action-outline" routerLink="/ems/admin/employees">
             <app-icon [icon]="APP_ICONS.USERS" aria-hidden="true"></app-icon>
             <span>{{ 'ADMIN_DASHBOARD_EMP_LIST' | translate }}</span>
           </a>
-          <a class="btn btn-action-outline" routerLink="/admin/roles">
+          <a class="btn btn-action-outline" routerLink="/ems/admin/roles">
             <app-icon [icon]="APP_ICONS.ROLE" aria-hidden="true"></app-icon>
             <span>{{ 'ADMIN_DASHBOARD_MANAGE_ROLES' | translate }}</span>
           </a>
-          <a class="btn btn-action-outline" routerLink="/admin/audit-logs">
+          <a class="btn btn-action-outline" routerLink="/ems/admin/audit-logs">
             <app-icon [icon]="APP_ICONS.AUDIT" aria-hidden="true"></app-icon>
             <span>{{ 'ADMIN_DASHBOARD_AUDIT' | translate }}</span>
           </a>
-          <a class="btn btn-action-outline" routerLink="/admin/reports">
+          <a class="btn btn-action-outline" routerLink="/ems/admin/reports">
             <app-icon [icon]="APP_ICONS.REPORTS" aria-hidden="true"></app-icon>
             <span>{{ 'ADMIN_DASHBOARD_REPORTS_BTN' | translate }}</span>
           </a>
@@ -187,7 +187,7 @@
       <app-icon [icon]="APP_ICONS.AUDIT" class="text-primary" aria-hidden="true"></app-icon>
       <span>{{ 'ADMIN_DASHBOARD_RECENT' | translate }}</span>
     </h2>
-    <a class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold timeline-view-all" routerLink="/admin/audit-logs">
+    <a class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold timeline-view-all" routerLink="/ems/admin/audit-logs">
       <span>{{ 'ADMIN_DASHBOARD_VIEW_ALL' | translate }}</span>
       <app-icon [icon]="APP_ICONS.ARROW_FORWARD" [size]="16" class="align-middle ms-1" aria-hidden="true"></app-icon>
     </a>

@@ -31,7 +31,7 @@ export class EmployeeDetailComponent {
       icon: 'delete'
     }).then((confirmed) => {
       if (confirmed) {
-        this.employeeService.delete(this.employee.id).subscribe(() => void this.router.navigateByUrl('/admin/employees'));
+        this.employeeService.delete(this.employee.id).subscribe(() => void this.router.navigateByUrl('/ems/admin/employees'));
       }
     });
   }

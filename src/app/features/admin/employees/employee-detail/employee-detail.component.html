@@ -2,7 +2,7 @@
       <div class="d-flex justify-content-between gap-2 mb-3">
         <h1 class="h3">{{ employee.firstName }} {{ employee.lastName }}</h1>
         <div>
-          <a *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-outline-primary me-2" [routerLink]="['/admin/employees', employee.id, 'edit']">{{ 'EMP_DETAIL_EDIT' | translate }}</a>
+          <a *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-outline-primary me-2" [routerLink]="['/ems/admin/employees', employee.id, 'edit']">{{ 'EMP_DETAIL_EDIT' | translate }}</a>
           <button *appPermission="{ module: 'employees', action: 'delete' }" class="btn btn-outline-danger" type="button" (click)="delete()">{{ 'EMP_DETAIL_DELETE' | translate }}</button>
         </div>
       </div>

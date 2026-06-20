@@ -9,6 +9,8 @@ import { TokenService } from './token.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly restoreSessionTimeoutMs = 2500;
+
   constructor(
     private readonly supabase: SupabaseService,
     private readonly authState: AuthStateService,
@@ -69,7 +71,7 @@ export class AuthService {
   forgotPassword(email: string): Observable<boolean> {
     return from(
       this.supabase.client.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`
+        redirectTo: `${window.location.origin}/ems/auth/reset-password`
       })
     ).pipe(
       map(({ error }) => {
@@ -134,38 +136,63 @@ export class AuthService {
   }
 
   restoreSession(): Promise<void> {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<void>((resolve) => {
+      timeoutId = setTimeout(() => {
+        console.warn('Session restore timed out. Continuing app bootstrap.');
+        resolve();
+      }, this.restoreSessionTimeoutMs);
+    });
+
+    return Promise.race([
+      this.restoreSessionFromSupabase(),
+      timeout
+    ]).finally(() => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    });
+  }
+
+  private restoreSessionFromSupabase(): Promise<void> {
     return new Promise((resolve) => {
       this.supabase.client.auth.getSession().then(({ data: { session } }) => {
-        if (session && session.user) {
-          const expiresAt = new Date(Date.now() + (session.expires_in ?? 3600) * 1000).toISOString();
-          this.tokenService.setTokens(
-            session.access_token,
-            session.refresh_token ?? '',
-            this.tokenService.rememberMe(),
-            expiresAt
-          );
-          
-          this.fetchProfile(session.user.id).subscribe({
-            next: (authUser) => {
-              this.authState.setUser(authUser, this.tokenService.rememberMe());
-              resolve();
-            },
-            error: (err) => {
-              console.error('Failed to restore session profile:', err);
-              this.logout();
-              resolve();
-            }
-          });
-        } else {
-          this.logout();
+        if (!session?.user) {
+          this.clearLocalSession();
           resolve();
+          return;
         }
+
+        const expiresAt = new Date(Date.now() + (session.expires_in ?? 3600) * 1000).toISOString();
+        this.tokenService.setTokens(
+          session.access_token,
+          session.refresh_token ?? '',
+          this.tokenService.rememberMe(),
+          expiresAt
+        );
+
+        this.fetchProfile(session.user.id).subscribe({
+          next: (authUser) => {
+            this.authState.setUser(authUser, this.tokenService.rememberMe());
+            resolve();
+          },
+          error: (err) => {
+            console.error('Failed to restore session profile:', err);
+            this.clearLocalSession();
+            resolve();
+          }
+        });
       }).catch((err) => {
         console.error('Get session error during restore:', err);
-        this.logout();
+        this.clearLocalSession();
         resolve();
       });
     });
+  }
+
+  private clearLocalSession(): void {
+    this.authState.clear();
+    this.tokenService.clear();
   }
 
   private fetchProfile(userId: string): Observable<AuthUser> {

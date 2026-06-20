@@ -20,13 +20,13 @@ import { ShellStateService } from '@core/services/shell-state.service';
 export class AdminLayoutComponent {
   readonly shell = inject(ShellStateService);
   readonly items: NavItem[] = [
-    { label: 'NAV_DASHBOARD',     path: '/admin/dashboard',     icon: APP_ICONS.DASHBOARD, permission: PERMISSIONS.DASHBOARD.VIEW },
-    { label: 'NAV_EMPLOYEES',     path: '/admin/employees',     icon: APP_ICONS.USERS, permission: PERMISSIONS.EMPLOYEES.READ },
-    { label: 'NAV_USERS',         path: '/admin/users',         icon: APP_ICONS.USER, permission: PERMISSIONS.USERS.MANAGE },
-    { label: 'NAV_ROLES',         path: '/admin/roles',         icon: APP_ICONS.ROLE, permission: PERMISSIONS.ROLES.MANAGE },
-    { label: 'NAV_REPORTS',       path: '/admin/reports',       icon: APP_ICONS.REPORTS, permission: PERMISSIONS.REPORTS.VIEW },
-    { label: 'NAV_NOTIFICATIONS', path: '/admin/notifications', icon: APP_ICONS.NOTIFICATIONS, featureFlag: 'notifications' },
-    { label: 'NAV_AUDIT_LOGS',    path: '/admin/audit-logs',   icon: APP_ICONS.AUDIT, permission: PERMISSIONS.AUDIT.VIEW, featureFlag: 'auditLogs' },
-    { label: 'NAV_SETTINGS',      path: '/admin/settings',     icon: APP_ICONS.SETTINGS, permission: PERMISSIONS.SETTINGS.MANAGE }
+    { label: 'NAV_DASHBOARD',     path: '/ems/admin/dashboard',     icon: APP_ICONS.DASHBOARD, permission: PERMISSIONS.DASHBOARD.VIEW },
+    { label: 'NAV_EMPLOYEES',     path: '/ems/admin/employees',     icon: APP_ICONS.USERS, permission: PERMISSIONS.EMPLOYEES.READ },
+    { label: 'NAV_USERS',         path: '/ems/admin/users',         icon: APP_ICONS.USER, permission: PERMISSIONS.USERS.MANAGE },
+    { label: 'NAV_ROLES',         path: '/ems/admin/roles',         icon: APP_ICONS.ROLE, permission: PERMISSIONS.ROLES.MANAGE },
+    { label: 'NAV_REPORTS',       path: '/ems/admin/reports',       icon: APP_ICONS.REPORTS, permission: PERMISSIONS.REPORTS.VIEW },
+    { label: 'NAV_NOTIFICATIONS', path: '/ems/admin/notifications', icon: APP_ICONS.NOTIFICATIONS, featureFlag: 'notifications' },
+    { label: 'NAV_AUDIT_LOGS',    path: '/ems/admin/audit-logs',    icon: APP_ICONS.AUDIT, permission: PERMISSIONS.AUDIT.VIEW, featureFlag: 'auditLogs' },
+    { label: 'NAV_SETTINGS',      path: '/ems/admin/settings',      icon: APP_ICONS.SETTINGS, permission: PERMISSIONS.SETTINGS.MANAGE }
   ];
 }

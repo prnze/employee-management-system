@@ -10,9 +10,9 @@ export const authGuard: CanActivateFn = (_route, state) => {
   
   if (authState.isAuthenticated() && tokens.hasTokens()) {
     if (authState.user()?.forcePasswordReset && !state.url.includes('change-password')) {
-      return router.createUrlTree(['/auth/change-password']);
+      return router.createUrlTree(['/ems/auth/change-password']);
     }
     return true;
   }
-  return router.createUrlTree(['/auth/login'], { queryParams: { returnUrl: state.url } });
+  return router.createUrlTree(['/ems/auth/login'], { queryParams: { returnUrl: state.url } });
 };

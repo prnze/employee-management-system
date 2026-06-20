@@ -35,12 +35,6 @@ export class AuditService {
   readonly actors      = computed(() => Array.from(new Set(this.logsSignal().map((l) => l.actor))).sort());
   readonly actions     = computed(() => Array.from(new Set(this.logsSignal().map((l) => l.action))).sort());
 
-  constructor() {
-    this.getAuditLogs().subscribe({
-      error: (err) => console.error('Failed to load audit logs from Supabase:', err)
-    });
-  }
-
   getAuditLogs(force = false): Observable<AuditLog[]> {
     if (this.hasLoaded && !force) {
       return of(this.logsSignal());

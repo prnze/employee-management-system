@@ -43,7 +43,7 @@
       [label]="'AUTH_REMEMBER_ME' | translate"
       formControlName="rememberMe">
     </app-checkbox>
-    <a routerLink="/auth/forgot-password" class="text-link small">{{ 'AUTH_FORGOT_PASSWORD' | translate }}</a>
+    <a routerLink="/ems/auth/forgot-password" class="text-link small">{{ 'AUTH_FORGOT_PASSWORD' | translate }}</a>
   </div>
 
   <button class="btn btn-primary w-100 py-2" type="submit" [disabled]="form.invalid || loading()">

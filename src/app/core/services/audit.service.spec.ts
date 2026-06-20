@@ -63,7 +63,8 @@ describe('AuditService', () => {
       ]
     });
     service = TestBed.inject(AuditService);
-    tick(); // resolve initial getAuditLogs load
+    service.getAuditLogs().subscribe();
+    tick(); // resolve explicit getAuditLogs load
   }));
 
   it('should be created', () => {

@@ -49,11 +49,11 @@ export class EmployeeFormComponent implements UnsavedChangesAware {
     const save$ = this.employee ? this.employeeService.update(this.employee.id, request) : this.employeeService.create(request);
     save$.subscribe((employee) => {
       this.form.markAsPristine();
-      void this.router.navigate(['/admin/employees', employee.id]);
+      void this.router.navigate(['/ems/admin/employees', employee.id]);
     });
   }
 
   cancel(): void {
-    void this.router.navigateByUrl('/admin/employees');
+    void this.router.navigateByUrl('/ems/admin/employees');
   }
 }

@@ -44,10 +44,10 @@ export class LoginComponent {
     this.auth.login(this.form.getRawValue()).subscribe({
       next: ({ user }) => {
         if (user.forcePasswordReset) {
-          void this.router.navigateByUrl('/auth/change-password');
+          void this.router.navigateByUrl('/ems/auth/change-password');
         } else {
           const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-          void this.router.navigateByUrl(returnUrl ?? (user.role === 'Admin' ? '/admin/dashboard' : '/employee/dashboard'));
+          void this.router.navigateByUrl(returnUrl ?? (user.role === 'Admin' ? '/ems/admin/dashboard' : '/ems/employee/dashboard'));
         }
       },
       error: (error: Error) => { this.error.set(error.message); this.loading.set(false); }

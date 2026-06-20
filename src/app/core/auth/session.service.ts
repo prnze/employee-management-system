@@ -57,7 +57,7 @@ export class SessionService {
     const idleTimeoutMinutes = this.configSvc.config()?.idleTimeoutMinutes ?? 20;
     if (idleMs > idleTimeoutMinutes * 60_000) {
       this.auth.logout();
-      void this.router.navigateByUrl('/auth/login');
+      void this.router.navigateByUrl('/ems/auth/login');
     }
   }
 }

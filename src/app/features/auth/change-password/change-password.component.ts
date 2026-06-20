@@ -62,7 +62,7 @@ export class ChangePasswordComponent {
       
       if (this.isPage()) {
         const role = this.authState.role();
-        void this.router.navigateByUrl(role === 'Admin' ? '/admin/dashboard' : '/employee/dashboard');
+        void this.router.navigateByUrl(role === 'Admin' ? '/ems/admin/dashboard' : '/ems/employee/dashboard');
       } else {
         this.closed.emit();
       }

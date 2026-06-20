@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://princelj.vercel.app/sitemap.xml

@@ -59,7 +59,7 @@
       </div>
 
       <!-- New Employee Button -->
-      <a *appPermission="{ module: 'employees', action: 'create' }" class="btn btn-premium-primary d-inline-flex align-items-center gap-2 text-decoration-none" routerLink="/admin/employees/create">
+      <a *appPermission="{ module: 'employees', action: 'create' }" class="btn btn-premium-primary d-inline-flex align-items-center gap-2 text-decoration-none" routerLink="/ems/admin/employees/create">
         <app-icon [icon]="APP_ICONS.ADD" aria-hidden="true"></app-icon>
         <span>{{ 'EMP_LIST_NEW_EMPLOYEE' | translate }}</span>
       </a>
@@ -296,11 +296,11 @@
 
 <ng-template #actionsTpl let-row>
   <div class="d-flex justify-content-end gap-1.5 flex-wrap">
-    <a class="btn btn-sm btn-action-outline text-decoration-none" [routerLink]="['/admin/employees', row.id]">
+    <a class="btn btn-sm btn-action-outline text-decoration-none" [routerLink]="['/ems/admin/employees', row.id]">
       <app-icon [icon]="APP_ICONS.USER" [size]="14" class="me-1"></app-icon>
       <span>{{ 'EMP_LIST_VIEW' | translate }}</span>
     </a>
-    <a *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-sm btn-action-outline text-decoration-none" [routerLink]="['/admin/employees', row.id, 'edit']">
+    <a *appPermission="{ module: 'employees', action: 'update' }" class="btn btn-sm btn-action-outline text-decoration-none" [routerLink]="['/ems/admin/employees', row.id, 'edit']">
       <app-icon [icon]="APP_ICONS.EDIT" [size]="14" class="me-1"></app-icon>
       <span>{{ 'EMP_LIST_EDIT' | translate }}</span>
     </a>

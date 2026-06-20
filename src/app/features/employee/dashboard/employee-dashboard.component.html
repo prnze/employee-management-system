@@ -9,7 +9,7 @@
         <span>{{ today }}</span>
       </p>
     </div>
-    <a class="btn btn-premium-primary d-flex align-items-center gap-2" routerLink="/employee/attendance">
+    <a class="btn btn-premium-primary d-flex align-items-center gap-2" routerLink="/ems/employee/attendance">
       <app-icon [icon]="APP_ICONS.CALENDAR" aria-hidden="true"></app-icon>
       <span>{{ 'EMP_DASHBOARD_LOG_BTN' | translate }}</span>
     </a>
@@ -110,7 +110,7 @@
             <app-icon [icon]="APP_ICONS.TASKS" class="text-primary" aria-hidden="true"></app-icon>
             <span>{{ 'EMP_DASHBOARD_UPCOMING' | translate }}</span>
           </h2>
-          <a class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold timeline-view-all" routerLink="/employee/tasks">
+          <a class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold timeline-view-all" routerLink="/ems/employee/tasks">
             <span>{{ 'EMP_DASHBOARD_VIEW_TASKS' | translate }}</span>
             <app-icon [icon]="APP_ICONS.ARROW_FORWARD" [size]="16" class="align-middle ms-1" aria-hidden="true"></app-icon>
           </a>

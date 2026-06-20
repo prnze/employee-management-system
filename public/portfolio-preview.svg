@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="g" cx="75%" cy="15%" r="80%">
+      <stop offset="0" stop-color="#27331d"/>
+      <stop offset=".55" stop-color="#111314"/>
+      <stop offset="1" stop-color="#0d0e0f"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <circle cx="1040" cy="80" r="180" fill="#c7f36b" opacity=".07"/>
+  <text x="90" y="105" fill="#c7f36b" font-family="Arial, sans-serif" font-size="22" letter-spacing="5">PRINCE L J · PORTFOLIO</text>
+  <text x="85" y="270" fill="#f5f4ef" font-family="Arial, sans-serif" font-size="92" font-weight="600">Thoughtful digital</text>
+  <text x="85" y="375" fill="none" stroke="#f5f4ef" stroke-opacity=".65" font-family="Georgia, serif" font-size="102" font-style="italic">experiences.</text>
+  <text x="90" y="490" fill="#9b9a94" font-family="Arial, sans-serif" font-size="28">Associate Software Engineer · Angular Developer</text>
+  <circle cx="1070" cy="510" r="55" fill="#c7f36b"/>
+  <text x="1070" y="525" text-anchor="middle" fill="#111" font-family="Georgia, serif" font-size="42" font-style="italic">P</text>
+</svg>

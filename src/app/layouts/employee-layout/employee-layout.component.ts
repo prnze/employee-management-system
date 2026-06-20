@@ -20,10 +20,10 @@ import { ShellStateService } from '@core/services/shell-state.service';
 export class EmployeeLayoutComponent {
   readonly shell = inject(ShellStateService);
   readonly items: NavItem[] = [
-    { label: 'NAV_DASHBOARD',     path: '/employee/dashboard',     icon: APP_ICONS.DASHBOARD, permission: PERMISSIONS.DASHBOARD.VIEW },
-    { label: 'NAV_PROFILE',       path: '/employee/profile',       icon: APP_ICONS.EMPLOYEE, permission: PERMISSIONS.PROFILE.UPDATE },
-    { label: 'NAV_ATTENDANCE',    path: '/employee/attendance',    icon: APP_ICONS.CALENDAR, permission: PERMISSIONS.ATTENDANCE.VIEW },
-    { label: 'NAV_TASKS',         path: '/employee/tasks',         icon: APP_ICONS.TASKS, permission: PERMISSIONS.TASKS.VIEW },
-    { label: 'NAV_NOTIFICATIONS', path: '/employee/notifications', icon: APP_ICONS.NOTIFICATIONS, permission: PERMISSIONS.NOTIFICATIONS.VIEW, featureFlag: 'notifications' }
+    { label: 'NAV_DASHBOARD',     path: '/ems/employee/dashboard',     icon: APP_ICONS.DASHBOARD, permission: PERMISSIONS.DASHBOARD.VIEW },
+    { label: 'NAV_PROFILE',       path: '/ems/employee/profile',       icon: APP_ICONS.EMPLOYEE, permission: PERMISSIONS.PROFILE.UPDATE },
+    { label: 'NAV_ATTENDANCE',    path: '/ems/employee/attendance',    icon: APP_ICONS.CALENDAR, permission: PERMISSIONS.ATTENDANCE.VIEW },
+    { label: 'NAV_TASKS',         path: '/ems/employee/tasks',         icon: APP_ICONS.TASKS, permission: PERMISSIONS.TASKS.VIEW },
+    { label: 'NAV_NOTIFICATIONS', path: '/ems/employee/notifications', icon: APP_ICONS.NOTIFICATIONS, permission: PERMISSIONS.NOTIFICATIONS.VIEW, featureFlag: 'notifications' }
   ];
 }
