@@ -74,6 +74,10 @@ export const routes: Routes = [
     loadChildren: () => import('@features/employee/employee.routes').then((m) => m.EMPLOYEE_ROUTES)
   },
   {
+    path: 'sharex',
+    loadChildren: () => import('@features/sharex/sharex.routes').then((m) => m.SHAREX_ROUTES)
+  },
+  {
     path: 'profile',
     redirectTo: () => {
       const auth = inject(AuthStateService);

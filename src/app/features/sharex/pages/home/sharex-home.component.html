@@ -1,0 +1,89 @@
+<div class="sx-home">
+  <!-- ═══════════════════════ HERO ═══════════════════════ -->
+  <section class="sx-hero">
+    <div class="sx-hero-content">
+      <div class="sx-hero-badge">
+        <span class="sx-hero-badge-dot" aria-hidden="true"></span>
+        Temporary · Secure · Beautiful
+      </div>
+
+      <h1 class="sx-hero-title">
+        Share anything.<br>
+        <span class="sx-gradient-text">Temporarily.</span>
+      </h1>
+
+      <p class="sx-hero-subtitle">
+        Text, code, files — secure and self-destructing.
+        No account needed. Just create, share, and let it disappear.
+      </p>
+
+      <div class="sx-hero-actions">
+        <a routerLink="/sharex/create" class="sx-btn-primary-lg" id="sharex-hero-cta">
+          <span class="material-symbols-rounded" aria-hidden="true">bolt</span>
+          Create a Share
+        </a>
+        <a href="#features" class="sx-btn-secondary-lg">
+          Learn More
+          <span class="material-symbols-rounded" aria-hidden="true">arrow_downward</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ FEATURES ═══════════════════════ -->
+  <section class="sx-features" id="features">
+    <div class="sx-section-header">
+      <span class="sx-section-number">01</span>
+      <h2>Everything you need</h2>
+      <p>Share text, code, and files with automatic expiry and security.</p>
+    </div>
+
+    <div class="sx-features-grid">
+      @for (feature of features; track feature.title) {
+        <article class="sx-feature-card">
+          <div class="sx-feature-icon">
+            <span class="material-symbols-rounded" aria-hidden="true">{{ feature.icon }}</span>
+          </div>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ HOW IT WORKS ═══════════════════════ -->
+  <section class="sx-how-it-works">
+    <div class="sx-section-header">
+      <span class="sx-section-number">02</span>
+      <h2>How it works</h2>
+      <p>Three simple steps to share anything temporarily.</p>
+    </div>
+
+    <div class="sx-steps">
+      @for (step of steps; track step.number; let last = $last) {
+        <div class="sx-step">
+          <div class="sx-step-number">{{ step.number }}</div>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.description }}</p>
+        </div>
+        @if (!last) {
+          <div class="sx-step-connector" aria-hidden="true">
+            <span class="material-symbols-rounded">arrow_forward</span>
+          </div>
+        }
+      }
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ CTA ═══════════════════════ -->
+  <section class="sx-cta">
+    <div class="sx-cta-card">
+      <h2>Ready to share<span class="sx-gradient-text">?</span></h2>
+      <p>Create your first temporary share in seconds. No account required.</p>
+      <a routerLink="/sharex/create" class="sx-btn-primary-lg" id="sharex-cta-bottom">
+        <span class="material-symbols-rounded" aria-hidden="true">bolt</span>
+        Get Started
+      </a>
+    </div>
+  </section>
+</div>

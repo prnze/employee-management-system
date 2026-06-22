@@ -1,0 +1,27 @@
+<div class="sx-about">
+  <section class="sx-about-hero">
+    <h1>About <span class="sx-gradient-text">ShareX</span></h1>
+    <p>A temporary sharing platform for text, code, and files — built with modern web technologies and a focus on privacy.</p>
+  </section>
+
+  <section class="sx-about-cards">
+    @for (card of infoCards; track card.title) {
+      <article class="sx-about-card">
+        <div class="sx-about-card-icon">
+          <span class="material-symbols-rounded" aria-hidden="true">{{ card.icon }}</span>
+        </div>
+        <h3>{{ card.title }}</h3>
+        <p>{{ card.text }}</p>
+      </article>
+    }
+  </section>
+
+  <section class="sx-about-tech">
+    <h2>Built With</h2>
+    <div class="sx-tech-badges">
+      @for (tech of techStack; track tech) {
+        <span class="sx-tech-badge">{{ tech }}</span>
+      }
+    </div>
+  </section>
+</div>

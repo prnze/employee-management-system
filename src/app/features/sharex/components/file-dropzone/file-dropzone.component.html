@@ -1,0 +1,55 @@
+<div
+  class="sx-dropzone"
+  [class.sx-dropzone--active]="isDragOver()"
+  [class.sx-dropzone--has-files]="files().length > 0"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)">
+
+  @if (files().length === 0) {
+    <div class="sx-dropzone-empty">
+      <div class="sx-dropzone-icon-wrapper">
+        <span class="material-symbols-rounded">cloud_upload</span>
+      </div>
+      <p class="sx-dropzone-title">Drop files here</p>
+      <p class="sx-dropzone-subtitle">or click to browse · Max 50 MB per file</p>
+      <button type="button" class="sx-dropzone-browse" (click)="fileInput.click()">
+        <span class="material-symbols-rounded">folder_open</span>
+        Browse Files
+      </button>
+    </div>
+  } @else {
+    <div class="sx-dropzone-files">
+      @for (file of files(); track $index) {
+        <div class="sx-dropzone-file">
+          <div class="sx-dropzone-file-icon">
+            <span class="material-symbols-rounded">{{ getFileIcon(file.type) }}</span>
+          </div>
+          <div class="sx-dropzone-file-info">
+            <span class="sx-dropzone-file-name">{{ file.name }}</span>
+            <span class="sx-dropzone-file-size">{{ formatFileSize(file.size) }}</span>
+          </div>
+          <button
+            type="button"
+            class="sx-dropzone-file-remove"
+            (click)="removeFile($index)"
+            title="Remove file">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </div>
+      }
+      <button type="button" class="sx-dropzone-add" (click)="fileInput.click()">
+        <span class="material-symbols-rounded">add</span>
+        Add more files
+      </button>
+    </div>
+  }
+
+  <input
+    type="file"
+    class="sx-dropzone-input"
+    multiple
+    (change)="onFileSelect($event)"
+    #fileInput
+    hidden>
+</div>

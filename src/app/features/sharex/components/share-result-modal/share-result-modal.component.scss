@@ -1,0 +1,245 @@
+// ============================================================================
+// Share Result Modal — Glassmorphic success dialog
+// ============================================================================
+
+.sx-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: modal-backdrop-in 0.3s ease both;
+}
+
+@keyframes modal-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.sx-modal {
+  position: relative;
+  width: min(460px, 100%);
+  background: rgba(16, 16, 28, 0.85);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--sx-radius-2xl, 28px);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  animation: modal-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.sx-modal-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+// ── Header ──────────────────────────────────────────────────────────────────
+
+.sx-modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 36px 32px 20px;
+}
+
+.sx-modal-success-ring {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(16, 185, 129, 0.15));
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  margin-bottom: 16px;
+  animation: success-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+
+  .material-symbols-rounded {
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+}
+
+@keyframes success-pop {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.sx-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--sx-text, rgba(255, 255, 255, 0.93));
+}
+
+.sx-modal-subtitle {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
+  max-width: 320px;
+}
+
+// ── Body ────────────────────────────────────────────────────────────────────
+
+.sx-modal-body {
+  padding: 8px 32px 24px;
+}
+
+.sx-modal-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
+  margin-bottom: 8px;
+}
+
+.sx-modal-link-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
+  border-radius: var(--sx-radius-md, 16px);
+  transition: border-color 0.25s ease;
+
+  &:hover {
+    border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
+  }
+}
+
+.sx-modal-link-url {
+  flex: 1;
+  font-family: var(--sx-font-mono, monospace);
+  font-size: 0.82rem;
+  color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: all;
+}
+
+.sx-modal-link-copy {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
+  background: var(--sx-surface, rgba(255, 255, 255, 0.035));
+  color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+
+  .material-symbols-rounded { font-size: 1.05rem; }
+
+  &:hover {
+    background: rgba(139, 92, 246, 0.15);
+    border-color: rgba(139, 92, 246, 0.3);
+    color: #a78bfa;
+  }
+}
+
+.sx-modal-copied-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #34d399;
+  animation: toast-in 0.3s ease both;
+
+  .material-symbols-rounded { font-size: 0.95rem; }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Footer ──────────────────────────────────────────────────────────────────
+
+.sx-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 32px 28px;
+}
+
+.sx-modal-btn-secondary {
+  padding: 10px 20px;
+  border-radius: var(--sx-radius-sm, 12px);
+  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
+  background: var(--sx-surface, rgba(255, 255, 255, 0.035));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
+  font-family: var(--sx-font, 'Inter', sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: var(--sx-surface-hover, rgba(255, 255, 255, 0.055));
+    border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
+    color: var(--sx-text, rgba(255, 255, 255, 0.93));
+  }
+}
+
+.sx-modal-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--sx-radius-sm, 12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+  color: #ffffff;
+  font-family: var(--sx-font, 'Inter', sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .material-symbols-rounded { font-size: 1.1rem; }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+  }
+}

@@ -1,0 +1,143 @@
+<div class="sx-create">
+  <div class="sx-create-header">
+    <h1>Create a <span class="sx-gradient-text">Share</span></h1>
+    <p>Share text, code, or files with a unique self-destructing link.</p>
+  </div>
+
+  <div class="sx-create-card">
+    <!-- ══════════ Tab Bar ══════════ -->
+    <div class="sx-tabs">
+      @for (tab of tabs; track tab.value) {
+        <button
+          type="button"
+          class="sx-tab"
+          [class.sx-tab--active]="activeTab() === tab.value"
+          (click)="setTab(tab.value)">
+          <span class="material-symbols-rounded" aria-hidden="true">{{ tab.icon }}</span>
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+
+    <!-- ══════════ Title ══════════ -->
+    <div class="sx-field">
+      <label class="sx-label" for="sharex-title">
+        Title
+        <span class="sx-label-hint">optional</span>
+      </label>
+      <input
+        id="sharex-title"
+        type="text"
+        class="sx-input"
+        placeholder="Give your share a name..."
+        [ngModel]="title()"
+        (ngModelChange)="title.set($event)"
+        autocomplete="off">
+    </div>
+
+    <!-- ══════════ Text Content ══════════ -->
+    @if (activeTab() === 'text' || activeTab() === 'both') {
+      <div class="sx-field">
+        <div class="sx-field-row">
+          <label class="sx-label" for="sharex-content">Content</label>
+          <div class="sx-content-type-pills">
+            @for (ct of contentTypes; track ct.value) {
+              <button
+                type="button"
+                class="sx-ct-pill"
+                [class.sx-ct-pill--active]="contentType() === ct.value"
+                (click)="contentType.set(ct.value)">
+                {{ ct.label }}
+              </button>
+            }
+          </div>
+        </div>
+        <textarea
+          id="sharex-content"
+          class="sx-textarea"
+          placeholder="Paste your text, code, or markdown here..."
+          rows="14"
+          [ngModel]="content()"
+          (ngModelChange)="content.set($event)"
+          spellcheck="false">
+        </textarea>
+      </div>
+    }
+
+    <!-- ══════════ File Upload ══════════ -->
+    @if (activeTab() === 'files' || activeTab() === 'both') {
+      <div class="sx-field">
+        <label class="sx-label">Files</label>
+        <app-file-dropzone
+          [files]="files()"
+          (filesChange)="onFilesChanged($event)" />
+      </div>
+    }
+
+    <!-- ══════════ Options ══════════ -->
+    <div class="sx-options-section">
+      <div class="sx-options-header">
+        <span class="material-symbols-rounded" aria-hidden="true">tune</span>
+        Options
+      </div>
+
+      <div class="sx-options-grid">
+        <div class="sx-field">
+          <label class="sx-label">Expiry</label>
+          <app-expiry-selector
+            [value]="expiryOption()"
+            (valueChange)="expiryOption.set($event)" />
+        </div>
+
+        <div class="sx-field sx-field--toggle">
+          <div class="sx-toggle-row">
+            <div class="sx-toggle-info">
+              <label class="sx-label">Burn after reading</label>
+              <span class="sx-toggle-hint">Content is deleted after first view</span>
+            </div>
+            <button
+              type="button"
+              class="sx-toggle"
+              [class.sx-toggle--on]="isBurnAfterRead()"
+              (click)="isBurnAfterRead.set(!isBurnAfterRead())"
+              role="switch"
+              [attr.aria-checked]="isBurnAfterRead()">
+              <span class="sx-toggle-thumb"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ Error ══════════ -->
+    @if (error()) {
+      <div class="sx-error-bar">
+        <span class="material-symbols-rounded" aria-hidden="true">error</span>
+        {{ error() }}
+      </div>
+    }
+
+    <!-- ══════════ Submit ══════════ -->
+    <button
+      type="button"
+      class="sx-btn-create"
+      [disabled]="isCreating()"
+      (click)="createShare()"
+      id="sharex-create-btn">
+      @if (isCreating()) {
+        <span class="sx-spinner" aria-hidden="true"></span>
+        Creating...
+      } @else {
+        <span class="material-symbols-rounded" aria-hidden="true">bolt</span>
+        Create Share
+      }
+    </button>
+  </div>
+</div>
+
+<!-- ══════════ Result Modal ══════════ -->
+@if (createdShare()) {
+  <app-share-result-modal
+    [share]="createdShare()!"
+    (closed)="closeModal()" />
+}

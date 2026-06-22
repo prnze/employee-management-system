@@ -1,0 +1,37 @@
+<div class="sx-modal-backdrop" (click)="onBackdropClick()">
+  <div class="sx-modal" (click)="$event.stopPropagation()">
+    <div class="sx-modal-glow" aria-hidden="true"></div>
+
+    <div class="sx-modal-header">
+      <div class="sx-modal-success-ring">
+        <span class="material-symbols-rounded">check</span>
+      </div>
+      <h2 class="sx-modal-title">Share Created</h2>
+      <p class="sx-modal-subtitle">Your content is ready to share. The link will auto-expire as configured.</p>
+    </div>
+
+    <div class="sx-modal-body">
+      <label class="sx-modal-label">Share Link</label>
+      <div class="sx-modal-link-box">
+        <span class="sx-modal-link-url">{{ shareUrl }}</span>
+        <button type="button" class="sx-modal-link-copy" (click)="copyLink()" [title]="copied() ? 'Copied!' : 'Copy link'">
+          <span class="material-symbols-rounded">{{ copied() ? 'check' : 'content_copy' }}</span>
+        </button>
+      </div>
+      @if (copied()) {
+        <span class="sx-modal-copied-toast">
+          <span class="material-symbols-rounded">check_circle</span>
+          Copied to clipboard
+        </span>
+      }
+    </div>
+
+    <div class="sx-modal-footer">
+      <button type="button" class="sx-modal-btn-secondary" (click)="closed.emit()">Close</button>
+      <a class="sx-modal-btn-primary" [href]="shareUrl" target="_blank" rel="noopener noreferrer">
+        <span class="material-symbols-rounded">open_in_new</span>
+        Open Share
+      </a>
+    </div>
+  </div>
+</div>

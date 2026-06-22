@@ -1,0 +1,38 @@
+<div class="sx-aurora" aria-hidden="true">
+  <div class="sx-aurora-blob sx-aurora-blob--purple"></div>
+  <div class="sx-aurora-blob sx-aurora-blob--cyan"></div>
+  <div class="sx-aurora-blob sx-aurora-blob--emerald"></div>
+</div>
+
+<nav class="sx-nav" aria-label="ShareX navigation">
+  <a class="sx-nav-brand" routerLink="/sharex">
+    <span class="sx-nav-brand-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span class="sx-nav-brand-text">ShareX</span>
+  </a>
+  <div class="sx-nav-links">
+    <a routerLink="/sharex/create" routerLinkActive="sx-nav-link--active" class="sx-nav-link">
+      <span class="material-symbols-rounded" aria-hidden="true">add_circle</span>
+      Create
+    </a>
+    <a routerLink="/sharex/about" routerLinkActive="sx-nav-link--active" class="sx-nav-link">
+      <span class="material-symbols-rounded" aria-hidden="true">info</span>
+      About
+    </a>
+  </div>
+</nav>
+
+<main class="sx-main" id="sharex-main-content">
+  <router-outlet />
+</main>
+
+<footer class="sx-footer">
+  <div class="sx-footer-inner">
+    <span class="sx-footer-brand">ShareX</span>
+    <span class="sx-footer-separator">·</span>
+    <span class="sx-footer-text">Temporary sharing, made beautiful.</span>
+  </div>
+</footer>

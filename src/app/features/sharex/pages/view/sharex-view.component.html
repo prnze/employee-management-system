@@ -1,0 +1,105 @@
+<div class="sx-view">
+  <!-- ══════════ Loading ══════════ -->
+  @if (loading()) {
+    <div class="sx-view-state">
+      <div class="sx-spinner-lg" aria-label="Loading"></div>
+      <p>Loading share...</p>
+    </div>
+  }
+
+  <!-- ══════════ Not Found / Expired ══════════ -->
+  @else if (!shareData()) {
+    <div class="sx-view-state">
+      <div class="sx-expired-icon">
+        <span class="material-symbols-rounded">link_off</span>
+      </div>
+      <h2>Share not found</h2>
+      <p>This share has expired, reached its view limit, or doesn't exist.</p>
+      <a routerLink="/sharex/create" class="sx-btn-primary">
+        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+        Create a new share
+      </a>
+    </div>
+  }
+
+  <!-- ══════════ Share Content ══════════ -->
+  @else {
+    <div class="sx-view-card">
+      <!-- Header -->
+      <div class="sx-view-header">
+        @if (shareData()!.share.title) {
+          <h1 class="sx-view-title">{{ shareData()!.share.title }}</h1>
+        } @else {
+          <h1 class="sx-view-title sx-view-title--untitled">Untitled Share</h1>
+        }
+
+        <div class="sx-view-meta">
+          <span class="sx-meta-chip">
+            <span class="material-symbols-rounded" aria-hidden="true">schedule</span>
+            {{ timeAgo(shareData()!.share.created_at) }}
+          </span>
+          @if (shareData()!.share.expiry_at) {
+            <span class="sx-meta-chip sx-meta-chip--expiry">
+              <span class="material-symbols-rounded" aria-hidden="true">timer</span>
+              Expires in {{ timeUntil(shareData()!.share.expiry_at!) }}
+            </span>
+          }
+          <span class="sx-meta-chip">
+            <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+            {{ shareData()!.share.view_count }} views
+          </span>
+          @if (shareData()!.share.is_burn_after_read) {
+            <span class="sx-meta-chip sx-meta-chip--burn">
+              <span class="material-symbols-rounded" aria-hidden="true">local_fire_department</span>
+              Burn after read
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Content -->
+      @if (shareData()!.share.content) {
+        <div class="sx-view-content-section">
+          <div class="sx-view-content-toolbar">
+            <span class="sx-content-type-badge">
+              <span class="material-symbols-rounded" aria-hidden="true">code</span>
+              {{ shareData()!.share.content_type }}
+            </span>
+            <button type="button" class="sx-copy-btn" (click)="copyContent()" id="sharex-copy-content">
+              <span class="material-symbols-rounded" aria-hidden="true">{{ copied() ? 'check' : 'content_copy' }}</span>
+              {{ copied() ? 'Copied!' : 'Copy' }}
+            </button>
+          </div>
+          <app-content-viewer
+            [content]="shareData()!.share.content!"
+            [contentType]="getContentType()"
+            [language]="shareData()!.share.language ?? null" />
+        </div>
+      }
+
+      <!-- Files -->
+      @if (shareData()!.files.length > 0) {
+        <div class="sx-view-files-section">
+          <h3 class="sx-view-section-title">
+            <span class="material-symbols-rounded" aria-hidden="true">attach_file</span>
+            Files
+            <span class="sx-file-count">{{ shareData()!.files.length }}</span>
+          </h3>
+          <app-file-list [files]="shareData()!.files" />
+        </div>
+      }
+
+      <!-- Actions -->
+      <div class="sx-view-actions">
+        <button type="button" class="sx-btn-copy-link" (click)="copyLink()" id="sharex-copy-link">
+          <span class="material-symbols-rounded" aria-hidden="true">{{ linkCopied() ? 'check' : 'link' }}</span>
+          {{ linkCopied() ? 'Link Copied!' : 'Copy Link' }}
+        </button>
+        <a routerLink="/sharex/create" class="sx-btn-new">
+          <span class="material-symbols-rounded" aria-hidden="true">add</span>
+          New Share
+        </a>
+      </div>
+    </div>
+  }
+</div>
