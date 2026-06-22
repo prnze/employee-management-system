@@ -60,7 +60,7 @@ describe('LanguageService', () => {
   it('should persist language to localStorage on switch', () => {
     service.setLanguage('de');
     TestBed.flushEffects();
-    expect(localStorage.getItem('ems_language')).toBe('de');
+    expect(JSON.parse(localStorage.getItem('ems_language') ?? 'null')).toBe('de');
   });
 
   it('should restore language from localStorage on init', () => {
@@ -86,9 +86,4 @@ describe('LanguageService', () => {
     expect(service.currentCode()).toBe('en');
   });
 
-  it('should provide instant() translation', () => {
-    const result = service.instant('NAV_DASHBOARD');
-    // Instant returns the key or value depending on loading state
-    expect(typeof result).toBe('string');
-  });
 });

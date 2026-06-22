@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostListener,
+  computed,
   inject,
   signal
 } from '@angular/core';
@@ -15,10 +16,13 @@ import {
   trigger
 } from '@angular/animations';
 import { Meta, Title } from '@angular/platform-browser';
+import { TranslatePipe } from '@ngx-translate/core';
+import { LanguageService } from '@core/services/language.service';
+import { LocalStorageService } from '@core/services/local-storage.service';
 
 interface Project {
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   technologies: string[];
   liveUrl: string;
   githubUrl: string;
@@ -26,14 +30,35 @@ interface Project {
 }
 
 interface SkillGroup {
-  title: string;
+  titleKey: string;
   index: string;
   skills: string[];
+}
+
+type PortfolioTheme = 'light' | 'dark';
+
+const PORTFOLIO_THEME_KEY = 'portfolio_theme';
+const PORTFOLIO_FONT_KEY = 'portfolio_font';
+const PORTFOLIO_ACCENT_KEY = 'portfolio_accent';
+
+interface FontOption {
+  id: string;
+  labelKey: string;
+  family: string;
+}
+
+interface AccentOption {
+  id: string;
+  labelKey: string;
+  color: string;
+  lightColor: string;
+  rgb: string;
 }
 
 @Component({
   selector: 'app-landing',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,26 +80,93 @@ export class LandingComponent {
   private readonly document = inject(DOCUMENT);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
+  private readonly languageService = inject(LanguageService);
+  private readonly storage = inject(LocalStorageService);
 
   readonly menuOpen = signal(false);
   readonly scrolled = signal(false);
+  readonly settingsOpen = signal(false);
+  readonly portfolioTheme = signal<PortfolioTheme>(this.resolveInitialTheme());
+  readonly selectedFontId = signal(this.resolveInitialFont());
+  readonly selectedAccentId = signal(this.resolveInitialAccent());
+  readonly currentLanguage = this.languageService.currentCode;
   readonly year = new Date().getFullYear();
 
+  readonly fontOptions: FontOption[] = [
+    {
+      id: 'inter',
+      labelKey: 'LANDING.SETTINGS.FONTS.INTER',
+      family: 'Inter, "Segoe UI", sans-serif'
+    },
+    {
+      id: 'poppins',
+      labelKey: 'LANDING.SETTINGS.FONTS.POPPINS',
+      family: 'Poppins, Inter, "Segoe UI", sans-serif'
+    },
+    {
+      id: 'outfit',
+      labelKey: 'LANDING.SETTINGS.FONTS.OUTFIT',
+      family: 'Outfit, Inter, "Segoe UI", sans-serif'
+    },
+    {
+      id: 'plus-jakarta',
+      labelKey: 'LANDING.SETTINGS.FONTS.PLUS_JAKARTA',
+      family: '"Plus Jakarta Sans", Inter, "Segoe UI", sans-serif'
+    },
+    {
+      id: 'space-grotesk',
+      labelKey: 'LANDING.SETTINGS.FONTS.SPACE_GROTESK',
+      family: '"Space Grotesk", Inter, "Segoe UI", sans-serif'
+    }
+  ];
+
+  readonly accentOptions: AccentOption[] = [
+    { id: 'blue', labelKey: 'LANDING.SETTINGS.ACCENTS.BLUE', color: '#7cc7ff', lightColor: '#2563eb', rgb: '124, 199, 255' },
+    { id: 'purple', labelKey: 'LANDING.SETTINGS.ACCENTS.PURPLE', color: '#b39cff', lightColor: '#7c3aed', rgb: '179, 156, 255' },
+    { id: 'cyan', labelKey: 'LANDING.SETTINGS.ACCENTS.CYAN', color: '#67e8f9', lightColor: '#0891b2', rgb: '103, 232, 249' },
+    { id: 'emerald', labelKey: 'LANDING.SETTINGS.ACCENTS.EMERALD', color: '#c7f36b', lightColor: '#7c9d24', rgb: '199, 243, 107' },
+    { id: 'orange', labelKey: 'LANDING.SETTINGS.ACCENTS.ORANGE', color: '#ffb36b', lightColor: '#ea580c', rgb: '255, 179, 107' },
+    { id: 'red', labelKey: 'LANDING.SETTINGS.ACCENTS.RED', color: '#ff8a8a', lightColor: '#dc2626', rgb: '255, 138, 138' },
+    { id: 'rose', labelKey: 'LANDING.SETTINGS.ACCENTS.ROSE', color: '#ff9ac2', lightColor: '#e11d48', rgb: '255, 154, 194' }
+  ];
+
+  readonly selectedFont = computed(() =>
+    this.fontOptions.find((font) => font.id === this.selectedFontId()) ?? this.fontOptions[0]
+  );
+
+  readonly selectedAccent = computed(() =>
+    this.accentOptions.find((accent) => accent.id === this.selectedAccentId()) ?? this.accentOptions[3]
+  );
+
+  readonly accentColor = computed(() =>
+    this.portfolioTheme() === 'light' ? this.selectedAccent().lightColor : this.selectedAccent().color
+  );
+
+  readonly accentRgb = computed(() => this.selectedAccent().rgb);
+
   readonly navItems = [
-    { label: 'About', href: '#about' },
-    { label: 'Experience', href: '#experience' },
-    { label: 'Work', href: '#work' },
-    { label: 'Skills', href: '#skills' },
-    { label: 'Contact', href: '#contact' }
+    { labelKey: 'LANDING.NAV.ABOUT', href: '#about' },
+    { labelKey: 'LANDING.NAV.EXPERIENCE', href: '#experience' },
+    { labelKey: 'LANDING.NAV.WORK', href: '#work' },
+    { labelKey: 'LANDING.NAV.SKILLS', href: '#skills' },
+    { labelKey: 'LANDING.NAV.CONTACT', href: '#contact' }
   ];
 
   readonly projects: Project[] = [
     {
-      title: 'Employee Management System',
-      description: 'A production-grade workforce platform with secure authentication, real-time operations, database-level audit trails, and role-aware experiences for administrators and employees.',
+      titleKey: 'LANDING.PROJECTS.ITEMS.EMS.TITLE',
+      descriptionKey: 'LANDING.PROJECTS.ITEMS.EMS.DESCRIPTION',
       technologies: [
-        'Angular 19', 'TypeScript', 'Signals', 'RxJS', 'Supabase Auth',
-        'PostgreSQL', 'Storage', 'Realtime', 'RLS', 'Database Triggers'
+        'LANDING.PROJECTS.TECH.ANGULAR',
+        'LANDING.PROJECTS.TECH.TYPESCRIPT',
+        'LANDING.PROJECTS.TECH.SIGNALS',
+        'LANDING.PROJECTS.TECH.RXJS',
+        'LANDING.PROJECTS.TECH.SUPABASE_AUTH',
+        'LANDING.PROJECTS.TECH.POSTGRESQL',
+        'LANDING.PROJECTS.TECH.STORAGE',
+        'LANDING.PROJECTS.TECH.REALTIME',
+        'LANDING.PROJECTS.TECH.RLS',
+        'LANDING.PROJECTS.TECH.TRIGGERS'
       ],
       liveUrl: 'https://princelj.vercel.app/ems',
       githubUrl: 'https://github.com/prnze/employee-management-system',
@@ -85,26 +177,47 @@ export class LandingComponent {
   readonly skillGroups: SkillGroup[] = [
     {
       index: '01',
-      title: 'Frontend',
-      skills: ['Angular', 'TypeScript', 'JavaScript', 'HTML', 'CSS', 'SCSS', 'RxJS', 'Signals']
+      titleKey: 'LANDING.SKILLS.GROUPS.FRONTEND.TITLE',
+      skills: [
+        'LANDING.SKILLS.ITEMS.ANGULAR',
+        'LANDING.SKILLS.ITEMS.TYPESCRIPT',
+        'LANDING.SKILLS.ITEMS.JAVASCRIPT',
+        'LANDING.SKILLS.ITEMS.HTML',
+        'LANDING.SKILLS.ITEMS.CSS',
+        'LANDING.SKILLS.ITEMS.SCSS',
+        'LANDING.SKILLS.ITEMS.RXJS',
+        'LANDING.SKILLS.ITEMS.SIGNALS'
+      ]
     },
     {
       index: '02',
-      title: 'Backend & data',
-      skills: ['Supabase', 'PostgreSQL', 'Authentication', 'Row Level Security', 'Realtime']
+      titleKey: 'LANDING.SKILLS.GROUPS.BACKEND.TITLE',
+      skills: [
+        'LANDING.SKILLS.ITEMS.SUPABASE',
+        'LANDING.SKILLS.ITEMS.POSTGRESQL',
+        'LANDING.SKILLS.ITEMS.AUTHENTICATION',
+        'LANDING.SKILLS.ITEMS.RLS',
+        'LANDING.SKILLS.ITEMS.REALTIME'
+      ]
     },
     {
       index: '03',
-      title: 'Tools',
-      skills: ['Git', 'GitHub', 'Vercel', 'Figma', 'Chrome DevTools']
+      titleKey: 'LANDING.SKILLS.GROUPS.TOOLS.TITLE',
+      skills: [
+        'LANDING.SKILLS.ITEMS.GIT',
+        'LANDING.SKILLS.ITEMS.GITHUB',
+        'LANDING.SKILLS.ITEMS.VERCEL',
+        'LANDING.SKILLS.ITEMS.FIGMA',
+        'LANDING.SKILLS.ITEMS.CHROME_DEVTOOLS'
+      ]
     }
   ];
 
   readonly certifications = [
-    ['Full Stack with Python Programming', 'GUVI'],
-    ['JavaScript', 'GUVI'],
-    ['Java', 'Merjersofttech'],
-    ['UI/UX', 'Srishti Innovative, Technopark TVM']
+    ['LANDING.CERTIFICATIONS.ITEMS.FULL_STACK.TITLE', 'LANDING.CERTIFICATIONS.ITEMS.FULL_STACK.ISSUER'],
+    ['LANDING.CERTIFICATIONS.ITEMS.JAVASCRIPT.TITLE', 'LANDING.CERTIFICATIONS.ITEMS.JAVASCRIPT.ISSUER'],
+    ['LANDING.CERTIFICATIONS.ITEMS.JAVA.TITLE', 'LANDING.CERTIFICATIONS.ITEMS.JAVA.ISSUER'],
+    ['LANDING.CERTIFICATIONS.ITEMS.UI_UX.TITLE', 'LANDING.CERTIFICATIONS.ITEMS.UI_UX.ISSUER']
   ];
 
   constructor() {
@@ -147,5 +260,69 @@ export class LandingComponent {
 
   closeMenu(): void {
     this.menuOpen.set(false);
+  }
+
+  setPortfolioLanguage(code: string): void {
+    this.languageService.setLanguage(code);
+    this.closeMenu();
+  }
+
+  toggleSettings(event?: Event): void {
+    event?.stopPropagation();
+    this.settingsOpen.update((open) => !open);
+  }
+
+  closeSettings(): void {
+    this.settingsOpen.set(false);
+  }
+
+  setPortfolioTheme(theme: PortfolioTheme): void {
+    this.portfolioTheme.set(theme);
+    this.storage.set(PORTFOLIO_THEME_KEY, theme, localStorage);
+  }
+
+  setPortfolioFont(id: string): void {
+    if (!this.fontOptions.some((font) => font.id === id)) return;
+    this.selectedFontId.set(id);
+    this.storage.set(PORTFOLIO_FONT_KEY, id, localStorage);
+  }
+
+  setPortfolioAccent(id: string): void {
+    if (!this.accentOptions.some((accent) => accent.id === id)) return;
+    this.selectedAccentId.set(id);
+    this.storage.set(PORTFOLIO_ACCENT_KEY, id, localStorage);
+  }
+
+  private resolveInitialTheme(): PortfolioTheme {
+    const storedTheme = this.storage.get<PortfolioTheme>(PORTFOLIO_THEME_KEY, localStorage);
+    if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme;
+
+    const prefersLight = this.document.defaultView?.matchMedia('(prefers-color-scheme: light)').matches;
+    return prefersLight ? 'light' : 'dark';
+  }
+
+  private resolveInitialFont(): string {
+    const storedFont = this.storage.get<string>(PORTFOLIO_FONT_KEY, localStorage);
+    if (storedFont && this.fontOptions?.some((font) => font.id === storedFont)) return storedFont;
+    return 'inter';
+  }
+
+  private resolveInitialAccent(): string {
+    const storedAccent = this.storage.get<string>(PORTFOLIO_ACCENT_KEY, localStorage);
+    if (storedAccent && this.accentOptions?.some((accent) => accent.id === storedAccent)) return storedAccent;
+    return 'emerald';
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('.settings-dock')) {
+      this.closeSettings();
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeSettings();
   }
 }

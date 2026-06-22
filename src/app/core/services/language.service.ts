@@ -1,5 +1,6 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { LocalStorageService } from './local-storage.service';
 
 export interface Language {
   code: string;
@@ -20,6 +21,7 @@ const DEFAULT_LANG = 'en';
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
   private readonly translateService = inject(TranslateService);
+  private readonly storage = inject(LocalStorageService);
 
   /** Currently active language code — source of truth. */
   private readonly activeCode = signal<string>(this.resolveInitialLanguage());
@@ -35,12 +37,11 @@ export class LanguageService {
   );
 
   constructor() {
-    // Apply stored / detected language on startup
+    // Apply stored language on startup.
     this.translateService.use(this.activeCode());
 
-    // Persist language to localStorage whenever it changes
     effect(() => {
-      localStorage.setItem(STORAGE_KEY, this.activeCode());
+      this.storage.set(STORAGE_KEY, this.activeCode(), localStorage);
     });
   }
 
@@ -52,19 +53,18 @@ export class LanguageService {
     this.translateService.use(code);
   }
 
-  /** Convenience instant translation (synchronous, for non-template usage). */
-  instant(key: string, params?: Record<string, unknown>): string {
-    return String(this.translateService.instant(key, params));
-  }
-
   private resolveInitialLanguage(): string {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = this.readStoredLanguage();
     if (stored && SUPPORTED_LANGUAGES.some((l) => l.code === stored)) return stored;
 
-    // Browser preference
-    const browserLang = navigator.language.split('-')[0];
-    if (SUPPORTED_LANGUAGES.some((l) => l.code === browserLang)) return browserLang;
-
     return DEFAULT_LANG;
+  }
+
+  private readStoredLanguage(): string | null {
+    try {
+      return this.storage.get<string>(STORAGE_KEY, localStorage);
+    } catch {
+      return localStorage.getItem(STORAGE_KEY);
+    }
   }
 }

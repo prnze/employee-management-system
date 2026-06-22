@@ -889,20 +889,203 @@
   "ATTEND_STATUS_LEAVE": "Urlaub",
   "ATTEND_STATUS_HOLIDAY": "Feiertag",
   "ATTEND_STATUS_WEEKEND": "Wochenende",
-  "LANDING_HERO_TITLE": "Unternehmens-Workforce-Plattform",
-  "LANDING_HERO_SUBTITLE": "Moderne HR-, Analyse- & Workforce-Abläufe",
-  "LANDING_GET_STARTED": "Erste Schritte",
-  "LANDING_WATCH_DEMO": "Demo ansehen",
-  "LANDING_LOG_IN": "Einloggen",
-  "LANDING_FEATURE_1_TITLE": "Mitarbeiterverwaltung",
-  "LANDING_FEATURE_1_DESC": "Verwalten Sie Profile, Onboarding, Lebenszyklus und Dokumentation nahtlos.",
-  "LANDING_FEATURE_2_TITLE": "Analysen & Berichte",
-  "LANDING_FEATURE_2_DESC": "Erhalten Sie Echtzeit-Einblicke mit hochdichter Verfolgung und Metrik-Dashboards.",
-  "LANDING_FEATURE_3_TITLE": "Compliance & Sicherheit",
-  "LANDING_FEATURE_3_DESC": "Setzen Sie Unternehmensrichtlinien, Rollenberechtigungs-Kontrollen und Prüfprotokolle durch.",
-  "LANDING_STAT_1": "10K+ aktive Mitarbeiter",
-  "LANDING_STAT_2": "250+ Berichte erstellt",
-  "LANDING_STAT_3": "99.9% Plattform-Uptime",
+  "LANDING": {
+    "BRAND": { "MARK": "P", "NAME": "Prince L J", "INITIALS": "PLJ", "HOME_ARIA": "Prince L J, Startseite" },
+    "ICONS": { "EXTERNAL": "\u2197", "DOWN": "\u2193", "DOWN_LEFT": "\u2199" },
+    "NAV": {
+      "ARIA": "Hauptnavigation",
+      "TOGGLE": "Navigation umschalten",
+      "ABOUT": "\u00dcber mich",
+      "EXPERIENCE": "Erfahrung",
+      "WORK": "Arbeiten",
+      "SKILLS": "Skills",
+      "CONTACT": "Kontakt",
+      "CTA": "Kontakt aufnehmen"
+    },
+    "CONTROLS": {
+      "LANGUAGE_ARIA": "Portfolio-Sprache",
+      "THEME_ARIA": "Portfolio-Design umschalten",
+      "EN": "EN",
+      "DE": "DE",
+      "LIGHT": "Hell",
+      "DARK": "Dunkel"
+    },
+    "SETTINGS": {
+      "TITLE": "Anpassen",
+      "BUTTON_ARIA": "Portfolio-Einstellungen \u00f6ffnen",
+      "LANGUAGE": "Sprache",
+      "ENGLISH": "English",
+      "DEUTSCH": "Deutsch",
+      "THEME": "Design",
+      "DARK": "Dunkel",
+      "LIGHT": "Hell",
+      "TYPOGRAPHY": "Typografie",
+      "ACCENT_COLOR": "Akzentfarbe",
+      "FONTS": {
+        "INTER": "Inter",
+        "POPPINS": "Poppins",
+        "OUTFIT": "Outfit",
+        "PLUS_JAKARTA": "Plus Jakarta Sans",
+        "SPACE_GROTESK": "Space Grotesk"
+      },
+      "ACCENTS": {
+        "BLUE": "Blau",
+        "PURPLE": "Violett",
+        "CYAN": "Cyan",
+        "EMERALD": "Smaragd",
+        "ORANGE": "Orange",
+        "RED": "Rot",
+        "ROSE": "Rose"
+      }
+    },
+    "HERO": {
+      "EYEBROW": "Verf\u00fcgbar f\u00fcr sinnvolle Frontend-Arbeit",
+      "TITLE_LINE_1": "Ich entwickle durchdachte",
+      "TITLE_LINE_2": "digitale Erlebnisse.",
+      "INTRO_PREFIX": "Ich bin",
+      "INTRO_SUFFIX": "Associate Software Engineer und Front-End Developer mit mehr als 1,5 Jahren Erfahrung im Aufbau skalierbarer Angular-Anwendungen.",
+      "HIGHLIGHTS_ARIA": "Berufliche Schwerpunkte",
+      "TAG_ENGINEER": "Associate Software Engineer",
+      "TAG_FRONTEND": "Front-End Developer",
+      "TAG_EXPERIENCE": "1,5+ Jahre",
+      "PRIMARY_ACTION": "Ausgew\u00e4hlte Arbeiten ansehen",
+      "RESUME_ACTION": "Lebenslauf anfragen",
+      "SOCIAL_ARIA": "Social Links",
+      "SUMMARY_ARIA": "Berufliches Profil",
+      "META_LOCATION": "Basierend in Indien",
+      "META_STACK": "Angular \u00b7 TypeScript \u00b7 Supabase",
+      "SCROLL_ARIA": "Zum \u00dcber-mich-Bereich scrollen",
+      "SCROLL_TEXT": "Weiter entdecken"
+    },
+    "SOCIAL": { "GITHUB": "GitHub", "LINKEDIN": "LinkedIn", "CONTACT": "Kontakt" },
+    "ABOUT": {
+      "NUMBER": "01",
+      "KICKER": "\u00dcber mich",
+      "TITLE": "Ich entwickle Interfaces, die klar, leistungsf\u00e4hig und menschlich wirken.",
+      "PARAGRAPH_1": "Ich spezialisiere mich auf Angular und TypeScript und \u00fcbersetze komplexe Anforderungen in zuverl\u00e4ssige, zug\u00e4ngliche Produkte, die angenehm zu nutzen und einfach zu warten sind.",
+      "PARAGRAPH_2": "Bei SJS Business Solutions arbeite ich an Enterprise-Anwendungen und Healthcare-Plattformen, mit Schwerpunkten auf dynamischen Formularen, Analytics, Internationalisierung, Berechtigungen, PDF-Workflows und patientenzentrierten Erlebnissen.",
+      "STATS": {
+        "EXPERIENCE": { "VALUE": "1,5+", "LABEL": "Jahre Produktentwicklung" },
+        "ANGULAR": { "VALUE": "19+", "LABEL": "Angular-Expertise" },
+        "CURIOSITY": { "VALUE": "100%", "LABEL": "Neugier, immer" }
+      }
+    },
+    "EXPERIENCE": {
+      "NUMBER": "02",
+      "KICKER": "Erfahrung",
+      "TITLE": "Wo ich gebaut habe.",
+      "SUBTITLE": "Produktionsarbeit, gepr\u00e4gt von echten Nutzern, sensiblen Daten und ambitionierten Produktzielen.",
+      "START": "Juni 2024",
+      "END": "Heute",
+      "ROLE": "Associate Software Engineer",
+      "COMPANY": "SJS Business Solutions",
+      "COMPANY_ALIAS": "(Sodisys)",
+      "STATUS": "Aktuelle Rolle",
+      "FEATURED_LABEL": "Ausgew\u00e4hltes Produkt",
+      "PRODUCT": "RefCare",
+      "DESCRIPTION": "Eine Krankenhausmanagement-Plattform zur Koordination der Patientenversorgung und zur Darstellung von Krankheitsanalysen \u00fcber sichere, mehrsprachige Workflows.",
+      "FEATURES": {
+        "RBAC": "Rollenbasierter Zugriff",
+        "FORMS": "Dynamische Formulare",
+        "PDF": "PDF-Erstellung",
+        "ANALYTICS": "Analytics-Dashboards",
+        "PATIENTS": "Patientenverwaltung",
+        "I18N": "Internationalisierung"
+      }
+    },
+    "PROJECTS": {
+      "NUMBER": "03",
+      "KICKER": "Ausgew\u00e4hlte Arbeiten",
+      "TITLE": "Gebaut, um zu l\u00f6sen, nicht nur zu zeigen.",
+      "SUBTITLE": "Pers\u00f6nliche Projekte, in denen Architektur, Feinschliff und praktisches Produktdenken zusammenkommen.",
+      "FEATURED": "Ausgew\u00e4hltes Projekt",
+      "PREVIEW_URL": "princelj.vercel.app/ems",
+      "PREVIEW_BRAND": "EMS",
+      "LIVE_DEMO": "Live-Demo",
+      "ITEMS": {
+        "EMS": {
+          "TITLE": "Employee Management System",
+          "DESCRIPTION": "Eine produktionsreife Workforce-Plattform mit sicherer Authentifizierung, Echtzeitprozessen, Audit-Trails auf Datenbankebene und rollenbewussten Erlebnissen f\u00fcr Administratoren und Mitarbeiter."
+        }
+      },
+      "TECH": {
+        "ANGULAR": "Angular 19",
+        "TYPESCRIPT": "TypeScript",
+        "SIGNALS": "Signals",
+        "RXJS": "RxJS",
+        "SUPABASE_AUTH": "Supabase Auth",
+        "POSTGRESQL": "PostgreSQL",
+        "STORAGE": "Storage",
+        "REALTIME": "Realtime",
+        "RLS": "RLS",
+        "TRIGGERS": "Database Triggers"
+      }
+    },
+    "SKILLS": {
+      "NUMBER": "04",
+      "KICKER": "F\u00e4higkeiten",
+      "TITLE": "Tools, mit denen ich denke.",
+      "SUBTITLE": "Ein fokussiertes Toolkit f\u00fcr Design und Umsetzung moderner Webanwendungen.",
+      "GROUPS": {
+        "FRONTEND": { "TITLE": "Frontend" },
+        "BACKEND": { "TITLE": "Backend & Daten" },
+        "TOOLS": { "TITLE": "Tools" }
+      },
+      "ITEMS": {
+        "ANGULAR": "Angular",
+        "TYPESCRIPT": "TypeScript",
+        "JAVASCRIPT": "JavaScript",
+        "HTML": "HTML",
+        "CSS": "CSS",
+        "SCSS": "SCSS",
+        "RXJS": "RxJS",
+        "SIGNALS": "Signals",
+        "SUPABASE": "Supabase",
+        "POSTGRESQL": "PostgreSQL",
+        "AUTHENTICATION": "Authentifizierung",
+        "RLS": "Row Level Security",
+        "REALTIME": "Realtime",
+        "GIT": "Git",
+        "GITHUB": "GitHub",
+        "VERCEL": "Vercel",
+        "FIGMA": "Figma",
+        "CHROME_DEVTOOLS": "Chrome DevTools"
+      }
+    },
+    "EDUCATION": {
+      "NUMBER": "05",
+      "KICKER": "Fundament",
+      "LABEL": "Ausbildung",
+      "YEAR": "2020-2024",
+      "DEGREE_LINE_1": "B.Tech",
+      "DEGREE_LINE_2": "Information Technology",
+      "SCHOOL": "St. Xavier's Catholic College of Engineering"
+    },
+    "CERTIFICATIONS": {
+      "LABEL": "Zertifizierungen",
+      "ITEMS": {
+        "FULL_STACK": { "TITLE": "Full Stack mit Python Programming", "ISSUER": "GUVI" },
+        "JAVASCRIPT": { "TITLE": "JavaScript", "ISSUER": "GUVI" },
+        "JAVA": { "TITLE": "Java", "ISSUER": "Merjersofttech" },
+        "UI_UX": { "TITLE": "UI/UX", "ISSUER": "Srishti Innovative, Technopark TVM" }
+      }
+    },
+    "CONTACT": {
+      "EYEBROW": "Ein Projekt oder eine Gelegenheit?",
+      "TITLE_LINE_1": "Lass uns etwas bauen,",
+      "TITLE_LINE_2": "das man gern nutzt.",
+      "EMAIL": "prince2002@protonmail.com",
+      "LOCATION_LABEL": "Standort",
+      "LOCATION_VALUE": "Indien \u00b7 Offen f\u00fcr Remote",
+      "ELSEWHERE_LABEL": "Anderswo",
+      "CURRENTLY_LABEL": "Aktuell",
+      "CURRENTLY_VALUE": "Aufbau skalierbarer Angular-Produkte"
+    },
+    "FOOTER": {
+      "BUILT": "Mit Absicht designt & entwickelt.",
+      "COPYRIGHT": "\u00a9 {{year}} Prince L J"
+    }
+  },
   "PUBLIC_BRAND_TITLE": "Unternehmens-Workforce-Plattform",
   "PUBLIC_BRAND_SUBTITLE": "Moderne HR-, Analyse- & Workforce-Abläufe",
   "PUBLIC_FEATURE_RBAC_TITLE": "Zugriffsverwaltung",
@@ -912,5 +1095,3 @@
   "PUBLIC_FEATURE_RUNTIME_TITLE": "Flexible Konfiguration",
   "PUBLIC_FEATURE_RUNTIME_DESC": "Sitzungsdauer und Sicherheitsrichtlinien dynamisch verwalten."
 }
-
-
