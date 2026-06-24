@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Meta, Title } from '@angular/platform-browser';
+import { SeoService } from '@core/services/seo.service';
 
 @Component({
   selector: 'app-sharex-home',
@@ -11,9 +11,30 @@ import { Meta, Title } from '@angular/platform-browser';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SharexHomeComponent {
-  constructor(title: Title, meta: Meta) {
-    title.setTitle('ShareX — Temporary Text & File Sharing');
-    meta.updateTag({ name: 'description', content: 'Share text, code, and files with unique self-destructing links. No account needed. Powered by Angular and Supabase.' });
+  private readonly seo = inject(SeoService);
+
+  constructor() {
+    const canonical = SeoService.canonicalUrl('/sharex');
+
+    this.seo.update({
+      title: 'ShareX — Temporary Text & File Sharing',
+      description: 'Share text, code, and files with unique self-destructing links. No account needed. Powered by Angular and Supabase.',
+      url: canonical,
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'WebApplication',
+        'name': 'ShareX',
+        'description': 'Temporary text and file sharing with self-destructing links.',
+        'url': canonical,
+        'applicationCategory': 'UtilityApplication',
+        'operatingSystem': 'Web',
+        'author': {
+          '@type': 'Person',
+          'name': 'Prince L J',
+          'url': SeoService.canonicalUrl('/')
+        }
+      }
+    });
   }
 
   readonly features = [

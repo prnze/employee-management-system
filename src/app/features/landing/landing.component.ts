@@ -15,10 +15,10 @@ import {
   transition,
   trigger
 } from '@angular/animations';
-import { Meta, Title } from '@angular/platform-browser';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LanguageService } from '@core/services/language.service';
 import { LocalStorageService } from '@core/services/local-storage.service';
+import { SeoService } from '@core/services/seo.service';
 
 interface Project {
   titleKey: string;
@@ -78,8 +78,7 @@ interface AccentOption {
 })
 export class LandingComponent {
   private readonly document = inject(DOCUMENT);
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(SeoService);
   private readonly languageService = inject(LanguageService);
   private readonly storage = inject(LocalStorageService);
 
@@ -221,32 +220,32 @@ export class LandingComponent {
   ];
 
   constructor() {
-    const pageTitle = 'Prince L J | Associate Software Engineer | Angular Developer';
-    const description = 'Prince L J is an Associate Software Engineer with 1.5+ years of experience specializing in Angular, TypeScript, Supabase and PostgreSQL.';
-    const canonical = 'https://prnze.in/';
+    const canonical = SeoService.canonicalUrl('/');
 
-    this.title.setTitle(pageTitle);
-    this.meta.updateTag({ name: 'description', content: description });
-    this.meta.updateTag({ name: 'author', content: 'Prince L J' });
-    this.meta.updateTag({ name: 'robots', content: 'index, follow, max-image-preview:large' });
-    this.meta.updateTag({ property: 'og:type', content: 'website' });
-    this.meta.updateTag({ property: 'og:title', content: pageTitle });
-    this.meta.updateTag({ property: 'og:description', content: description });
-    this.meta.updateTag({ property: 'og:url', content: canonical });
-    this.meta.updateTag({ property: 'og:site_name', content: 'Prince L J' });
-    this.meta.updateTag({ property: 'og:image', content: `${canonical}portfolio-preview.svg` });
-    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
-    this.meta.updateTag({ name: 'twitter:title', content: pageTitle });
-    this.meta.updateTag({ name: 'twitter:description', content: description });
-    this.meta.updateTag({ name: 'twitter:image', content: `${canonical}portfolio-preview.svg` });
-
-    let canonicalLink = this.document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-    if (!canonicalLink) {
-      canonicalLink = this.document.createElement('link');
-      canonicalLink.rel = 'canonical';
-      this.document.head.appendChild(canonicalLink);
-    }
-    canonicalLink.href = canonical;
+    this.seo.update({
+      title: 'Prince L J | Associate Software Engineer | Angular Developer',
+      description: 'Prince L J is an Associate Software Engineer with 1.5+ years of experience specializing in Angular, TypeScript, Supabase and PostgreSQL.',
+      url: canonical,
+      image: `${canonical}assets/profile.jpg`,
+      keywords: 'Prince L J, Prince LJ, princelj, Angular Developer, Associate Software Engineer, Front-End Developer, TypeScript Developer, Supabase Developer, PostgreSQL',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        'name': 'Prince L J',
+        'alternateName': ['Prince LJ', 'princelj'],
+        'jobTitle': 'Associate Software Engineer',
+        'description': 'Front-End Developer specializing in Angular, TypeScript, Supabase and PostgreSQL.',
+        'url': canonical,
+        'image': `${canonical}assets/profile.jpg`,
+        'email': 'mailto:prince2002@protonmail.com',
+        'sameAs': [
+          'https://github.com/prnze',
+          'https://www.linkedin.com/in/prnze/'
+        ],
+        'knowsAbout': ['Angular', 'TypeScript', 'Supabase', 'PostgreSQL', 'Frontend Development'],
+        'nationality': 'India'
+      }
+    });
   }
 
   @HostListener('window:scroll')
