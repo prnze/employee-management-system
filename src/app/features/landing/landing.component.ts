@@ -168,7 +168,7 @@ export class LandingComponent {
         'LANDING.PROJECTS.TECH.RLS',
         'LANDING.PROJECTS.TECH.TRIGGERS'
       ],
-      liveUrl: 'https://princelj.vercel.app/ems',
+      liveUrl: 'https://prnze.in/ems',
       githubUrl: 'https://github.com/prnze/employee-management-system',
       featured: true
     }
@@ -223,7 +223,7 @@ export class LandingComponent {
   constructor() {
     const pageTitle = 'Prince L J | Associate Software Engineer | Angular Developer';
     const description = 'Prince L J is an Associate Software Engineer with 1.5+ years of experience specializing in Angular, TypeScript, Supabase and PostgreSQL.';
-    const canonical = 'https://princelj.vercel.app/';
+    const canonical = 'https://prnze.in/';
 
     this.title.setTitle(pageTitle);
     this.meta.updateTag({ name: 'description', content: description });
