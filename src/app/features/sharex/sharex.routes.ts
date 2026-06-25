@@ -14,6 +14,10 @@ export const SHAREX_ROUTES: Routes = [
         loadComponent: () => import('./pages/create/sharex-create.component').then((m) => m.SharexCreateComponent)
       },
       {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/dashboard/sharex-dashboard.component').then((m) => m.SharexDashboardComponent)
+      },
+      {
         path: 's/:code',
         loadComponent: () => import('./pages/view/sharex-view.component').then((m) => m.SharexViewComponent)
       },

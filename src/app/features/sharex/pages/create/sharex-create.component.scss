@@ -264,6 +264,85 @@
   gap: 20px;
 }
 
+// ── Label Icon ──────────────────────────────────────────────────────────────
+
+.sx-label-icon {
+  font-size: 0.95rem !important;
+  vertical-align: -2px;
+  margin-right: 2px;
+  opacity: 0.7;
+}
+
+// ── Password Field ──────────────────────────────────────────────────────────
+
+.sx-password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sx-input--password {
+  padding-right: 48px !important;
+}
+
+.sx-password-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  .material-symbols-rounded { font-size: 1.1rem; }
+
+  &:hover {
+    color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+// ── View Limit Pills ────────────────────────────────────────────────────────
+
+.sx-view-limit-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sx-vl-pill {
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
+  font-family: var(--sx-font, 'Inter', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover:not(.sx-vl-pill--active) {
+    color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  &--active {
+    background: rgba(139, 92, 246, 0.12);
+    border-color: rgba(139, 92, 246, 0.25);
+    color: #a78bfa;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+  }
+}
+
 // ── Toggle ──────────────────────────────────────────────────────────────────
 
 .sx-toggle-row {

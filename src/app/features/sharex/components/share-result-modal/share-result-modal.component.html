@@ -2,6 +2,7 @@
   <div class="sx-modal" (click)="$event.stopPropagation()">
     <div class="sx-modal-glow" aria-hidden="true"></div>
 
+    <!-- Header -->
     <div class="sx-modal-header">
       <div class="sx-modal-success-ring">
         <span class="material-symbols-rounded">check</span>
@@ -10,15 +11,33 @@
       <p class="sx-modal-subtitle">Your content is ready to share. The link will auto-expire as configured.</p>
     </div>
 
+    <!-- QR Code -->
+    <div class="sx-modal-qr-section">
+      @if (qrDataUrl()) {
+        <div class="sx-modal-qr-container">
+          <img [src]="qrDataUrl()!" alt="QR Code for share link" class="sx-modal-qr-image" />
+        </div>
+      }
+    </div>
+
+    <!-- Share Code -->
     <div class="sx-modal-body">
-      <label class="sx-modal-label">Share Link</label>
+      <label class="sx-modal-label">Share Code</label>
+      <div class="sx-modal-code-badge" (click)="copyShareCode()">
+        <span class="sx-modal-code-text">{{ shareCode }}</span>
+        <span class="material-symbols-rounded sx-modal-code-copy">
+          {{ codeCopied() ? 'check' : 'content_copy' }}
+        </span>
+      </div>
+
+      <label class="sx-modal-label" style="margin-top: 16px;">Share Link</label>
       <div class="sx-modal-link-box">
         <span class="sx-modal-link-url">{{ shareUrl }}</span>
         <button type="button" class="sx-modal-link-copy" (click)="copyLink()" [title]="copied() ? 'Copied!' : 'Copy link'">
           <span class="material-symbols-rounded">{{ copied() ? 'check' : 'content_copy' }}</span>
         </button>
       </div>
-      @if (copied()) {
+      @if (copied() || codeCopied()) {
         <span class="sx-modal-copied-toast">
           <span class="material-symbols-rounded">check_circle</span>
           Copied to clipboard
@@ -26,12 +45,35 @@
       }
     </div>
 
+    <!-- Actions Grid -->
+    <div class="sx-modal-actions">
+      <button type="button" class="sx-modal-action-btn" (click)="copyLink()" id="sharex-modal-copy-link">
+        <span class="material-symbols-rounded">link</span>
+        <span>Copy Link</span>
+      </button>
+      <button type="button" class="sx-modal-action-btn" (click)="copyShareCode()" id="sharex-modal-copy-code">
+        <span class="material-symbols-rounded">tag</span>
+        <span>Copy Code</span>
+      </button>
+      <button type="button" class="sx-modal-action-btn" (click)="openLink()" id="sharex-modal-open-link">
+        <span class="material-symbols-rounded">open_in_new</span>
+        <span>Open Link</span>
+      </button>
+      <button type="button" class="sx-modal-action-btn" (click)="downloadQR()" id="sharex-modal-download-qr">
+        <span class="material-symbols-rounded">qr_code_2</span>
+        <span>Download QR</span>
+      </button>
+      @if (canShare()) {
+        <button type="button" class="sx-modal-action-btn sx-modal-action-btn--share" (click)="nativeShare()" id="sharex-modal-share">
+          <span class="material-symbols-rounded">share</span>
+          <span>Share…</span>
+        </button>
+      }
+    </div>
+
+    <!-- Footer -->
     <div class="sx-modal-footer">
       <button type="button" class="sx-modal-btn-secondary" (click)="closed.emit()">Close</button>
-      <a class="sx-modal-btn-primary" [href]="shareUrl" target="_blank" rel="noopener noreferrer">
-        <span class="material-symbols-rounded">open_in_new</span>
-        Open Share
-      </a>
     </div>
   </div>
 </div>

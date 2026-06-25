@@ -1,0 +1,189 @@
+<div class="sx-dashboard">
+  <!-- Header -->
+  <div class="sx-dashboard-header">
+    <h1>My <span class="sx-gradient-text">Shares</span></h1>
+    <p>Manage your shared content and track views.</p>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="sx-stats-bar">
+    <div class="sx-stat-card">
+      <span class="material-symbols-rounded sx-stat-icon" aria-hidden="true">inventory_2</span>
+      <div class="sx-stat-info">
+        <span class="sx-stat-value">{{ totalShares() }}</span>
+        <span class="sx-stat-label">Total Shares</span>
+      </div>
+    </div>
+    <div class="sx-stat-card">
+      <span class="material-symbols-rounded sx-stat-icon sx-stat-icon--active" aria-hidden="true">radio_button_checked</span>
+      <div class="sx-stat-info">
+        <span class="sx-stat-value">{{ activeShares() }}</span>
+        <span class="sx-stat-label">Active</span>
+      </div>
+    </div>
+    <div class="sx-stat-card">
+      <span class="material-symbols-rounded sx-stat-icon sx-stat-icon--views" aria-hidden="true">visibility</span>
+      <div class="sx-stat-info">
+        <span class="sx-stat-value">{{ totalViews() }}</span>
+        <span class="sx-stat-label">Total Views</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  @if (shares().length > 0) {
+    <div class="sx-search-wrapper">
+      <span class="material-symbols-rounded sx-search-icon" aria-hidden="true">search</span>
+      <input
+        type="text"
+        class="sx-search-input"
+        placeholder="Search by title, code, or type..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="onSearch($event)"
+        id="sharex-dashboard-search"
+        autocomplete="off">
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="sx-dashboard-loading">
+      <div class="sx-spinner-lg" aria-label="Loading"></div>
+      <p>Loading your shares...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @else if (shares().length === 0) {
+    <div class="sx-dashboard-empty">
+      <div class="sx-empty-icon">
+        <span class="material-symbols-rounded">inbox</span>
+      </div>
+      <h2>No shares yet</h2>
+      <p>Create your first share to see it here.</p>
+      <a routerLink="/sharex/create" class="sx-btn-primary">
+        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+        Create a Share
+      </a>
+    </div>
+  }
+
+  <!-- No Search Results -->
+  @else if (filteredShares().length === 0) {
+    <div class="sx-dashboard-empty">
+      <div class="sx-empty-icon sx-empty-icon--search">
+        <span class="material-symbols-rounded">search_off</span>
+      </div>
+      <h2>No matches</h2>
+      <p>Try a different search term.</p>
+    </div>
+  }
+
+  <!-- Share Cards Grid -->
+  @else {
+    <div class="sx-cards-grid">
+      @for (share of filteredShares(); track share.id) {
+        <div class="sx-share-card" [class.sx-share-card--expired]="share.status === 'expired'" [class.sx-share-card--burned]="share.status === 'burned'">
+          <!-- Card Header -->
+          <div class="sx-card-header">
+            <div class="sx-card-type-icon">
+              <span class="material-symbols-rounded">{{ getTypeIcon(share.type) }}</span>
+            </div>
+            <div class="sx-card-title-area">
+              <h3 class="sx-card-title">{{ share.title }}</h3>
+              <span class="sx-card-type-label">{{ share.type === 'mixed' ? 'Mixed Content' : share.type === 'files' ? 'Files' : 'Text' }}</span>
+            </div>
+            <div class="sx-card-status sx-card-status--{{ share.status }}">
+              {{ getStatusLabel(share.status) }}
+            </div>
+          </div>
+
+          <!-- Card Chips -->
+          <div class="sx-card-chips">
+            @if (share.passwordProtected) {
+              <span class="sx-chip sx-chip--password">
+                <span class="material-symbols-rounded">lock</span>
+                Password
+              </span>
+            }
+            @if (share.burnAfterRead) {
+              <span class="sx-chip sx-chip--burn">
+                <span class="material-symbols-rounded">local_fire_department</span>
+                Burn After Read
+              </span>
+            }
+            @if (share.viewCount !== undefined && share.viewLimit) {
+              <span class="sx-chip sx-chip--views">
+                <span class="material-symbols-rounded">visibility</span>
+                {{ share.viewCount }} / {{ share.viewLimit }} Views
+              </span>
+            } @else if (share.viewCount !== undefined) {
+              <span class="sx-chip">
+                <span class="material-symbols-rounded">visibility</span>
+                {{ share.viewCount }} Views
+              </span>
+            }
+            @if (share.expiresAt && share.status !== 'expired') {
+              <span class="sx-chip sx-chip--expiry">
+                <span class="material-symbols-rounded">timer</span>
+                Expires in {{ timeUntil(share.expiresAt) }}
+              </span>
+            } @else if (share.status === 'expired') {
+              <span class="sx-chip sx-chip--expired">
+                <span class="material-symbols-rounded">timer_off</span>
+                Expired
+              </span>
+            }
+          </div>
+
+          <!-- Card Footer -->
+          <div class="sx-card-footer">
+            <span class="sx-card-date">{{ timeAgo(share.createdAt) }}</span>
+            <div class="sx-card-actions">
+              <a [href]="getShareUrl(share.code)" target="_blank" rel="noopener noreferrer"
+                 class="sx-card-action" title="Open">
+                <span class="material-symbols-rounded">open_in_new</span>
+              </a>
+              <button type="button" class="sx-card-action" (click)="copyLink(share)"
+                      [title]="linkCopied() === share.id ? 'Copied!' : 'Copy Link'">
+                <span class="material-symbols-rounded">{{ linkCopied() === share.id ? 'check' : 'content_copy' }}</span>
+              </button>
+              <button type="button" class="sx-card-action sx-card-action--delete"
+                      (click)="confirmDelete(share)" title="Delete">
+                <span class="material-symbols-rounded">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- ══════════ Delete Confirmation Dialog ══════════ -->
+@if (deleteTarget()) {
+  <div class="sx-confirm-backdrop" (click)="cancelDelete()">
+    <div class="sx-confirm-dialog" (click)="$event.stopPropagation()">
+      <div class="sx-confirm-icon">
+        <span class="material-symbols-rounded">delete_forever</span>
+      </div>
+      <h3 class="sx-confirm-title">Delete Share?</h3>
+      <p class="sx-confirm-text">
+        This will permanently delete <strong>"{{ deleteTarget()!.title }}"</strong> and
+        cannot be undone.
+      </p>
+      <div class="sx-confirm-actions">
+        <button type="button" class="sx-confirm-btn-cancel" (click)="cancelDelete()">Cancel</button>
+        <button type="button" class="sx-confirm-btn-delete" (click)="executeDelete()" [disabled]="isDeleting()">
+          @if (isDeleting()) {
+            <span class="sx-spinner" aria-hidden="true"></span>
+            Deleting...
+          } @else {
+            <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+            Delete
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

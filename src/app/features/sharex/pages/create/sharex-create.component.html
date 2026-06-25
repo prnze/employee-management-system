@@ -86,7 +86,53 @@
           <label class="sx-label">Expiry</label>
           <app-expiry-selector
             [value]="expiryOption()"
-            (valueChange)="expiryOption.set($event)" />
+            (valueChange)="expiryOption.set($event)"
+            (customDateChange)="customExpiryDate.set($event)" />
+        </div>
+
+        <!-- ── Password Protection ── -->
+        <div class="sx-field">
+          <label class="sx-label" for="sharex-password">
+            <span class="material-symbols-rounded sx-label-icon" aria-hidden="true">lock</span>
+            Password Protection
+            <span class="sx-label-hint">optional</span>
+          </label>
+          <div class="sx-password-wrapper">
+            <input
+              id="sharex-password"
+              [type]="showPassword() ? 'text' : 'password'"
+              class="sx-input sx-input--password"
+              placeholder="Set a password to protect this share..."
+              [ngModel]="password()"
+              (ngModelChange)="password.set($event)"
+              autocomplete="new-password">
+            <button
+              type="button"
+              class="sx-password-toggle"
+              (click)="showPassword.set(!showPassword())"
+              [title]="showPassword() ? 'Hide password' : 'Show password'">
+              <span class="material-symbols-rounded">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ── View Limit ── -->
+        <div class="sx-field">
+          <label class="sx-label">
+            <span class="material-symbols-rounded sx-label-icon" aria-hidden="true">visibility</span>
+            View Limit
+          </label>
+          <div class="sx-view-limit-pills">
+            @for (opt of viewLimitOptions; track opt.value) {
+              <button
+                type="button"
+                class="sx-vl-pill"
+                [class.sx-vl-pill--active]="viewLimit() === opt.value"
+                (click)="viewLimit.set(opt.value)">
+                {{ opt.label }}
+              </button>
+            }
+          </div>
         </div>
 
         <div class="sx-field sx-field--toggle">
@@ -141,3 +187,4 @@
     [share]="createdShare()!"
     (closed)="closeModal()" />
 }
+

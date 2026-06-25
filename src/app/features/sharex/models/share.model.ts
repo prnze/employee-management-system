@@ -29,7 +29,7 @@ export interface ShareFile {
 
 export type ContentType = 'text' | 'code' | 'markdown' | 'json';
 
-export type ExpiryOption = '10m' | '1h' | '1d' | '7d' | '30d' | 'never';
+export type ExpiryOption = '10m' | '1h' | '1d' | '7d' | '30d' | 'never' | 'custom';
 
 export interface CreateSharePayload {
   title?: string;
@@ -38,6 +38,7 @@ export interface CreateSharePayload {
   language?: string;
   password?: string;
   expiry_option: ExpiryOption;
+  custom_expiry_at?: string;
   view_limit?: number;
   is_burn_after_read?: boolean;
 }
@@ -48,7 +49,8 @@ export const EXPIRY_OPTIONS: { value: ExpiryOption; label: string; description: 
   { value: '1d', label: '1 day', description: 'Expires in 24 hours' },
   { value: '7d', label: '7 days', description: 'Expires in 7 days' },
   { value: '30d', label: '30 days', description: 'Expires in 30 days' },
-  { value: 'never', label: 'Never', description: 'Never expires' }
+  { value: 'never', label: 'Never', description: 'Never expires' },
+  { value: 'custom', label: 'Custom', description: 'Pick a specific date and time' }
 ];
 
 export const CONTENT_TYPES: { value: ContentType; label: string; icon: string }[] = [
@@ -64,8 +66,9 @@ export const CODE_LANGUAGES: string[] = [
   'php', 'swift', 'kotlin', 'dart', 'yaml', 'xml', 'markdown', 'plaintext'
 ];
 
-export function expiryToDate(option: ExpiryOption): string | null {
+export function expiryToDate(option: ExpiryOption, customDate?: string): string | null {
   if (option === 'never') return null;
+  if (option === 'custom') return customDate ? new Date(customDate).toISOString() : null;
   const durations: Record<string, number> = {
     '10m': 10 * 60 * 1000,
     '1h': 60 * 60 * 1000,

@@ -1,20 +1,20 @@
 <div class="sx-view">
   <!-- ══════════ Loading ══════════ -->
-  @if (loading()) {
+  @if (viewState() === 'loading') {
     <div class="sx-view-state">
       <div class="sx-spinner-lg" aria-label="Loading"></div>
       <p>Loading share...</p>
     </div>
   }
 
-  <!-- ══════════ Not Found / Expired ══════════ -->
-  @else if (!shareData()) {
+  <!-- ══════════ Not Found ══════════ -->
+  @else if (viewState() === 'not_found') {
     <div class="sx-view-state">
-      <div class="sx-expired-icon">
+      <div class="sx-state-icon sx-state-icon--not-found">
         <span class="material-symbols-rounded">link_off</span>
       </div>
-      <h2>Share not found</h2>
-      <p>This share has expired, reached its view limit, or doesn't exist.</p>
+      <h2>Share Not Found</h2>
+      <p>This share doesn't exist or may have been deleted.</p>
       <a routerLink="/sharex/create" class="sx-btn-primary">
         <span class="material-symbols-rounded" aria-hidden="true">add</span>
         Create a new share
@@ -22,9 +22,112 @@
     </div>
   }
 
+  <!-- ══════════ Expired ══════════ -->
+  @else if (viewState() === 'expired') {
+    <div class="sx-view-state">
+      <div class="sx-state-icon sx-state-icon--expired">
+        <span class="material-symbols-rounded">timer_off</span>
+      </div>
+      <h2>Share Expired</h2>
+      <p>This share has passed its expiration date and is no longer available.</p>
+      <a routerLink="/sharex/create" class="sx-btn-primary">
+        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+        Create a new share
+      </a>
+    </div>
+  }
+
+  <!-- ══════════ View Limit Reached ══════════ -->
+  @else if (viewState() === 'view_limit') {
+    <div class="sx-view-state">
+      <div class="sx-state-icon sx-state-icon--view-limit">
+        <span class="material-symbols-rounded">visibility_off</span>
+      </div>
+      <h2>View Limit Reached</h2>
+      <p>This share has reached its maximum number of views and is no longer accessible.</p>
+      <a routerLink="/sharex/create" class="sx-btn-primary">
+        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+        Create a new share
+      </a>
+    </div>
+  }
+
+  <!-- ══════════ Burned ══════════ -->
+  @else if (viewState() === 'burned') {
+    <div class="sx-view-state">
+      <div class="sx-state-icon sx-state-icon--burned">
+        <span class="material-symbols-rounded">local_fire_department</span>
+      </div>
+      <h2>Share Destroyed</h2>
+      <p>This was a burn-after-read share. It was viewed once and has been permanently destroyed.</p>
+      <a routerLink="/sharex/create" class="sx-btn-primary">
+        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+        Create a new share
+      </a>
+    </div>
+  }
+
+  <!-- ══════════ Password Locked ══════════ -->
+  @else if (viewState() === 'locked') {
+    <div class="sx-lock-screen">
+      <div class="sx-lock-card">
+        <div class="sx-lock-icon-ring">
+          <span class="material-symbols-rounded">lock</span>
+        </div>
+        <h2 class="sx-lock-title">Password Protected</h2>
+        <p class="sx-lock-subtitle">This share is locked. Enter the password to view its content.</p>
+
+        <form class="sx-lock-form" (submit)="$event.preventDefault(); unlockShare()">
+          <div class="sx-lock-input-wrapper">
+            <input
+              id="sharex-password-input"
+              type="password"
+              class="sx-lock-input"
+              [class.sx-lock-input--error]="passwordError()"
+              placeholder="Enter password..."
+              [ngModel]="passwordInput()"
+              (ngModelChange)="passwordInput.set($event)"
+              autocomplete="off"
+              autofocus>
+            <span class="sx-lock-input-icon material-symbols-rounded">key</span>
+          </div>
+
+          @if (passwordError()) {
+            <div class="sx-lock-error">
+              <span class="material-symbols-rounded">error</span>
+              Incorrect password. Please try again.
+            </div>
+          }
+
+          <button
+            type="submit"
+            class="sx-lock-btn"
+            [disabled]="isVerifying()"
+            id="sharex-unlock-btn">
+            @if (isVerifying()) {
+              <span class="sx-spinner" aria-hidden="true"></span>
+              Verifying...
+            } @else {
+              <span class="material-symbols-rounded" aria-hidden="true">lock_open</span>
+              Unlock Share
+            }
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+
   <!-- ══════════ Share Content ══════════ -->
-  @else {
+  @else if (viewState() === 'content') {
     <div class="sx-view-card">
+      <!-- Burn Warning Banner -->
+      @if (isBurned()) {
+        <div class="sx-burn-banner">
+          <span class="material-symbols-rounded" aria-hidden="true">local_fire_department</span>
+          <span>This content will be <strong>destroyed</strong> after you leave this page.</span>
+        </div>
+      }
+
       <!-- Header -->
       <div class="sx-view-header">
         @if (shareData()!.share.title) {
@@ -46,8 +149,18 @@
           }
           <span class="sx-meta-chip">
             <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
-            {{ shareData()!.share.view_count }} views
+            @if (getViewInfo()) {
+              {{ getViewInfo() }} views
+            } @else {
+              {{ shareData()!.share.view_count }} views
+            }
           </span>
+          @if (isPasswordProtected()) {
+            <span class="sx-meta-chip sx-meta-chip--password">
+              <span class="material-symbols-rounded" aria-hidden="true">lock</span>
+              Password protected
+            </span>
+          }
           @if (shareData()!.share.is_burn_after_read) {
             <span class="sx-meta-chip sx-meta-chip--burn">
               <span class="material-symbols-rounded" aria-hidden="true">local_fire_department</span>
