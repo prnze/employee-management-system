@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal }
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Meta, Title } from '@angular/platform-browser';
-import { SharexService } from '../../services/sharex.service';
+import { ProtectedShareMetadata, SharexService } from '../../services/sharex.service';
 import { ContentType, Share, ShareFile, formatFileSize, timeAgo, timeUntil } from '../../models/share.model';
 import { ContentViewerComponent } from '../../components/content-viewer/content-viewer.component';
 import { FileListComponent } from '../../components/file-list/file-list.component';
@@ -31,17 +31,16 @@ export class SharexViewComponent implements OnInit, OnDestroy {
   private readonly countdown = inject(ExpiryCountdownService);
 
   readonly viewState = signal<ViewState>('loading');
+  readonly shareMeta = signal<ProtectedShareMetadata | null>(null);
   readonly shareData = signal<ShareData | null>(null);
   readonly copied = signal(false);
   readonly linkCopied = signal(false);
   readonly isBurned = signal(false);
 
-  // Password
   readonly passwordInput = signal('');
   readonly passwordError = signal(false);
   readonly isVerifying = signal(false);
 
-  // Expiry countdown
   readonly countdownDisplay = signal<string | null>(null);
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -59,47 +58,46 @@ export class SharexViewComponent implements OnInit, OnDestroy {
     }
 
     try {
-      const result = await this.sharexService.getShareMeta(this.shareCode);
+      const result = await this.sharexService.fetchProtectedMetadata(this.shareCode);
 
       switch (result.status) {
         case 'not_found':
           this.viewState.set('not_found');
-          this.titleService.setTitle('Share Not Found — ShareX');
+          this.titleService.setTitle('Share Not Found - ShareX');
           return;
 
         case 'expired':
           this.viewState.set('expired');
-          this.titleService.setTitle('Share Expired — ShareX');
+          this.titleService.setTitle('Share Expired - ShareX');
           return;
 
         case 'view_limit':
           this.viewState.set('view_limit');
-          this.titleService.setTitle('View Limit Reached — ShareX');
+          this.titleService.setTitle('View Limit Reached - ShareX');
           return;
 
         case 'burned':
           this.viewState.set('burned');
-          this.titleService.setTitle('Share Destroyed — ShareX');
+          this.titleService.setTitle('Share Destroyed - ShareX');
           return;
 
         case 'ok':
-          this.shareData.set({ share: result.share, files: result.files });
-          const shareTitle = result.share.title || 'Shared Content';
-          this.titleService.setTitle(`${shareTitle} — ShareX`);
-          this.meta.updateTag({ name: 'description', content: `View shared content on ShareX: ${shareTitle}` });
+          if (!result.share) {
+            this.viewState.set('not_found');
+            return;
+          }
 
-          // Start expiry countdown if applicable
+          this.shareMeta.set(result.share);
+          this.configureShareHead(result.share);
+
           if (result.share.expiry_at) {
             this.startCountdown(result.share.expiry_at);
           }
 
-          // Check if password-protected
           if (result.share.password_hash) {
             this.viewState.set('locked');
           } else {
-            // No password — show content and record view
-            await this.onSuccessfulAccess(result.share);
-            this.viewState.set('content');
+            await this.loadFullShareAndRecordView(result.share.id);
           }
           break;
       }
@@ -119,7 +117,7 @@ export class SharexViewComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const share = this.shareData()?.share;
+    const share = this.shareMeta();
     if (!share?.password_hash) return;
 
     this.isVerifying.set(true);
@@ -129,8 +127,7 @@ export class SharexViewComponent implements OnInit, OnDestroy {
       const valid = await this.sharexService.verifyPassword(pwd, share.share_code, share.password_hash);
 
       if (valid) {
-        await this.onSuccessfulAccess(share);
-        this.viewState.set('content');
+        await this.loadFullShareAndRecordView(share.id, pwd);
       } else {
         this.passwordError.set(true);
         this.passwordInput.set('');
@@ -142,32 +139,12 @@ export class SharexViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Called after content is successfully accessed (password verified or no password).
-   * Records the view and handles burn-after-read marking.
-   *
-   * Burn-after-read uses a "delete on next access" pattern:
-   * - First view: content shown, view_count incremented to 1
-   * - Next access: getShareMeta sees view_count > 0, returns 'burned' status
-   * - No immediate file deletion — avoids accidental loss on page refresh
-   */
-  private async onSuccessfulAccess(share: Share): Promise<void> {
-    // Record the view
-    await this.sharexService.recordView(share.id, share.view_count);
-
-    // For burn-after-read: mark as consumed (view_count is now > 0).
-    // On next access, getShareMeta will return status 'burned'.
-    if (share.is_burn_after_read) {
-      this.isBurned.set(true);
-    }
-  }
-
   getContentType(): ContentType {
     return (this.shareData()?.share.content_type as ContentType) || 'text';
   }
 
   isPasswordProtected(): boolean {
-    return !!this.shareData()?.share.password_hash;
+    return !!(this.shareData()?.share.password_hash || this.shareMeta()?.password_hash);
   }
 
   getViewInfo(): string | null {
@@ -192,7 +169,7 @@ export class SharexViewComponent implements OnInit, OnDestroy {
   }
 
   async copyLink(): Promise<void> {
-    const code = this.shareData()?.share.share_code;
+    const code = this.shareData()?.share.share_code || this.shareMeta()?.share_code;
     if (!code) return;
     const url = this.sharexService.getShareUrl(code);
     await navigator.clipboard.writeText(url);
@@ -200,7 +177,35 @@ export class SharexViewComponent implements OnInit, OnDestroy {
     setTimeout(() => this.linkCopied.set(false), 2500);
   }
 
-  // ── Expiry Countdown ─────────────────────────────────────────────────────
+  private async loadFullShareAndRecordView(id: string, password?: string): Promise<void> {
+    const full = await this.sharexService.fetchFullShare(id, password);
+    this.shareData.set(full);
+    await this.onSuccessfulAccess(full.share);
+    this.viewState.set('content');
+  }
+
+  private configureShareHead(share: ProtectedShareMetadata | Share): void {
+    const shareTitle = share.title || 'Shared Content';
+    this.titleService.setTitle(`${shareTitle} - ShareX`);
+    this.meta.updateTag({ name: 'description', content: `View shared content on ShareX: ${shareTitle}` });
+  }
+
+  /**
+   * Called after content is successfully accessed (password verified or no password).
+   * Records the view and handles burn-after-read marking.
+   *
+   * Burn-after-read uses a "delete on next access" pattern:
+   * - First view: content shown, view_count incremented to 1
+   * - Next access: fetchProtectedMetadata sees view_count > 0, returns burned
+   * - No immediate file deletion; avoids accidental loss on page refresh
+   */
+  private async onSuccessfulAccess(share: Share): Promise<void> {
+    await this.sharexService.recordView(share.id, share.view_count);
+
+    if (share.is_burn_after_read) {
+      this.isBurned.set(true);
+    }
+  }
 
   private startCountdown(expiryAt: string): void {
     this.updateCountdown(expiryAt);

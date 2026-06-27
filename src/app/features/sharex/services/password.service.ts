@@ -10,7 +10,7 @@ export class PasswordService {
    */
   async hashPassword(password: string, shareCode: string): Promise<string> {
     const encoder = new TextEncoder();
-    const data = encoder.encode(`${password}:${shareCode}:${this.pepper}`);
+    const data = encoder.encode(`${password.trim()}:${shareCode.trim()}:${this.pepper}`);
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     return this.bufferToHex(hashBuffer);
   }

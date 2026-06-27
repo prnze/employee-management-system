@@ -29,16 +29,13 @@ export class SharexStorageService {
       if (uploadError) throw new Error(uploadError.message);
 
       const { data: record, error: dbError } = await this.supabase.client
-        .from('share_files')
-        .insert({
-          share_id: shareId,
-          file_name: displayPath,
-          storage_path: storagePath,
-          mime_type: file.type || 'application/octet-stream',
-          size: file.size
-        })
-        .select()
-        .single();
+        .rpc('sharex_add_file', {
+          p_share_id: shareId,
+          p_file_name: displayPath,
+          p_storage_path: storagePath,
+          p_mime_type: file.type || 'application/octet-stream',
+          p_size: file.size
+        });
 
       if (dbError) throw new Error(dbError.message);
       results.push(record as unknown as ShareFile);

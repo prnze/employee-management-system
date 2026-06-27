@@ -18,12 +18,9 @@ export class ShareCodeService {
    */
   async checkAvailability(code: string): Promise<{ available: boolean }> {
     const { data, error } = await this.supabase.client
-      .from('shares')
-      .select('id')
-      .eq('share_code', code)
-      .maybeSingle();
+      .rpc('sharex_check_code_available', { p_code: code });
 
     if (error) throw new Error(error.message);
-    return { available: !data };
+    return { available: !!data };
   }
 }
