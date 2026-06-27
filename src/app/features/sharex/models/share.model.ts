@@ -41,6 +41,7 @@ export interface CreateSharePayload {
   custom_expiry_at?: string;
   view_limit?: number;
   is_burn_after_read?: boolean;
+  custom_code?: string;
 }
 
 export const EXPIRY_OPTIONS: { value: ExpiryOption; label: string; description: string }[] = [
@@ -118,4 +119,35 @@ export function timeUntil(dateStr: string): string {
   if (hours < 24) return `${hours}h`;
   const days = Math.floor(hours / 24);
   return `${days}d`;
+}
+
+// ── Custom Share Code ─────────────────────────────────────────────────────
+
+export const RESERVED_CODES: string[] = [
+  'create', 'dashboard', 'about', 'settings', 'history',
+  'api', 'admin', 'login', 'register',
+  'ems', 'sharex', 's',
+  'assets', 'favicon', 'robots', 'sitemap'
+];
+
+export function isValidShareCode(code: string): { valid: boolean; error?: string } {
+  if (!code) return { valid: false, error: 'Code is required' };
+  if (code.length < 3) return { valid: false, error: 'Must be at least 3 characters' };
+  if (code.length > 32) return { valid: false, error: 'Must be 32 characters or fewer' };
+  if (!/^[a-z0-9-]+$/.test(code)) return { valid: false, error: 'Only lowercase letters, numbers, and hyphens' };
+  if (code.startsWith('-') || code.endsWith('-')) return { valid: false, error: 'Cannot start or end with a hyphen' };
+  if (code.includes('--')) return { valid: false, error: 'Cannot contain consecutive hyphens' };
+  if (RESERVED_CODES.includes(code)) return { valid: false, error: 'This code is reserved' };
+  return { valid: true };
+}
+
+export function normalizeSlug(input: string): string {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')  // remove special chars
+    .replace(/\s+/g, '-')          // spaces to hyphens
+    .replace(/-+/g, '-')           // collapse multiple hyphens
+    .replace(/^-+|-+$/g, '')       // trim leading/trailing hyphens
+    .slice(0, 32);                 // enforce max length
 }

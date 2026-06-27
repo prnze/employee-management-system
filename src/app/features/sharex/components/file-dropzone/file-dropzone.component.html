@@ -13,10 +13,16 @@
       </div>
       <p class="sx-dropzone-title">Drop files here</p>
       <p class="sx-dropzone-subtitle">or click to browse · Max 50 MB per file</p>
-      <button type="button" class="sx-dropzone-browse" (click)="fileInput.click()">
-        <span class="material-symbols-rounded">folder_open</span>
-        Browse Files
-      </button>
+      <div class="sx-dropzone-buttons">
+        <button type="button" class="sx-dropzone-browse" (click)="fileInput.click()">
+          <span class="material-symbols-rounded">folder_open</span>
+          Browse Files
+        </button>
+        <button type="button" class="sx-dropzone-browse sx-dropzone-browse--folder" (click)="folderInput.click()">
+          <span class="material-symbols-rounded">create_new_folder</span>
+          Browse Folder
+        </button>
+      </div>
     </div>
   } @else {
     <div class="sx-dropzone-files">
@@ -26,6 +32,12 @@
             <span class="material-symbols-rounded">{{ getFileIcon(file.type) }}</span>
           </div>
           <div class="sx-dropzone-file-info">
+            @if (hasFolder(file)) {
+              <span class="sx-dropzone-file-folder">
+                <span class="material-symbols-rounded">folder</span>
+                {{ getFolderPath(file) }}
+              </span>
+            }
             <span class="sx-dropzone-file-name">{{ file.name }}</span>
             <span class="sx-dropzone-file-size">{{ formatFileSize(file.size) }}</span>
           </div>
@@ -38,10 +50,16 @@
           </button>
         </div>
       }
-      <button type="button" class="sx-dropzone-add" (click)="fileInput.click()">
-        <span class="material-symbols-rounded">add</span>
-        Add more files
-      </button>
+      <div class="sx-dropzone-add-row">
+        <button type="button" class="sx-dropzone-add" (click)="fileInput.click()">
+          <span class="material-symbols-rounded">add</span>
+          Add files
+        </button>
+        <button type="button" class="sx-dropzone-add sx-dropzone-add--folder" (click)="folderInput.click()">
+          <span class="material-symbols-rounded">create_new_folder</span>
+          Add folder
+        </button>
+      </div>
     </div>
   }
 
@@ -51,5 +69,13 @@
     multiple
     (change)="onFileSelect($event)"
     #fileInput
+    hidden>
+
+  <input
+    type="file"
+    class="sx-dropzone-input"
+    webkitdirectory
+    (change)="onFolderSelect($event)"
+    #folderInput
     hidden>
 </div>

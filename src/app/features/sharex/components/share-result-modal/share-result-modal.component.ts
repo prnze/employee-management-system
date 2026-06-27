@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnInit, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { Share } from '../../models/share.model';
 import { SharexService } from '../../services/sharex.service';
 import { QrCodeService } from '../../services/qr-code.service';
+import { ExpiryCountdownService } from '../../services/expiry-countdown.service';
 
 @Component({
   selector: 'app-share-result-modal',
@@ -10,9 +11,10 @@ import { QrCodeService } from '../../services/qr-code.service';
   styleUrl: './share-result-modal.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ShareResultModalComponent implements OnInit {
+export class ShareResultModalComponent implements OnInit, OnDestroy {
   private readonly sharexService = inject(SharexService);
   private readonly qrService = inject(QrCodeService);
+  private readonly countdown = inject(ExpiryCountdownService);
 
   readonly share = input.required<Share>();
   readonly closed = output<void>();
@@ -21,6 +23,9 @@ export class ShareResultModalComponent implements OnInit {
   readonly codeCopied = signal(false);
   readonly qrDataUrl = signal<string | null>(null);
   readonly canShare = signal(false);
+  readonly countdownDisplay = signal<string | null>(null);
+
+  private countdownInterval: ReturnType<typeof setInterval> | null = null;
 
   get shareUrl(): string {
     return this.sharexService.getShareUrl(this.share().share_code);
@@ -41,6 +46,12 @@ export class ShareResultModalComponent implements OnInit {
     } catch {
       // QR generation failed — modal still works without it
     }
+
+    this.startCountdown();
+  }
+
+  ngOnDestroy(): void {
+    this.stopCountdown();
   }
 
   async copyLink(): Promise<void> {
@@ -79,5 +90,25 @@ export class ShareResultModalComponent implements OnInit {
 
   onBackdropClick(): void {
     this.closed.emit();
+  }
+
+  private startCountdown(): void {
+    const expiryAt = this.share().expiry_at;
+    if (!expiryAt) return;
+
+    const update = () => {
+      const value = this.countdown.format(expiryAt);
+      this.countdownDisplay.set(value);
+      if (value === 'Expired') this.stopCountdown();
+    };
+
+    update();
+    this.countdownInterval = setInterval(update, 1000);
+  }
+
+  private stopCountdown(): void {
+    if (!this.countdownInterval) return;
+    clearInterval(this.countdownInterval);
+    this.countdownInterval = null;
   }
 }

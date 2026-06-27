@@ -30,6 +30,13 @@
         </span>
       </div>
 
+      @if (countdownDisplay()) {
+        <div class="sx-modal-countdown">
+          <span class="material-symbols-rounded" aria-hidden="true">timer</span>
+          <span>Expires in: {{ countdownDisplay() }}</span>
+        </div>
+      }
+
       <label class="sx-modal-label" style="margin-top: 16px;">Share Link</label>
       <div class="sx-modal-link-box">
         <span class="sx-modal-link-url">{{ shareUrl }}</span>

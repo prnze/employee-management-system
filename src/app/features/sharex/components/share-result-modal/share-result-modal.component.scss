@@ -206,6 +206,25 @@
 
 // ── Link Box ────────────────────────────────────────────────────────────────
 
+.sx-modal-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.06);
+  border: 1px solid rgba(251, 191, 36, 0.14);
+  color: #fbbf24;
+  font-family: var(--sx-font-mono, monospace);
+  font-size: 0.76rem;
+  font-weight: 600;
+
+  .material-symbols-rounded {
+    font-size: 0.95rem;
+  }
+}
+
 .sx-modal-link-box {
   display: flex;
   align-items: center;

@@ -11,7 +11,7 @@ export class SharexService {
   private readonly passwordService = inject(PasswordService);
 
   async createShare(payload: CreateSharePayload): Promise<Share> {
-    const code = this.shareCode.generate();
+    const code = payload.custom_code || this.shareCode.generate();
     const expiryAt = expiryToDate(payload.expiry_option, payload.custom_expiry_at);
 
     let passwordHash: string | null = null;
@@ -35,7 +35,13 @@ export class SharexService {
       .select()
       .single();
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      // Handle unique constraint violation for custom codes
+      if (error.code === '23505' && payload.custom_code) {
+        throw new Error('This custom URL is already taken. Please choose another.');
+      }
+      throw new Error(error.message);
+    }
     return data as Share;
   }
 
@@ -89,6 +95,21 @@ export class SharexService {
     await this.supabase.client
       .from('shares')
       .update({ view_count: currentCount + 1 })
+      .eq('id', shareId);
+  }
+
+  async recordDownload(shareId: string): Promise<void> {
+    const { data } = await this.supabase.client
+      .from('shares')
+      .select('download_count')
+      .eq('id', shareId)
+      .single();
+
+    const currentCount = (data?.['download_count'] as number | undefined) ?? 0;
+
+    await this.supabase.client
+      .from('shares')
+      .update({ download_count: currentCount + 1 })
       .eq('id', shareId);
   }
 

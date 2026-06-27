@@ -19,7 +19,8 @@ export class SharexStorageService {
         throw new Error(`File "${file.name}" is empty.`);
       }
 
-      const storagePath = `${shareId}/${Date.now()}_${this.sanitizeFileName(file.name)}`;
+      const displayPath = this.getRelativePath(file);
+      const storagePath = `${shareId}/${Date.now()}_${this.sanitizePath(displayPath)}`;
 
       const { error: uploadError } = await this.supabase.client.storage
         .from(this.bucket)
@@ -31,7 +32,7 @@ export class SharexStorageService {
         .from('share_files')
         .insert({
           share_id: shareId,
-          file_name: file.name,
+          file_name: displayPath,
           storage_path: storagePath,
           mime_type: file.type || 'application/octet-stream',
           size: file.size
@@ -72,7 +73,16 @@ export class SharexStorageService {
     await this.supabase.client.storage.from(this.bucket).remove(paths);
   }
 
-  private sanitizeFileName(name: string): string {
-    return name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  private getRelativePath(file: File): string {
+    const relativePath = (file as File & { webkitRelativePath?: string }).webkitRelativePath;
+    return relativePath || file.name;
+  }
+
+  private sanitizePath(path: string): string {
+    return path
+      .split('/')
+      .filter(Boolean)
+      .map((segment) => segment.replace(/[^a-zA-Z0-9._-]/g, '_'))
+      .join('/');
   }
 }

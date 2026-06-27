@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Meta, Title } from '@angular/platform-browser';
 import { SharexService } from '../../services/sharex.service';
-import { Share, timeAgo, timeUntil } from '../../models/share.model';
+import { Share, timeAgo } from '../../models/share.model';
 import { LocalShare } from '../create/sharex-create.component';
+import { ExpiryCountdownService } from '../../services/expiry-countdown.service';
 
 type ShareStatus = 'active' | 'expired' | 'burned' | 'view_limit';
 
@@ -22,14 +23,17 @@ interface DashboardShare extends LocalShare {
   styleUrl: './sharex-dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SharexDashboardComponent implements OnInit {
+export class SharexDashboardComponent implements OnInit, OnDestroy {
   private readonly sharexService = inject(SharexService);
+  private readonly countdown = inject(ExpiryCountdownService);
 
   readonly shares = signal<DashboardShare[]>([]);
   readonly filteredShares = signal<DashboardShare[]>([]);
   readonly searchQuery = signal('');
   readonly isLoading = signal(true);
   readonly linkCopied = signal<string | null>(null);
+  readonly countdownTick = signal(Date.now());
+  private countdownInterval: ReturnType<typeof setInterval> | null = null;
 
   // Delete confirmation dialog
   readonly deleteTarget = signal<DashboardShare | null>(null);
@@ -41,15 +45,21 @@ export class SharexDashboardComponent implements OnInit {
   readonly totalViews = signal(0);
 
   readonly timeAgo = timeAgo;
-  readonly timeUntil = timeUntil;
-
   constructor(titleService: Title, meta: Meta) {
     titleService.setTitle('Dashboard — ShareX');
     meta.updateTag({ name: 'description', content: 'Manage your shared content. View stats, copy links, and delete shares.' });
   }
 
   async ngOnInit(): Promise<void> {
+    this.countdownInterval = setInterval(() => this.countdownTick.set(Date.now()), 1000);
     await this.loadShares();
+  }
+
+  ngOnDestroy(): void {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+      this.countdownInterval = null;
+    }
   }
 
   private async loadShares(): Promise<void> {
@@ -164,6 +174,11 @@ export class SharexDashboardComponent implements OnInit {
 
   getShareUrl(code: string): string {
     return this.sharexService.getShareUrl(code);
+  }
+
+  countdownFor(expiresAt: string | null): string {
+    this.countdownTick();
+    return this.countdown.format(expiresAt) ?? '';
   }
 
   getTypeIcon(type: string): string {

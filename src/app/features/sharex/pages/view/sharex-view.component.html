@@ -141,7 +141,12 @@
             <span class="material-symbols-rounded" aria-hidden="true">schedule</span>
             {{ timeAgo(shareData()!.share.created_at) }}
           </span>
-          @if (shareData()!.share.expiry_at) {
+          @if (countdownDisplay()) {
+            <span class="sx-meta-chip sx-meta-chip--countdown">
+              <span class="material-symbols-rounded" aria-hidden="true">timer</span>
+              {{ countdownDisplay() }}
+            </span>
+          } @else if (shareData()!.share.expiry_at) {
             <span class="sx-meta-chip sx-meta-chip--expiry">
               <span class="material-symbols-rounded" aria-hidden="true">timer</span>
               Expires in {{ timeUntil(shareData()!.share.expiry_at!) }}
@@ -167,6 +172,91 @@
               Burn after read
             </span>
           }
+        </div>
+      </div>
+
+      <!-- ══════════ Metadata Panel ══════════ -->
+      <div class="sx-metadata-panel">
+        <div class="sx-metadata-grid">
+          <div class="sx-metadata-item">
+            <span class="sx-metadata-label">
+              <span class="material-symbols-rounded">calendar_today</span>
+              Created
+            </span>
+            <span class="sx-metadata-value">{{ timeAgo(shareData()!.share.created_at) }}</span>
+          </div>
+
+          <div class="sx-metadata-item">
+            <span class="sx-metadata-label">
+              <span class="material-symbols-rounded">timer</span>
+              Expires
+            </span>
+            <span class="sx-metadata-value" [class.sx-metadata-value--countdown]="countdownDisplay()">
+              @if (countdownDisplay()) {
+                {{ countdownDisplay() }}
+              } @else if (shareData()!.share.expiry_at) {
+                {{ timeUntil(shareData()!.share.expiry_at!) }}
+              } @else {
+                Never
+              }
+            </span>
+          </div>
+
+          <div class="sx-metadata-item">
+            <span class="sx-metadata-label">
+              <span class="material-symbols-rounded">visibility</span>
+              Views
+            </span>
+            <span class="sx-metadata-value">
+              @if (getViewInfo()) {
+                {{ getViewInfo() }}
+              } @else {
+                {{ shareData()!.share.view_count }}
+              }
+            </span>
+          </div>
+
+          <div class="sx-metadata-item">
+            <span class="sx-metadata-label">
+              <span class="material-symbols-rounded">download</span>
+              Downloads
+            </span>
+            <span class="sx-metadata-value">{{ shareData()!.share.download_count }}</span>
+          </div>
+
+          @if (shareData()!.files.length > 0) {
+            <div class="sx-metadata-item">
+              <span class="sx-metadata-label">
+                <span class="material-symbols-rounded">attach_file</span>
+                Files
+              </span>
+              <span class="sx-metadata-value">{{ shareData()!.files.length }}</span>
+            </div>
+
+            <div class="sx-metadata-item">
+              <span class="sx-metadata-label">
+                <span class="material-symbols-rounded">database</span>
+                Total Size
+              </span>
+              <span class="sx-metadata-value">{{ getTotalFileSize() }}</span>
+            </div>
+          }
+
+          <div class="sx-metadata-item">
+            <span class="sx-metadata-label">
+              <span class="material-symbols-rounded">lock</span>
+              Protected
+            </span>
+            <span class="sx-metadata-value">{{ isPasswordProtected() ? 'Yes' : 'No' }}</span>
+          </div>
+
+          <div class="sx-metadata-item">
+            <span class="sx-metadata-label">
+              <span class="material-symbols-rounded">local_fire_department</span>
+              Burn after read
+            </span>
+            <span class="sx-metadata-value">{{ shareData()!.share.is_burn_after_read ? 'Yes' : 'No' }}</span>
+          </div>
         </div>
       </div>
 
@@ -198,7 +288,7 @@
             Files
             <span class="sx-file-count">{{ shareData()!.files.length }}</span>
           </h3>
-          <app-file-list [files]="shareData()!.files" />
+          <app-file-list [files]="shareData()!.files" [expiryAt]="shareData()!.share.expiry_at" />
         </div>
       }
 

@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Meta, Title } from '@angular/platform-browser';
 import { SharexService } from '../../services/sharex.service';
-import { ContentType, Share, ShareFile, timeAgo, timeUntil } from '../../models/share.model';
+import { ContentType, Share, ShareFile, formatFileSize, timeAgo, timeUntil } from '../../models/share.model';
 import { ContentViewerComponent } from '../../components/content-viewer/content-viewer.component';
 import { FileListComponent } from '../../components/file-list/file-list.component';
+import { ExpiryCountdownService } from '../../services/expiry-countdown.service';
 
 type ViewState = 'loading' | 'locked' | 'content' | 'not_found' | 'burned' | 'expired' | 'view_limit';
 
@@ -22,11 +23,12 @@ interface ShareData {
   styleUrl: './sharex-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SharexViewComponent implements OnInit {
+export class SharexViewComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly sharexService = inject(SharexService);
   private readonly titleService = inject(Title);
   private readonly meta = inject(Meta);
+  private readonly countdown = inject(ExpiryCountdownService);
 
   readonly viewState = signal<ViewState>('loading');
   readonly shareData = signal<ShareData | null>(null);
@@ -39,8 +41,13 @@ export class SharexViewComponent implements OnInit {
   readonly passwordError = signal(false);
   readonly isVerifying = signal(false);
 
+  // Expiry countdown
+  readonly countdownDisplay = signal<string | null>(null);
+  private countdownInterval: ReturnType<typeof setInterval> | null = null;
+
   readonly timeAgo = timeAgo;
   readonly timeUntil = timeUntil;
+  readonly formatFileSize = formatFileSize;
 
   private shareCode = '';
 
@@ -81,6 +88,11 @@ export class SharexViewComponent implements OnInit {
           this.titleService.setTitle(`${shareTitle} — ShareX`);
           this.meta.updateTag({ name: 'description', content: `View shared content on ShareX: ${shareTitle}` });
 
+          // Start expiry countdown if applicable
+          if (result.share.expiry_at) {
+            this.startCountdown(result.share.expiry_at);
+          }
+
           // Check if password-protected
           if (result.share.password_hash) {
             this.viewState.set('locked');
@@ -94,6 +106,10 @@ export class SharexViewComponent implements OnInit {
     } catch {
       this.viewState.set('not_found');
     }
+  }
+
+  ngOnDestroy(): void {
+    this.stopCountdown();
   }
 
   async unlockShare(): Promise<void> {
@@ -160,6 +176,13 @@ export class SharexViewComponent implements OnInit {
     return `${share.view_count + 1}/${share.view_limit}`;
   }
 
+  getTotalFileSize(): string {
+    const files = this.shareData()?.files;
+    if (!files || files.length === 0) return '0 B';
+    const total = files.reduce((sum, f) => sum + f.size, 0);
+    return formatFileSize(total);
+  }
+
   async copyContent(): Promise<void> {
     const content = this.shareData()?.share.content;
     if (!content) return;
@@ -176,5 +199,28 @@ export class SharexViewComponent implements OnInit {
     this.linkCopied.set(true);
     setTimeout(() => this.linkCopied.set(false), 2500);
   }
-}
 
+  // ── Expiry Countdown ─────────────────────────────────────────────────────
+
+  private startCountdown(expiryAt: string): void {
+    this.updateCountdown(expiryAt);
+    this.countdownInterval = setInterval(() => {
+      this.updateCountdown(expiryAt);
+    }, 1000);
+  }
+
+  private updateCountdown(expiryAt: string): void {
+    const value = this.countdown.format(expiryAt);
+    this.countdownDisplay.set(value);
+    if (value === 'Expired') {
+      this.stopCountdown();
+    }
+  }
+
+  private stopCountdown(): void {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+      this.countdownInterval = null;
+    }
+  }
+}

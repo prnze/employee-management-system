@@ -126,7 +126,7 @@
             @if (share.expiresAt && share.status !== 'expired') {
               <span class="sx-chip sx-chip--expiry">
                 <span class="material-symbols-rounded">timer</span>
-                Expires in {{ timeUntil(share.expiresAt) }}
+                Expires in {{ countdownFor(share.expiresAt) }}
               </span>
             } @else if (share.status === 'expired') {
               <span class="sx-chip sx-chip--expired">

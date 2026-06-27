@@ -1,10 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { ShareFile, formatFileSize, getFileIcon } from '../../models/share.model';
 import { SharexStorageService } from '../../services/sharex-storage.service';
+import { FilePreviewService } from '../../services/file-preview.service';
+import { SharexService } from '../../services/sharex.service';
+import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-modal.component';
 
 @Component({
   selector: 'app-file-list',
   standalone: true,
+  imports: [FilePreviewModalComponent],
   template: `
     <div class="sx-file-list">
       @for (file of files(); track file.id) {
@@ -16,18 +20,37 @@ import { SharexStorageService } from '../../services/sharex-storage.service';
             <span class="sx-file-item-name">{{ file.file_name }}</span>
             <span class="sx-file-item-size">{{ formatSize(file.size) }}</span>
           </div>
-          <a
-            [href]="getUrl(file)"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="sx-file-item-download"
-            download
-            title="Download">
-            <span class="material-symbols-rounded">download</span>
-          </a>
+          <div class="sx-file-item-actions">
+            @if (isPreviewable(file)) {
+              <button
+                type="button"
+                class="sx-file-item-btn sx-file-item-preview"
+                (click)="openPreview(file)"
+                title="Preview">
+                <span class="material-symbols-rounded">visibility</span>
+              </button>
+            }
+            <a
+              [href]="getUrl(file)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="sx-file-item-btn sx-file-item-download"
+              (click)="trackDownload(file)"
+              download
+              title="Download">
+              <span class="material-symbols-rounded">download</span>
+            </a>
+          </div>
         </div>
       }
     </div>
+
+    @if (previewFile()) {
+      <app-file-preview-modal
+        [file]="previewFile()!"
+        [expiryAt]="expiryAt()"
+        (closed)="closePreview()" />
+    }
   `,
   styles: `
     .sx-file-list {
@@ -91,7 +114,13 @@ import { SharexStorageService } from '../../services/sharex-storage.service';
       font-family: var(--sx-font-mono, monospace);
     }
 
-    .sx-file-item-download {
+    .sx-file-item-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .sx-file-item-btn {
       width: 36px;
       height: 36px;
       display: grid;
@@ -106,20 +135,32 @@ import { SharexStorageService } from '../../services/sharex-storage.service';
       transition: all 0.25s ease;
 
       .material-symbols-rounded { font-size: 1.1rem; }
+    }
 
-      &:hover {
-        background: rgba(139, 92, 246, 0.15);
-        border-color: rgba(139, 92, 246, 0.3);
-        color: #a78bfa;
-        transform: translateY(-1px);
-      }
+    .sx-file-item-preview:hover {
+      background: rgba(6, 182, 212, 0.12);
+      border-color: rgba(6, 182, 212, 0.25);
+      color: #22d3ee;
+      transform: translateY(-1px);
+    }
+
+    .sx-file-item-download:hover {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: rgba(139, 92, 246, 0.3);
+      color: #a78bfa;
+      transform: translateY(-1px);
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FileListComponent {
   private readonly storage = inject(SharexStorageService);
+  private readonly previewService = inject(FilePreviewService);
+  private readonly sharexService = inject(SharexService);
+
   readonly files = input.required<ShareFile[]>();
+  readonly expiryAt = input<string | null>(null);
+  readonly previewFile = signal<ShareFile | null>(null);
 
   getUrl(file: ShareFile): string {
     return this.storage.getPublicUrl(file.storage_path);
@@ -131,5 +172,21 @@ export class FileListComponent {
 
   getIcon(mimeType: string): string {
     return getFileIcon(mimeType);
+  }
+
+  isPreviewable(file: ShareFile): boolean {
+    return this.previewService.isPreviewable(file.mime_type, file.file_name);
+  }
+
+  openPreview(file: ShareFile): void {
+    this.previewFile.set(file);
+  }
+
+  closePreview(): void {
+    this.previewFile.set(null);
+  }
+
+  trackDownload(file: ShareFile): void {
+    void this.sharexService.recordDownload(file.share_id);
   }
 }

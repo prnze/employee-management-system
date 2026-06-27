@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { DropFilesService } from '../services/drop-files.service';
 
 @Component({
   selector: 'app-sharex-layout',
@@ -12,6 +13,16 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 })
 export class SharexLayoutComponent implements OnInit {
   private readonly document = inject(DOCUMENT);
+  private readonly router = inject(Router);
+  private readonly dropService = inject(DropFilesService);
+
+  /**
+   * Drag counter pattern: increment on dragenter, decrement on dragleave.
+   * Prevents overlay flickering caused by nested elements firing
+   * dragenter/dragleave independently.
+   */
+  readonly dragCounter = signal(0);
+  readonly isDragOverGlobal = computed(() => this.dragCounter() > 0);
 
   private readonly fonts = [
     'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
@@ -20,6 +31,47 @@ export class SharexLayoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.fonts.forEach((url) => this.loadFont(url));
+  }
+
+  @HostListener('dragenter', ['$event'])
+  onDragEnter(event: DragEvent): void {
+    event.preventDefault();
+    // Only react to file drags, not text selection drags
+    if (this.hasFiles(event)) {
+      this.dragCounter.update((c) => c + 1);
+    }
+  }
+
+  @HostListener('dragover', ['$event'])
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+  }
+
+  @HostListener('dragleave', ['$event'])
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    this.dragCounter.update((c) => Math.max(0, c - 1));
+  }
+
+  @HostListener('drop', ['$event'])
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragCounter.set(0);
+
+    const files = Array.from(event.dataTransfer?.files || []);
+    if (files.length === 0) return;
+
+    this.dropService.setPending(files);
+    this.router.navigate(['/sharex/create']);
+  }
+
+  private hasFiles(event: DragEvent): boolean {
+    if (!event.dataTransfer?.types) return false;
+    return event.dataTransfer.types.includes('Files');
   }
 
   private loadFont(url: string): void {

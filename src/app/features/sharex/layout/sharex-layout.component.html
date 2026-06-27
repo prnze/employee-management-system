@@ -29,7 +29,20 @@
   </div>
 </nav>
 
-<main class="sx-main" id="sharex-main-content">
+<!-- ══════════ Global Drag & Drop Overlay ══════════ -->
+@if (isDragOverGlobal()) {
+  <div class="sx-global-dropzone" aria-label="Drop files to upload">
+    <div class="sx-global-dropzone-inner">
+      <div class="sx-global-dropzone-icon">
+        <span class="material-symbols-rounded">cloud_upload</span>
+      </div>
+      <p class="sx-global-dropzone-title">Drop files anywhere</p>
+      <p class="sx-global-dropzone-subtitle">Files will be added to a new share</p>
+    </div>
+  </div>
+}
+
+<main class="sx-main" id="sharex-main-content" [class.sx-main--blurred]="isDragOverGlobal()">
   <router-outlet />
 </main>
 

@@ -67,7 +67,13 @@
     <!-- ══════════ File Upload ══════════ -->
     @if (activeTab() === 'files' || activeTab() === 'both') {
       <div class="sx-field">
-        <label class="sx-label">Files</label>
+        <div class="sx-field-row">
+          <label class="sx-label">Files</label>
+          <span class="sx-paste-hint">
+            <span class="material-symbols-rounded" aria-hidden="true">content_paste</span>
+            Ctrl+V to paste
+          </span>
+        </div>
         <app-file-dropzone
           [files]="files()"
           (filesChange)="onFilesChanged($event)" />
@@ -135,6 +141,58 @@
           </div>
         </div>
 
+        <!-- ── Custom Share Code ── -->
+        <div class="sx-field sx-field--toggle">
+          <div class="sx-toggle-row">
+            <div class="sx-toggle-info">
+              <label class="sx-label">
+                <span class="material-symbols-rounded sx-label-icon" aria-hidden="true">link</span>
+                Custom URL
+              </label>
+              <span class="sx-toggle-hint">Use a custom URL slug instead of a random code</span>
+            </div>
+            <button
+              type="button"
+              class="sx-toggle"
+              [class.sx-toggle--on]="useCustomCode()"
+              (click)="toggleCustomCode()"
+              role="switch"
+              [attr.aria-checked]="useCustomCode()">
+              <span class="sx-toggle-thumb"></span>
+            </button>
+          </div>
+        </div>
+
+        @if (useCustomCode()) {
+          <div class="sx-field sx-custom-code-field">
+            <div class="sx-custom-code-wrapper">
+              <span class="sx-custom-code-prefix">/sharex/s/</span>
+              <input
+                type="text"
+                class="sx-input sx-custom-code-input"
+                [class.sx-custom-code-input--available]="codeAvailability() === 'available'"
+                [class.sx-custom-code-input--taken]="codeAvailability() === 'taken' || codeAvailability() === 'invalid'"
+                placeholder="my-project-demo"
+                [ngModel]="customCode()"
+                (ngModelChange)="onCustomCodeInput($event)"
+                autocomplete="off"
+                maxlength="32">
+              <div class="sx-custom-code-indicator">
+                @if (codeAvailability() === 'checking') {
+                  <div class="sx-code-check-spinner"></div>
+                } @else if (codeAvailability() === 'available') {
+                  <span class="material-symbols-rounded sx-code-available">check_circle</span>
+                } @else if (codeAvailability() === 'taken' || codeAvailability() === 'invalid') {
+                  <span class="material-symbols-rounded sx-code-taken">cancel</span>
+                }
+              </div>
+            </div>
+            @if (codeError()) {
+              <span class="sx-custom-code-error">{{ codeError() }}</span>
+            }
+          </div>
+        }
+
         <div class="sx-field sx-field--toggle">
           <div class="sx-toggle-row">
             <div class="sx-toggle-info">
@@ -154,6 +212,11 @@
         </div>
       </div>
     </div>
+
+    <!-- ══════════ Upload Progress ══════════ -->
+    @if (uploadState()) {
+      <app-upload-progress [state]="uploadState()" />
+    }
 
     <!-- ══════════ Error ══════════ -->
     @if (error()) {
@@ -181,10 +244,17 @@
   </div>
 </div>
 
+<!-- ══════════ Paste Toast ══════════ -->
+@if (pasteToast()) {
+  <div class="sx-paste-toast">
+    <span class="material-symbols-rounded" aria-hidden="true">content_paste_go</span>
+    {{ pasteToast() }}
+  </div>
+}
+
 <!-- ══════════ Result Modal ══════════ -->
 @if (createdShare()) {
   <app-share-result-modal
     [share]="createdShare()!"
     (closed)="closeModal()" />
 }
-
