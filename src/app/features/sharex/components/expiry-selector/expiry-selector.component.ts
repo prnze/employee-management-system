@@ -121,7 +121,6 @@ import { ExpiryOption, EXPIRY_OPTIONS } from '../../models/share.model';
       &:focus {
         outline: none;
         border-color: var(--sx-accent-border, rgba(10,132,255,0.28));
-        box-shadow: 0 0 0 4px var(--sx-accent-soft, rgba(10,132,255,0.14));
       }
 
       &::-webkit-calendar-picker-indicator {

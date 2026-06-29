@@ -63,6 +63,11 @@ body {
   color: var(--app-text);
 }
 
+body.sx-sharex-modal-open {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
 .app-page {
   padding: 1rem;
 }
@@ -1011,4 +1016,3 @@ textarea.form-control {
     }
   }
 }
-

@@ -150,13 +150,11 @@
 
 .sx-lock-input:focus {
   border-color: var(--sx-accent-border);
-  box-shadow: 0 0 0 4px var(--sx-accent-soft);
   background: var(--sx-card-strong);
 }
 
 .sx-lock-input--error {
   border-color: color-mix(in srgb, var(--sx-danger) 42%, transparent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sx-danger) 13%, transparent);
 }
 
 .sx-lock-input-icon {

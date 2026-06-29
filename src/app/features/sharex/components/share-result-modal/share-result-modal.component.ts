@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { Share } from '../../models/share.model';
 import { SharexService } from '../../services/sharex.service';
@@ -15,6 +16,7 @@ export class ShareResultModalComponent implements OnInit, OnDestroy {
   private readonly sharexService = inject(SharexService);
   private readonly qrService = inject(QrCodeService);
   private readonly countdown = inject(ExpiryCountdownService);
+  private readonly document = inject(DOCUMENT);
 
   readonly share = input.required<Share>();
   readonly closed = output<void>();
@@ -36,6 +38,8 @@ export class ShareResultModalComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    this.document.body.classList.add('sx-sharex-modal-open');
+
     // Check native share support
     this.canShare.set(typeof navigator.share === 'function');
 
@@ -52,6 +56,7 @@ export class ShareResultModalComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopCountdown();
+    this.document.body.classList.remove('sx-sharex-modal-open');
   }
 
   async copyLink(): Promise<void> {

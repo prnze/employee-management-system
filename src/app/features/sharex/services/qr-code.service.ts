@@ -5,15 +5,16 @@ import QRCode from 'qrcode';
 export class QrCodeService {
   /**
    * Generate a QR code as a data URL (PNG).
-   * Uses dark background with light QR modules to match the ShareX dark theme.
+   * Uses high-contrast black modules on a white tile so the QR remains readable
+   * in both ShareX dark and light themes.
    */
   async generate(text: string): Promise<string> {
     return QRCode.toDataURL(text, {
       width: 280,
       margin: 2,
       color: {
-        dark: '#ffffffee',
-        light: '#00000000'
+        dark: '#000000',
+        light: '#ffffff'
       },
       errorCorrectionLevel: 'M'
     });

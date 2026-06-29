@@ -5,22 +5,25 @@
   display: grid;
   place-items: center;
   padding: var(--sx-space-6);
-  background: color-mix(in srgb, var(--sx-bg, #000) 70%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgba(0, 0, 0, .86);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   animation: sx-fade var(--sx-duration-3) ease both;
 }
 
 .sx-modal {
   width: min(480px, 100%);
-  max-height: 90vh;
+  max-height: calc(100dvh - 48px);
   overflow-y: auto;
+  overscroll-behavior: contain;
   border: 1px solid var(--sx-border);
   border-radius: var(--sx-radius-2xl);
-  background: var(--sx-glass-bg);
-  box-shadow: var(--sx-shadow);
-  backdrop-filter: blur(18px) saturate(1.12);
-  -webkit-backdrop-filter: blur(18px) saturate(1.12);
+  background: color-mix(in srgb, var(--sx-bg-secondary, #0B0B0B) 96%, transparent);
+  box-shadow: 0 24px 72px rgba(0, 0, 0, .62), inset 0 1px rgba(255, 255, 255, .1);
+  backdrop-filter: blur(14px) saturate(1.08);
+  -webkit-backdrop-filter: blur(14px) saturate(1.08);
   animation: sx-rise var(--sx-duration-4) var(--sx-ease) both;
 }
 
@@ -78,6 +81,7 @@
   border: 1px solid var(--sx-border);
   border-radius: var(--sx-radius-xl);
   background: #fff;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .18);
 }
 
 .sx-modal-qr-image {
@@ -261,6 +265,15 @@
 }
 
 @media (max-width: 480px) {
+  .sx-modal-backdrop {
+    padding: var(--sx-space-3);
+    align-items: start;
+  }
+
+  .sx-modal {
+    max-height: calc(100dvh - 24px);
+  }
+
   .sx-modal-header,
   .sx-modal-qr-section,
   .sx-modal-body,

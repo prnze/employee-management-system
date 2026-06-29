@@ -126,10 +126,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-:host ::ng-deep :focus-visible {
+:host ::ng-deep :focus-visible:not(input):not(textarea):not(select) {
   outline: 2px solid var(--sx-accent);
   outline-offset: 3px;
   box-shadow: 0 0 0 5px var(--sx-accent-soft);
+}
+
+:host ::ng-deep input:focus-visible,
+:host ::ng-deep textarea:focus-visible,
+:host ::ng-deep select:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 :host ::ng-deep .sx-glass,
