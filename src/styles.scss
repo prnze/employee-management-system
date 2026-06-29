@@ -38,6 +38,25 @@ html {
   scroll-behavior: smooth;
 }
 
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(128, 128, 128, .34);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 128, 128, .34) transparent;
+}
+
 body {
   margin: 0;
   background: var(--app-bg);
@@ -992,5 +1011,4 @@ textarea.form-control {
     }
   }
 }
-
 

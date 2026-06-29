@@ -56,30 +56,26 @@ import { ExpiryOption, EXPIRY_OPTIONS } from '../../models/share.model';
       padding: 8px 16px;
       border-radius: var(--sx-radius-sm, 12px);
       border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
-      background: var(--sx-surface, rgba(255, 255, 255, 0.035));
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: var(--sx-card, rgba(255, 255, 255, 0.05));
       color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
       font-family: var(--sx-font, 'Inter', sans-serif);
       font-size: 0.82rem;
-      font-weight: 500;
+      font-weight: 620;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: color var(--sx-duration-2, 150ms) ease, background var(--sx-duration-2, 150ms) ease, border-color var(--sx-duration-2, 150ms) ease, transform var(--sx-duration-3, 200ms) var(--sx-ease, cubic-bezier(.22,1,.36,1));
 
       &:hover {
-        background: var(--sx-surface-hover, rgba(255, 255, 255, 0.055));
+        background: var(--sx-card-strong, rgba(255, 255, 255, 0.075));
         border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
         color: var(--sx-text, rgba(255, 255, 255, 0.93));
         transform: translateY(-1px);
       }
 
       &--active {
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.15)) !important;
-        border-color: rgba(139, 92, 246, 0.35) !important;
-        color: #ffffff !important;
-        box-shadow:
-          0 0 20px rgba(139, 92, 246, 0.15),
-          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        background: var(--sx-accent-soft, rgba(10,132,255,0.14)) !important;
+        border-color: var(--sx-accent-border, rgba(10,132,255,0.28)) !important;
+        color: var(--sx-accent, #0A84FF) !important;
+        box-shadow: inset 0 1px 0 var(--sx-glass-highlight, rgba(255,255,255,.12));
       }
     }
 
@@ -113,23 +109,19 @@ import { ExpiryOption, EXPIRY_OPTIONS } from '../../models/share.model';
       height: 48px;
       padding: 12px 18px 12px 44px;
       border-radius: var(--sx-radius-md, 16px);
-      background: rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: var(--sx-input, rgba(255, 255, 255, 0.055));
       border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
       color: var(--sx-text, rgba(255, 255, 255, 0.93));
       font-family: var(--sx-font, 'Inter', sans-serif);
       font-size: 0.88rem;
       box-sizing: border-box;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      color-scheme: dark;
+      transition: border-color var(--sx-duration-2, 150ms) ease, box-shadow var(--sx-duration-2, 150ms) ease;
+      color-scheme: dark light;
 
       &:focus {
         outline: none;
-        border-color: rgba(139, 92, 246, 0.4);
-        box-shadow:
-          0 0 0 3px rgba(139, 92, 246, 0.12),
-          0 0 24px rgba(139, 92, 246, 0.08);
+        border-color: var(--sx-accent-border, rgba(10,132,255,0.28));
+        box-shadow: 0 0 0 4px var(--sx-accent-soft, rgba(10,132,255,0.14));
       }
 
       &::-webkit-calendar-picker-indicator {

@@ -1,7 +1,5 @@
 <div class="sx-modal-backdrop" (click)="onBackdropClick()">
   <div class="sx-modal" (click)="$event.stopPropagation()">
-    <div class="sx-modal-glow" aria-hidden="true"></div>
-
     <!-- Header -->
     <div class="sx-modal-header">
       <div class="sx-modal-success-ring">
@@ -73,7 +71,7 @@
       @if (canShare()) {
         <button type="button" class="sx-modal-action-btn sx-modal-action-btn--share" (click)="nativeShare()" id="sharex-modal-share">
           <span class="material-symbols-rounded">share</span>
-          <span>Share…</span>
+          <span>Share...</span>
         </button>
       }
     </div>

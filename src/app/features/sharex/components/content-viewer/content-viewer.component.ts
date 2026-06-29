@@ -18,9 +18,7 @@ import { ContentType } from '../../models/share.model';
     .sx-content-pre {
       margin: 0;
       padding: 20px 24px;
-      background: rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: color-mix(in srgb, var(--sx-bg-secondary, #0B0B0B) 88%, transparent);
       border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
       border-radius: var(--sx-radius-md, 16px);
       overflow-x: auto;

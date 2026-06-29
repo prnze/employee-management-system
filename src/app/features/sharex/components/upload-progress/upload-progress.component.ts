@@ -67,20 +67,18 @@ import { UploadState } from '../../services/upload-manager.service';
       gap: 14px;
       padding: 16px 20px;
       border-radius: var(--sx-radius-md, 16px);
-      background: rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(139, 92, 246, 0.15);
-      animation: upload-progress-in 0.3s ease both;
+      background: var(--sx-card, rgba(255,255,255,.05));
+      border: 1px solid var(--sx-accent-border, rgba(10,132,255,.28));
+      animation: upload-progress-in var(--sx-duration-4, 300ms) var(--sx-ease, cubic-bezier(.22,1,.36,1)) both;
 
       &--success {
-        border-color: rgba(16, 185, 129, 0.2);
-        background: rgba(16, 185, 129, 0.04);
+        border-color: color-mix(in srgb, var(--sx-success, #30D158) 28%, transparent);
+        background: color-mix(in srgb, var(--sx-success, #30D158) 10%, transparent);
       }
 
       &--error {
-        border-color: rgba(239, 68, 68, 0.2);
-        background: rgba(239, 68, 68, 0.04);
+        border-color: color-mix(in srgb, var(--sx-danger, #FF453A) 28%, transparent);
+        background: color-mix(in srgb, var(--sx-danger, #FF453A) 10%, transparent);
       }
     }
 
@@ -97,8 +95,8 @@ import { UploadState } from '../../services/upload-manager.service';
     .sx-upload-spinner {
       width: 22px;
       height: 22px;
-      border: 2.5px solid rgba(139, 92, 246, 0.2);
-      border-top-color: #a78bfa;
+      border: 2.5px solid var(--sx-accent-soft, rgba(10,132,255,.14));
+      border-top-color: var(--sx-accent, #0A84FF);
       border-radius: 50%;
       animation: upload-spin 0.8s linear infinite;
     }
@@ -109,12 +107,12 @@ import { UploadState } from '../../services/upload-manager.service';
 
     .sx-upload-icon-success {
       font-size: 1.4rem;
-      color: #34d399;
+      color: var(--sx-success, #30D158);
     }
 
     .sx-upload-icon-error {
       font-size: 1.4rem;
-      color: #f87171;
+      color: var(--sx-danger, #FF453A);
     }
 
     .sx-upload-info {
@@ -135,7 +133,7 @@ import { UploadState } from '../../services/upload-manager.service';
     .sx-upload-label {
       font-size: 0.84rem;
       font-weight: 600;
-      color: rgba(255, 255, 255, 0.85);
+      color: var(--sx-text, rgba(255, 255, 255, 0.85));
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -144,7 +142,7 @@ import { UploadState } from '../../services/upload-manager.service';
     .sx-upload-percent {
       font-size: 0.82rem;
       font-weight: 700;
-      color: #a78bfa;
+      color: var(--sx-accent, #0A84FF);
       font-family: var(--sx-font-mono, monospace);
       flex-shrink: 0;
     }
@@ -152,42 +150,24 @@ import { UploadState } from '../../services/upload-manager.service';
     .sx-upload-bar-track {
       height: 6px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
+      background: var(--sx-input, rgba(255, 255, 255, 0.055));
       overflow: hidden;
     }
 
     .sx-upload-bar-fill {
       height: 100%;
       border-radius: 999px;
-      background: linear-gradient(90deg, #8b5cf6, #06b6d4);
-      transition: width 0.3s ease;
+      background: var(--sx-accent, #0A84FF);
+      transition: width var(--sx-duration-4, 300ms) var(--sx-ease, cubic-bezier(.22,1,.36,1));
       position: relative;
 
-      &::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(90deg, transparent 40%, rgba(255, 255, 255, 0.2) 50%, transparent 60%);
-        background-size: 200% 100%;
-        animation: upload-shimmer 1.5s ease-in-out infinite;
-      }
-
       &--success {
-        background: linear-gradient(90deg, #10b981, #34d399);
-
-        &::after { display: none; }
+        background: var(--sx-success, #30D158);
       }
 
       &--error {
-        background: linear-gradient(90deg, #ef4444, #f87171);
-
-        &::after { display: none; }
+        background: var(--sx-danger, #FF453A);
       }
-    }
-
-    @keyframes upload-shimmer {
-      from { background-position: 200% 0; }
-      to   { background-position: -200% 0; }
     }
 
     .sx-upload-meta-row {
@@ -198,11 +178,11 @@ import { UploadState } from '../../services/upload-manager.service';
 
     .sx-upload-meta {
       font-size: 0.72rem;
-      color: rgba(255, 255, 255, 0.35);
+      color: var(--sx-text-muted, rgba(255, 255, 255, 0.35));
       font-family: var(--sx-font-mono, monospace);
 
       &--error {
-        color: #fca5a5;
+        color: var(--sx-danger, #FF453A);
       }
     }
   `,

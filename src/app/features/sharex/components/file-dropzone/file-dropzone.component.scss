@@ -1,60 +1,29 @@
 .sx-dropzone {
   position: relative;
-  border-radius: var(--sx-radius-xl, 24px);
-  border: 2px dashed var(--sx-border, rgba(255, 255, 255, 0.07));
-  background: var(--sx-surface, rgba(255, 255, 255, 0.035));
-  backdrop-filter: blur(var(--sx-blur, 24px));
-  -webkit-backdrop-filter: blur(var(--sx-blur, 24px));
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0), rgba(6, 182, 212, 0));
-    z-index: 0;
-    transition: background 0.4s ease;
-    pointer-events: none;
-  }
-
-  &--active {
-    border-color: transparent;
-    background: rgba(139, 92, 246, 0.06);
-    box-shadow:
-      0 0 40px rgba(139, 92, 246, 0.15),
-      inset 0 0 40px rgba(139, 92, 246, 0.05);
-    transform: scale(1.01);
-
-    &::before {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(6, 182, 212, 0.2));
-    }
-
-    .sx-dropzone-icon-wrapper {
-      transform: translateY(-4px) scale(1.1);
-      box-shadow: 0 12px 32px rgba(139, 92, 246, 0.3);
-    }
-  }
-
-  &:hover:not(&--active) {
-    border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
-    background: var(--sx-surface-hover, rgba(255, 255, 255, 0.055));
-  }
+  border: 1px dashed var(--sx-border-strong);
+  border-radius: var(--sx-radius-xl);
+  background: var(--sx-card);
+  transition: transform var(--sx-duration-3) var(--sx-ease), border-color var(--sx-duration-2) ease, background var(--sx-duration-2) ease, box-shadow var(--sx-duration-3) var(--sx-ease);
 }
 
-// ── Empty state ─────────────────────────────────────────────────────────────
+.sx-dropzone:hover,
+.sx-dropzone--active {
+  border-color: var(--sx-accent-border);
+  background: var(--sx-card-strong);
+}
+
+.sx-dropzone--active {
+  transform: scale(1.01);
+  box-shadow: 0 0 0 4px var(--sx-accent-soft), var(--sx-shadow);
+}
 
 .sx-dropzone-empty {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 24px;
+  display: grid;
+  justify-items: center;
+  gap: var(--sx-space-2);
+  padding: var(--sx-space-12) var(--sx-space-6);
   text-align: center;
-  gap: 8px;
 }
 
 .sx-dropzone-icon-wrapper {
@@ -62,220 +31,185 @@
   height: 64px;
   display: grid;
   place-items: center;
-  border-radius: var(--sx-radius-lg, 20px);
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1));
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  color: #a78bfa;
-  margin-bottom: 8px;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: var(--sx-space-2);
+  border: 1px solid var(--sx-accent-border);
+  border-radius: var(--sx-radius-xl);
+  color: var(--sx-accent);
+  background: var(--sx-accent-soft);
+  transition: transform var(--sx-duration-3) var(--sx-ease);
+}
 
-  .material-symbols-rounded { font-size: 1.8rem; }
+.sx-dropzone--active .sx-dropzone-icon-wrapper {
+  transform: translateY(-2px) scale(1.04);
+}
+
+.sx-dropzone-icon-wrapper .material-symbols-rounded {
+  font-size: 30px;
+}
+
+.sx-dropzone-title,
+.sx-dropzone-subtitle {
+  margin: 0;
 }
 
 .sx-dropzone-title {
-  margin: 0;
+  color: var(--sx-text);
   font-size: 1rem;
-  font-weight: 600;
-  color: var(--sx-text, rgba(255, 255, 255, 0.93));
+  font-weight: 720;
 }
 
 .sx-dropzone-subtitle {
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
+  color: var(--sx-text-muted);
+  font-size: .84rem;
 }
 
-.sx-dropzone-buttons {
+.sx-dropzone-buttons,
+.sx-dropzone-add-row {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
   flex-wrap: wrap;
   justify-content: center;
+  gap: var(--sx-space-2);
+  margin-top: var(--sx-space-3);
 }
 
-.sx-dropzone-browse {
+.sx-dropzone-browse,
+.sx-dropzone-add {
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: var(--sx-radius-sm, 12px);
-  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
-  background: var(--sx-surface, rgba(255, 255, 255, 0.035));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
-  font-family: var(--sx-font, 'Inter', sans-serif);
-  font-size: 0.82rem;
-  font-weight: 600;
+  justify-content: center;
+  gap: var(--sx-space-2);
+  padding: 0 var(--sx-space-4);
+  border: 1px solid var(--sx-border);
+  border-radius: var(--sx-radius-md);
+  color: var(--sx-text-secondary);
+  background: var(--sx-input);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-  .material-symbols-rounded { font-size: 1.1rem; }
-
-  &:hover {
-    background: var(--sx-surface-hover, rgba(255, 255, 255, 0.055));
-    border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
-    color: var(--sx-text, rgba(255, 255, 255, 0.93));
-    transform: translateY(-1px);
-  }
-
-  &--folder {
-    border-color: rgba(6, 182, 212, 0.12);
-    color: rgba(6, 182, 212, 0.6);
-
-    &:hover {
-      border-color: rgba(6, 182, 212, 0.25);
-      color: #22d3ee;
-    }
-  }
+  font-weight: 620;
+  transition: color var(--sx-duration-2) ease, background var(--sx-duration-2) ease, border-color var(--sx-duration-2) ease, transform var(--sx-duration-3) var(--sx-ease);
 }
 
-// ── Files list ──────────────────────────────────────────────────────────────
+.sx-dropzone-browse:hover,
+.sx-dropzone-add:hover {
+  color: var(--sx-text);
+  background: var(--sx-card-strong);
+  border-color: var(--sx-border-strong);
+  transform: translateY(-1px);
+}
+
+.sx-dropzone-browse--folder,
+.sx-dropzone-add--folder {
+  color: var(--sx-accent);
+  border-color: var(--sx-accent-border);
+}
 
 .sx-dropzone-files {
-  position: relative;
-  z-index: 1;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  gap: var(--sx-space-2);
+  padding: var(--sx-space-4);
 }
 
 .sx-dropzone-file {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
-  border-radius: var(--sx-radius-sm, 12px);
-  transition: all 0.2s ease;
-  animation: file-enter 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
-  }
+  gap: var(--sx-space-3);
+  padding: var(--sx-space-3);
+  border: 1px solid var(--sx-border);
+  border-radius: var(--sx-radius-md);
+  background: var(--sx-input);
+  animation: sx-rise var(--sx-duration-3) var(--sx-ease) both;
 }
 
-@keyframes file-enter {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.sx-dropzone-file:hover {
+  background: var(--sx-card-strong);
+  border-color: var(--sx-border-strong);
 }
 
 .sx-dropzone-file-icon {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
-  border-radius: 10px;
-  background: rgba(139, 92, 246, 0.1);
-  color: #a78bfa;
-  flex-shrink: 0;
-
-  .material-symbols-rounded { font-size: 1.15rem; }
+  border-radius: var(--sx-radius-sm);
+  color: var(--sx-accent);
+  background: var(--sx-accent-soft);
 }
 
 .sx-dropzone-file-info {
-  flex: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+  display: grid;
+  gap: 2px;
 }
 
 .sx-dropzone-file-folder {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 3px;
-  font-size: 0.68rem;
-  color: rgba(6, 182, 212, 0.55);
-  font-family: var(--sx-font-mono, monospace);
+  gap: var(--sx-space-1);
+  color: var(--sx-accent);
+  font-family: var(--sx-font-mono);
+  font-size: .68rem;
+}
 
-  .material-symbols-rounded {
-    font-size: 0.75rem;
-  }
+.sx-dropzone-file-folder .material-symbols-rounded {
+  font-size: 14px;
 }
 
 .sx-dropzone-file-name {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--sx-text, rgba(255, 255, 255, 0.93));
-  white-space: nowrap;
   overflow: hidden;
+  color: var(--sx-text);
+  font-size: .86rem;
+  font-weight: 620;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sx-dropzone-file-size {
-  font-size: 0.72rem;
-  font-family: var(--sx-font-mono, monospace);
-  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
+  color: var(--sx-text-muted);
+  font-family: var(--sx-font-mono);
+  font-size: .74rem;
 }
 
 .sx-dropzone-file-remove {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
-  border: none;
+  border: 0;
+  border-radius: var(--sx-radius-sm);
+  color: var(--sx-text-muted);
   background: transparent;
-  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
   cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
+  transition: color var(--sx-duration-2) ease, background var(--sx-duration-2) ease;
+}
 
-  .material-symbols-rounded { font-size: 1rem; }
-
-  &:hover {
-    background: rgba(239, 68, 68, 0.12);
-    color: #f87171;
-  }
+.sx-dropzone-file-remove:hover {
+  color: var(--sx-danger);
+  background: color-mix(in srgb, var(--sx-danger) 10%, transparent);
 }
 
 .sx-dropzone-add-row {
-  display: flex;
-  gap: 8px;
+  margin-top: var(--sx-space-1);
 }
 
 .sx-dropzone-add {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
-  border-radius: var(--sx-radius-sm, 12px);
-  border: 1px dashed var(--sx-border, rgba(255, 255, 255, 0.07));
+  border-style: dashed;
   background: transparent;
-  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
-  font-family: var(--sx-font, 'Inter', sans-serif);
-  font-size: 0.82rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
+}
 
-  .material-symbols-rounded { font-size: 1rem; }
-
-  &:hover {
-    border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
-    color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
-    background: var(--sx-surface, rgba(255, 255, 255, 0.035));
+@media (max-width: 520px) {
+  .sx-dropzone-empty {
+    padding: var(--sx-space-8) var(--sx-space-4);
   }
 
-  &--folder {
-    border-color: rgba(6, 182, 212, 0.08);
-    color: rgba(6, 182, 212, 0.45);
+  .sx-dropzone-buttons,
+  .sx-dropzone-add-row {
+    flex-direction: column;
+  }
 
-    &:hover {
-      border-color: rgba(6, 182, 212, 0.2);
-      color: rgba(6, 182, 212, 0.7);
-    }
+  .sx-dropzone-browse,
+  .sx-dropzone-add {
+    width: 100%;
   }
 }

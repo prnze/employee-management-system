@@ -1,7 +1,8 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostBinding, HostListener, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { DropFilesService } from '../services/drop-files.service';
+import { SharexAccent, SharexTheme, SharexThemeService } from '../services/sharex-theme.service';
 
 @Component({
   selector: 'app-sharex-layout',
@@ -15,6 +16,7 @@ export class SharexLayoutComponent implements OnInit {
   private readonly document = inject(DOCUMENT);
   private readonly router = inject(Router);
   private readonly dropService = inject(DropFilesService);
+  readonly themeService = inject(SharexThemeService);
 
   /**
    * Drag counter pattern: increment on dragenter, decrement on dragleave.
@@ -22,7 +24,12 @@ export class SharexLayoutComponent implements OnInit {
    * dragenter/dragleave independently.
    */
   readonly dragCounter = signal(0);
-  readonly isDragOverGlobal = computed(() => this.dragCounter() > 0);
+  readonly isDragOverGlobal = () => this.dragCounter() > 0;
+
+  @HostBinding('attr.data-sx-theme')
+  get hostTheme(): SharexTheme {
+    return this.themeService.theme();
+  }
 
   private readonly fonts = [
     'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
@@ -31,6 +38,14 @@ export class SharexLayoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.fonts.forEach((url) => this.loadFont(url));
+  }
+
+  setTheme(theme: SharexTheme): void {
+    this.themeService.setTheme(theme);
+  }
+
+  setAccent(accent: SharexAccent): void {
+    this.themeService.setAccent(accent.name);
   }
 
   @HostListener('dragenter', ['$event'])

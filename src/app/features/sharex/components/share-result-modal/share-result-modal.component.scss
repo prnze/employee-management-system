@@ -1,398 +1,281 @@
-// ============================================================================
-// Share Result Modal — Glassmorphic success dialog with QR & actions
-// ============================================================================
-
 .sx-modal-backdrop {
   position: fixed;
   inset: 0;
   z-index: 1000;
   display: grid;
   place-items: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  animation: modal-backdrop-in 0.3s ease both;
-}
-
-@keyframes modal-backdrop-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  padding: var(--sx-space-6);
+  background: color-mix(in srgb, var(--sx-bg, #000) 70%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: sx-fade var(--sx-duration-3) ease both;
 }
 
 .sx-modal {
-  position: relative;
   width: min(480px, 100%);
   max-height: 90vh;
   overflow-y: auto;
-  background: rgba(16, 16, 28, 0.88);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--sx-radius-2xl, 28px);
-  box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  animation: modal-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  border: 1px solid var(--sx-border);
+  border-radius: var(--sx-radius-2xl);
+  background: var(--sx-glass-bg);
+  box-shadow: var(--sx-shadow);
+  backdrop-filter: blur(18px) saturate(1.12);
+  -webkit-backdrop-filter: blur(18px) saturate(1.12);
+  animation: sx-rise var(--sx-duration-4) var(--sx-ease) both;
 }
-
-@keyframes modal-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.92) translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.sx-modal-glow {
-  position: absolute;
-  top: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  height: 120px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
-  filter: blur(40px);
-  pointer-events: none;
-}
-
-// ── Header ──────────────────────────────────────────────────────────────────
 
 .sx-modal-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  justify-items: center;
+  gap: var(--sx-space-2);
+  padding: var(--sx-space-10) var(--sx-space-8) var(--sx-space-4);
   text-align: center;
-  padding: 36px 32px 16px;
 }
 
 .sx-modal-success-ring {
-  width: 56px;
-  height: 56px;
+  width: 62px;
+  height: 62px;
   display: grid;
   place-items: center;
+  margin-bottom: var(--sx-space-2);
+  border: 2px solid color-mix(in srgb, var(--sx-success) 36%, transparent);
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(16, 185, 129, 0.15));
-  border: 2px solid rgba(16, 185, 129, 0.3);
-  color: #34d399;
-  margin-bottom: 16px;
-  animation: success-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
-
-  .material-symbols-rounded {
-    font-size: 1.6rem;
-    font-weight: 600;
-  }
+  color: var(--sx-success);
+  background: color-mix(in srgb, var(--sx-success) 12%, transparent);
+  animation: sx-check-settle var(--sx-duration-5) var(--sx-ease) both;
 }
 
-@keyframes success-pop {
-  0%   { transform: scale(0); opacity: 0; }
-  60%  { transform: scale(1.15); }
-  100% { transform: scale(1); opacity: 1; }
+.sx-modal-success-ring .material-symbols-rounded {
+  font-size: 30px;
+}
+
+.sx-modal-title,
+.sx-modal-subtitle {
+  margin: 0;
 }
 
 .sx-modal-title {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--sx-text, rgba(255, 255, 255, 0.93));
+  color: var(--sx-text);
+  font-size: 1.3rem;
+  font-weight: 780;
 }
 
 .sx-modal-subtitle {
-  margin: 6px 0 0;
-  font-size: 0.85rem;
-  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
-  max-width: 320px;
+  max-width: 330px;
+  color: var(--sx-text-secondary);
+  font-size: .88rem;
+  line-height: 1.55;
 }
 
-// ── QR Code ─────────────────────────────────────────────────────────────────
-
 .sx-modal-qr-section {
-  display: flex;
-  justify-content: center;
-  padding: 8px 32px 12px;
+  display: grid;
+  justify-items: center;
+  padding: var(--sx-space-3) var(--sx-space-8);
 }
 
 .sx-modal-qr-container {
-  padding: 16px;
-  border-radius: var(--sx-radius-lg, 20px);
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
-  position: relative;
-  animation: qr-fade-in 0.6s ease 0.3s both;
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1), transparent 60%);
-    z-index: -1;
-    filter: blur(16px);
-    opacity: 0.6;
-  }
-}
-
-@keyframes qr-fade-in {
-  from { opacity: 0; transform: scale(0.9); }
-  to   { opacity: 1; transform: scale(1); }
+  padding: var(--sx-space-4);
+  border: 1px solid var(--sx-border);
+  border-radius: var(--sx-radius-xl);
+  background: #fff;
 }
 
 .sx-modal-qr-image {
   display: block;
   width: 160px;
   height: 160px;
-  border-radius: 8px;
+  border-radius: var(--sx-radius-xs);
 }
 
-// ── Body ────────────────────────────────────────────────────────────────────
-
 .sx-modal-body {
-  padding: 8px 32px 16px;
+  padding: var(--sx-space-3) var(--sx-space-8) var(--sx-space-4);
 }
 
 .sx-modal-label {
   display: block;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
-  margin-bottom: 8px;
+  margin-bottom: var(--sx-space-2);
+  color: var(--sx-text-muted);
+  font-size: .72rem;
+  font-weight: 720;
 }
 
-// ── Share Code Badge ────────────────────────────────────────────────────────
-
-.sx-modal-code-badge {
+.sx-modal-code-badge,
+.sx-modal-link-box {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.06), rgba(6, 182, 212, 0.04));
-  border: 1px solid rgba(139, 92, 246, 0.15);
-  border-radius: var(--sx-radius-sm, 12px);
-  cursor: pointer;
-  transition: all 0.25s ease;
+  gap: var(--sx-space-3);
+  border: 1px solid var(--sx-border);
+  border-radius: var(--sx-radius-lg);
+  background: var(--sx-input);
+}
 
-  &:hover {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.06));
-    border-color: rgba(139, 92, 246, 0.25);
-  }
+.sx-modal-code-badge {
+  justify-content: space-between;
+  padding: var(--sx-space-3) var(--sx-space-4);
+  cursor: pointer;
+  transition: border-color var(--sx-duration-2) ease, background var(--sx-duration-2) ease;
+}
+
+.sx-modal-code-badge:hover,
+.sx-modal-link-box:hover {
+  border-color: var(--sx-border-strong);
+  background: var(--sx-card-strong);
 }
 
 .sx-modal-code-text {
-  font-family: var(--sx-font-mono, 'JetBrains Mono', monospace);
-  font-size: 1.3rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #a78bfa;
+  color: var(--sx-accent);
+  font-family: var(--sx-font-mono);
+  font-size: 1.25rem;
+  font-weight: 760;
+  letter-spacing: .08em;
 }
 
 .sx-modal-code-copy {
-  font-size: 1rem !important;
-  color: var(--sx-text-muted, rgba(255, 255, 255, 0.32));
-  transition: color 0.2s ease;
+  color: var(--sx-text-muted);
 }
-
-.sx-modal-code-badge:hover .sx-modal-code-copy {
-  color: #a78bfa;
-}
-
-// ── Link Box ────────────────────────────────────────────────────────────────
 
 .sx-modal-countdown {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 12px;
-  padding: 7px 12px;
-  border-radius: 10px;
-  background: rgba(251, 191, 36, 0.06);
-  border: 1px solid rgba(251, 191, 36, 0.14);
-  color: #fbbf24;
-  font-family: var(--sx-font-mono, monospace);
-  font-size: 0.76rem;
-  font-weight: 600;
+  gap: var(--sx-space-1);
+  margin-top: var(--sx-space-3);
+  padding: var(--sx-space-2) var(--sx-space-3);
+  border: 1px solid color-mix(in srgb, var(--sx-warning) 30%, transparent);
+  border-radius: var(--sx-pill);
+  color: var(--sx-warning);
+  background: color-mix(in srgb, var(--sx-warning) 12%, transparent);
+  font-family: var(--sx-font-mono);
+  font-size: .76rem;
+  font-weight: 650;
+}
 
-  .material-symbols-rounded {
-    font-size: 0.95rem;
-  }
+.sx-modal-countdown .material-symbols-rounded {
+  font-size: 17px;
+  animation: sx-tick 1.8s var(--sx-ease) infinite;
 }
 
 .sx-modal-link-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
-  border-radius: var(--sx-radius-md, 16px);
-  transition: border-color 0.25s ease;
-
-  &:hover {
-    border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
-  }
+  padding: var(--sx-space-2);
 }
 
 .sx-modal-link-url {
   flex: 1;
-  font-family: var(--sx-font-mono, monospace);
-  font-size: 0.8rem;
-  color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
-  white-space: nowrap;
+  min-width: 0;
   overflow: hidden;
+  color: var(--sx-text-secondary);
+  font-family: var(--sx-font-mono);
+  font-size: .8rem;
   text-overflow: ellipsis;
+  white-space: nowrap;
   user-select: all;
 }
 
-.sx-modal-link-copy {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
-  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
-  background: var(--sx-surface, rgba(255, 255, 255, 0.035));
-  color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
+.sx-modal-link-copy,
+.sx-modal-action-btn,
+.sx-modal-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sx-space-2);
+  border: 1px solid var(--sx-border);
+  border-radius: var(--sx-radius-md);
+  color: var(--sx-text-secondary);
+  background: var(--sx-card);
   cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.25s ease;
+  font-weight: 630;
+  transition: transform var(--sx-duration-3) var(--sx-ease), color var(--sx-duration-2) ease, background var(--sx-duration-2) ease, border-color var(--sx-duration-2) ease;
+}
 
-  .material-symbols-rounded { font-size: 1.05rem; }
+.sx-modal-link-copy {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+}
 
-  &:hover {
-    background: rgba(139, 92, 246, 0.15);
-    border-color: rgba(139, 92, 246, 0.3);
-    color: #a78bfa;
-  }
+.sx-modal-link-copy:hover,
+.sx-modal-action-btn:hover,
+.sx-modal-btn-secondary:hover {
+  color: var(--sx-text);
+  background: var(--sx-card-strong);
+  border-color: var(--sx-border-strong);
+  transform: translateY(-1px);
 }
 
 .sx-modal-copied-toast {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: #34d399;
-  animation: toast-in 0.3s ease both;
-
-  .material-symbols-rounded { font-size: 0.95rem; }
+  gap: var(--sx-space-1);
+  margin-top: var(--sx-space-3);
+  color: var(--sx-success);
+  font-size: .78rem;
+  font-weight: 600;
+  animation: sx-rise var(--sx-duration-3) var(--sx-ease) both;
 }
-
-@keyframes toast-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-// ── Actions Grid ────────────────────────────────────────────────────────────
 
 .sx-modal-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px 32px 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sx-space-2);
+  padding: var(--sx-space-2) var(--sx-space-8) var(--sx-space-4);
 }
 
 .sx-modal-action-btn {
-  flex: 1 1 calc(50% - 4px);
-  min-width: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 11px 16px;
-  border-radius: var(--sx-radius-sm, 12px);
-  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
-  background: var(--sx-surface, rgba(255, 255, 255, 0.035));
-  color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
-  font-family: var(--sx-font, 'Inter', sans-serif);
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-  .material-symbols-rounded { font-size: 1.1rem; }
-
-  &:hover {
-    background: var(--sx-surface-hover, rgba(255, 255, 255, 0.055));
-    border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
-    color: var(--sx-text, rgba(255, 255, 255, 0.93));
-    transform: translateY(-1px);
-  }
-
-  &--share {
-    flex: 1 1 100%;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(6, 182, 212, 0.08));
-    border-color: rgba(139, 92, 246, 0.2);
-    color: #a78bfa;
-
-    &:hover {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.12));
-      border-color: rgba(139, 92, 246, 0.35);
-      color: #c4b5fd;
-    }
-  }
+  min-height: 42px;
+  padding: 0 var(--sx-space-3);
+  font-size: .82rem;
 }
 
-// ── Footer ──────────────────────────────────────────────────────────────────
+.sx-modal-action-btn--share {
+  grid-column: 1 / -1;
+  color: #fff;
+  background: var(--sx-accent);
+  border-color: var(--sx-accent-border);
+}
+
+.sx-modal-action-btn--share:hover {
+  color: #fff;
+  background: var(--sx-accent-hover);
+  border-color: var(--sx-accent-border);
+}
 
 .sx-modal-footer {
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 8px 32px 28px;
+  padding: var(--sx-space-2) var(--sx-space-8) var(--sx-space-8);
 }
 
 .sx-modal-btn-secondary {
-  padding: 10px 28px;
-  border-radius: var(--sx-radius-sm, 12px);
-  border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
-  background: var(--sx-surface, rgba(255, 255, 255, 0.035));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
-  font-family: var(--sx-font, 'Inter', sans-serif);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-
-  &:hover {
-    background: var(--sx-surface-hover, rgba(255, 255, 255, 0.055));
-    border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
-    color: var(--sx-text, rgba(255, 255, 255, 0.93));
-  }
+  min-height: 42px;
+  padding: 0 var(--sx-space-6);
 }
 
-// ── Responsive ──────────────────────────────────────────────────────────────
+@keyframes sx-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sx-check-settle {
+  0% { opacity: 0; transform: scale(.64); }
+  58% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
 
 @media (max-width: 480px) {
-  .sx-modal-header { padding: 28px 20px 12px; }
-  .sx-modal-qr-section { padding: 8px 20px 12px; }
-  .sx-modal-body { padding: 8px 20px 12px; }
-  .sx-modal-actions { padding: 8px 20px 12px; }
-  .sx-modal-footer { padding: 8px 20px 20px; }
+  .sx-modal-header,
+  .sx-modal-qr-section,
+  .sx-modal-body,
+  .sx-modal-actions,
+  .sx-modal-footer {
+    padding-left: var(--sx-space-5);
+    padding-right: var(--sx-space-5);
+  }
 
-  .sx-modal-action-btn {
-    flex: 1 1 calc(50% - 4px);
-    min-width: 0;
-    font-size: 0.78rem;
-    padding: 10px 12px;
+  .sx-modal-actions {
+    grid-template-columns: 1fr;
   }
 
   .sx-modal-qr-image {
-    width: 140px;
-    height: 140px;
-  }
-
-  .sx-modal-code-text {
-    font-size: 1.1rem;
+    width: 136px;
+    height: 136px;
   }
 }

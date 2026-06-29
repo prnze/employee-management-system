@@ -138,8 +138,8 @@ import { SharexService } from '../../services/sharex.service';
       display: grid;
       place-items: center;
       padding: 24px;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(12px);
+      background: color-mix(in srgb, var(--sx-bg, #000) 72%, transparent);
+      backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(12px);
       animation: preview-backdrop-in 0.3s ease both;
     }
@@ -157,14 +157,11 @@ import { SharexService } from '../../services/sharex.service';
       display: flex;
       flex-direction: column;
       border-radius: var(--sx-radius-2xl, 28px);
-      background: rgba(12, 12, 20, 0.8);
-      backdrop-filter: blur(40px) saturate(180%);
-      -webkit-backdrop-filter: blur(40px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow:
-        0 24px 64px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08),
-        0 0 0 0.5px rgba(255, 255, 255, 0.04);
+      background: var(--sx-glass-bg, rgba(255,255,255,.045));
+      backdrop-filter: blur(18px) saturate(1.12);
+      -webkit-backdrop-filter: blur(18px) saturate(1.12);
+      border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.08));
+      box-shadow: var(--sx-shadow, 0 8px 40px rgba(0,0,0,.35));
       overflow: hidden;
       animation: preview-modal-in 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
@@ -180,7 +177,7 @@ import { SharexService } from '../../services/sharex.service';
       align-items: center;
       justify-content: space-between;
       padding: 16px 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid var(--sx-border, rgba(255, 255, 255, 0.06));
       flex-shrink: 0;
     }
 
@@ -194,7 +191,7 @@ import { SharexService } from '../../services/sharex.service';
     .sx-preview-filename {
       font-size: 0.9rem;
       font-weight: 600;
-      color: rgba(255, 255, 255, 0.93);
+      color: var(--sx-text, rgba(255, 255, 255, 0.93));
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -202,7 +199,7 @@ import { SharexService } from '../../services/sharex.service';
 
     .sx-preview-meta {
       font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.35);
+      color: var(--sx-text-muted, rgba(255, 255, 255, 0.35));
       font-family: var(--sx-font-mono, monospace);
     }
 
@@ -223,9 +220,9 @@ import { SharexService } from '../../services/sharex.service';
       display: grid;
       place-items: center;
       border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
       background: transparent;
-      color: rgba(255, 255, 255, 0.55);
+      color: var(--sx-text-secondary, rgba(255, 255, 255, 0.55));
       cursor: pointer;
       text-decoration: none;
       transition: all 0.25s ease;
@@ -233,15 +230,15 @@ import { SharexService } from '../../services/sharex.service';
       .material-symbols-rounded { font-size: 1.15rem; }
 
       &:hover {
-        background: rgba(255, 255, 255, 0.06);
-        color: rgba(255, 255, 255, 0.9);
-        border-color: rgba(255, 255, 255, 0.12);
+        background: var(--sx-card, rgba(255, 255, 255, 0.05));
+        color: var(--sx-text, rgba(255, 255, 255, 0.9));
+        border-color: var(--sx-border-strong, rgba(255, 255, 255, 0.12));
       }
 
       &--close:hover {
-        background: rgba(239, 68, 68, 0.12);
-        border-color: rgba(239, 68, 68, 0.25);
-        color: #f87171;
+        background: color-mix(in srgb, var(--sx-danger, #FF453A) 12%, transparent);
+        border-color: color-mix(in srgb, var(--sx-danger, #FF453A) 28%, transparent);
+        color: var(--sx-danger, #FF453A);
       }
     }
 
@@ -270,7 +267,7 @@ import { SharexService } from '../../services/sharex.service';
       justify-content: center;
       gap: 16px;
       padding: 80px 24px;
-      color: rgba(255, 255, 255, 0.4);
+      color: var(--sx-text-muted, rgba(255, 255, 255, 0.4));
       font-size: 0.88rem;
 
       p { margin: 0; }
@@ -279,8 +276,8 @@ import { SharexService } from '../../services/sharex.service';
     .sx-preview-spinner {
       width: 32px;
       height: 32px;
-      border: 2.5px solid rgba(255, 255, 255, 0.1);
-      border-top-color: #a78bfa;
+      border: 2.5px solid color-mix(in srgb, var(--sx-text-muted, rgba(255,255,255,.4)) 24%, transparent);
+      border-top-color: var(--sx-accent, #0A84FF);
       border-radius: 50%;
       animation: preview-spin 0.8s linear infinite;
     }
@@ -350,12 +347,12 @@ import { SharexService } from '../../services/sharex.service';
       display: grid;
       place-items: center;
       border-radius: 24px;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.15));
-      border: 1px solid rgba(139, 92, 246, 0.15);
+      background: var(--sx-accent-soft, rgba(10,132,255,0.14));
+      border: 1px solid var(--sx-accent-border, rgba(10,132,255,0.28));
 
       .material-symbols-rounded {
         font-size: 2.5rem;
-        color: #a78bfa;
+        color: var(--sx-accent, #0A84FF);
       }
     }
 
@@ -363,7 +360,7 @@ import { SharexService } from '../../services/sharex.service';
       margin: 0;
       font-size: 1rem;
       font-weight: 600;
-      color: rgba(255, 255, 255, 0.85);
+      color: var(--sx-text, rgba(255, 255, 255, 0.85));
       text-align: center;
     }
 
@@ -386,9 +383,9 @@ import { SharexService } from '../../services/sharex.service';
       right: 16px;
       padding: 3px 10px;
       border-radius: 8px;
-      background: rgba(139, 92, 246, 0.12);
-      border: 1px solid rgba(139, 92, 246, 0.2);
-      color: #a78bfa;
+      background: var(--sx-accent-soft, rgba(10,132,255,0.14));
+      border: 1px solid var(--sx-accent-border, rgba(10,132,255,0.28));
+      color: var(--sx-accent, #0A84FF);
       font-size: 0.7rem;
       font-weight: 600;
       font-family: var(--sx-font-mono, monospace);
@@ -399,7 +396,7 @@ import { SharexService } from '../../services/sharex.service';
     .sx-preview-text {
       margin: 0;
       padding: 24px;
-      background: rgba(0, 0, 0, 0.3);
+      background: color-mix(in srgb, var(--sx-bg-secondary, #0B0B0B) 88%, transparent);
       border-radius: 0 0 var(--sx-radius-2xl, 28px) var(--sx-radius-2xl, 28px);
       overflow-x: auto;
       scrollbar-width: thin;
@@ -416,7 +413,7 @@ import { SharexService } from '../../services/sharex.service';
         font-family: var(--sx-font-mono, 'JetBrains Mono', monospace);
         font-size: 0.82rem;
         line-height: 1.7;
-        color: rgba(255, 255, 255, 0.88);
+        color: var(--sx-text, rgba(255, 255, 255, 0.88));
         white-space: pre;
         tab-size: 2;
       }
@@ -429,7 +426,7 @@ import { SharexService } from '../../services/sharex.service';
       align-items: center;
       gap: 16px;
       padding: 80px 24px;
-      color: rgba(255, 255, 255, 0.4);
+      color: var(--sx-text-muted, rgba(255, 255, 255, 0.4));
 
       .material-symbols-rounded {
         font-size: 3rem;
@@ -448,8 +445,8 @@ import { SharexService } from '../../services/sharex.service';
       gap: 8px;
       padding: 12px 24px;
       border-radius: 14px;
-      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: var(--sx-accent, #0A84FF);
+      border: 1px solid var(--sx-accent-border, rgba(10,132,255,0.28));
       color: #ffffff;
       font-family: var(--sx-font, 'Inter', sans-serif);
       font-size: 0.88rem;
@@ -462,7 +459,7 @@ import { SharexService } from '../../services/sharex.service';
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+        box-shadow: 0 12px 28px color-mix(in srgb, var(--sx-accent, #0A84FF) 28%, transparent);
       }
     }
 

@@ -64,15 +64,13 @@ import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-mo
       align-items: center;
       gap: 14px;
       padding: 14px 18px;
-      background: var(--sx-surface, rgba(255, 255, 255, 0.035));
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: var(--sx-card, rgba(255, 255, 255, 0.05));
       border: 1px solid var(--sx-border, rgba(255, 255, 255, 0.07));
       border-radius: var(--sx-radius-md, 16px);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform var(--sx-duration-3, 200ms) var(--sx-ease, cubic-bezier(.22,1,.36,1)), background var(--sx-duration-2, 150ms) ease, border-color var(--sx-duration-2, 150ms) ease;
 
       &:hover {
-        background: var(--sx-surface-hover, rgba(255, 255, 255, 0.055));
+        background: var(--sx-card-strong, rgba(255, 255, 255, 0.075));
         border-color: var(--sx-border-hover, rgba(255, 255, 255, 0.12));
         transform: translateY(-1px);
       }
@@ -84,8 +82,8 @@ import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-mo
       display: grid;
       place-items: center;
       border-radius: var(--sx-radius-sm, 12px);
-      background: rgba(139, 92, 246, 0.12);
-      color: #a78bfa;
+      background: var(--sx-accent-soft, rgba(10,132,255,0.14));
+      color: var(--sx-accent, #0A84FF);
       flex-shrink: 0;
 
       .material-symbols-rounded { font-size: 1.25rem; }
@@ -138,16 +136,16 @@ import { FilePreviewModalComponent } from '../file-preview-modal/file-preview-mo
     }
 
     .sx-file-item-preview:hover {
-      background: rgba(6, 182, 212, 0.12);
-      border-color: rgba(6, 182, 212, 0.25);
-      color: #22d3ee;
+      background: color-mix(in srgb, var(--sx-info, #40C8E0) 12%, transparent);
+      border-color: color-mix(in srgb, var(--sx-info, #40C8E0) 28%, transparent);
+      color: var(--sx-info, #40C8E0);
       transform: translateY(-1px);
     }
 
     .sx-file-item-download:hover {
-      background: rgba(139, 92, 246, 0.15);
-      border-color: rgba(139, 92, 246, 0.3);
-      color: #a78bfa;
+      background: var(--sx-accent-soft, rgba(10,132,255,0.14));
+      border-color: var(--sx-accent-border, rgba(10,132,255,0.28));
+      color: var(--sx-accent, #0A84FF);
       transform: translateY(-1px);
     }
   `,
