@@ -1,8 +1,21 @@
 {
-    "rewrites": [
-        {
-            "source": "/(.*)",
-            "destination": "/"
-        }
-    ]
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/formatx/(.*)",
+      "destination": "/formatx/index.html"
+    },
+    {
+      "source": "/passx/(.*)",
+      "destination": "/passx/index.html"
+    },
+    {
+      "source": "/filex/(.*)",
+      "destination": "/filex/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }

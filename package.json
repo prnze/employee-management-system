@@ -7,7 +7,11 @@
     "start": "ng serve",
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:angular": "ng build --configuration production",
+    "build:react": "npm run build --prefix workspace",
+    "assemble": "node scripts/assemble.js",
+    "build:all": "npm run build:angular && npm run build:react && npm run assemble"
   },
   "dependencies": {
     "@angular/animations": "21.2.13",

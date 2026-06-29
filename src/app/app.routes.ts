@@ -78,6 +78,21 @@ export const routes: Routes = [
     loadChildren: () => import('@features/sharex/sharex.routes').then((m) => m.SHAREX_ROUTES)
   },
   {
+    path: 'formatx',
+    loadComponent: () => import('@shared/components/redirect/redirect.component').then((m) => m.RedirectComponent),
+    data: { redirectTo: '/formatx/' }
+  },
+  {
+    path: 'passx',
+    loadComponent: () => import('@shared/components/redirect/redirect.component').then((m) => m.RedirectComponent),
+    data: { redirectTo: '/passx/' }
+  },
+  {
+    path: 'filex',
+    loadComponent: () => import('@shared/components/redirect/redirect.component').then((m) => m.RedirectComponent),
+    data: { redirectTo: '/filex/' }
+  },
+  {
     path: 'profile',
     redirectTo: () => {
       const auth = inject(AuthStateService);
