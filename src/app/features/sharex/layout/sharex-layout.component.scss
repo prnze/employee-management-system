@@ -139,6 +139,18 @@
   box-shadow: none !important;
 }
 
+:host ::ng-deep input:focus,
+:host ::ng-deep textarea:focus,
+:host ::ng-deep select:focus,
+:host ::ng-deep .sx-input:focus,
+:host ::ng-deep .sx-textarea:focus,
+:host ::ng-deep .sx-search-input:focus,
+:host ::ng-deep .sx-lock-input:focus,
+:host ::ng-deep .sx-custom-date-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 :host ::ng-deep .sx-glass,
 :host ::ng-deep .sx-create-card,
 :host ::ng-deep .sx-view-card,
