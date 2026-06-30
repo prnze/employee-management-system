@@ -1,0 +1,40 @@
+<div class="stats-grid">
+  <article class="stat-card">
+    <span class="label">Length</span>
+    <strong>{{ password.length }}</strong>
+    <span class="sub">characters</span>
+  </article>
+  <article class="stat-card">
+    <span class="label">Entropy</span>
+    <strong>{{ entropy }}</strong>
+    <span class="sub">bits</span>
+  </article>
+  <article class="stat-card">
+    <span class="label">Strength</span>
+    <strong [style.color]="strength().color">{{ strength().label }}</strong>
+    <span class="sub">score {{ strength().score }}/5</span>
+  </article>
+  <article class="stat-card">
+    <span class="label">Crack time</span>
+    <strong>{{ crackTime() }}</strong>
+    <span class="sub">&#64; 10^11 guesses/s</span>
+  </article>
+
+  <section class="distribution">
+    <div class="distribution-head">
+      <span>Character distribution</span>
+      <span>pool: {{ poolSize }}</span>
+    </div>
+    <div class="bars">
+      @for (bar of distributionBars(); track bar.key) {
+        <div class="bar-row">
+          <span>{{ bar.key }}</span>
+          <div class="track">
+            <span class="fill" [style.width.%]="percentage(bar.value)"></span>
+          </div>
+          <span>{{ bar.value }}</span>
+        </div>
+      }
+    </div>
+  </section>
+</div>

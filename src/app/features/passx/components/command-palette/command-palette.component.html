@@ -1,0 +1,40 @@
+@if (open()) {
+  <div class="palette-backdrop" (click)="close()">
+    <section class="palette glass-panel" @passxScale (click)="$event.stopPropagation()">
+      <input class="command-input" placeholder="Type a command..." autofocus />
+      <div class="command-list">
+        <p>Actions</p>
+        <button type="button" (click)="regenerate.emit(); close()">
+          <span class="material-symbols-rounded">refresh</span>
+          Regenerate password
+        </button>
+        <button type="button" (click)="copyPassword.emit(); close()">
+          <span class="material-symbols-rounded">content_copy</span>
+          Copy password
+        </button>
+        <button type="button" (click)="toggleVisibility.emit(); close()">
+          <span class="material-symbols-rounded">visibility</span>
+          Toggle visibility
+        </button>
+        <button type="button" (click)="store.clearHistory(); close()">
+          <span class="material-symbols-rounded">delete</span>
+          Clear history
+        </button>
+
+        <p>Theme</p>
+        <button type="button" (click)="store.setTheme('light'); close()">
+          <span class="material-symbols-rounded">light_mode</span>
+          Light mode
+        </button>
+        <button type="button" (click)="store.setTheme('dark'); close()">
+          <span class="material-symbols-rounded">dark_mode</span>
+          Graphite mode
+        </button>
+        <button type="button" (click)="store.setTheme('black'); close()">
+          <span class="material-symbols-rounded">circle</span>
+          OLED black mode
+        </button>
+      </div>
+    </section>
+  </div>
+}

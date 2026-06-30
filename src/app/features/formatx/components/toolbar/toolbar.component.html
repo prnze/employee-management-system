@@ -1,0 +1,28 @@
+<div class="toolbar glass">
+  <select [ngModel]="lang" (ngModelChange)="langChange.emit($event)" aria-label="Language">
+    @for (language of languages; track language.id) {
+      <option [ngValue]="language.id">{{ language.label }}</option>
+    }
+  </select>
+  <button type="button" class="small" [class.active]="autoLang" (click)="autoLangChange.emit(!autoLang)">
+    Auto-detect @if (autoLang) { <span>- {{ confidence * 100 | number:'1.0-0' }}%</span> }
+  </button>
+  <select [ngModel]="mode" (ngModelChange)="modeChange.emit($event)" aria-label="Formatting mode">
+    @for (modeItem of modes; track modeItem.id) {
+      <option [ngValue]="modeItem.id">{{ modeItem.label }}</option>
+    }
+  </select>
+  <div class="indent">
+    <button type="button" [class.active]="indent === '  '" (click)="indentChange.emit('  ')">2sp</button>
+    <button type="button" [class.active]="indent === '    '" (click)="indentChange.emit('    ')">4sp</button>
+    <button type="button" [class.active]="indent === '\t'" (click)="indentChange.emit('\t')">Tab</button>
+  </div>
+  <div class="push"></div>
+  <button type="button" class="icon" (click)="undo.emit()" aria-label="Undo"><span class="material-symbols-rounded">undo</span></button>
+  <button type="button" class="icon" (click)="redo.emit()" aria-label="Redo"><span class="material-symbols-rounded">redo</span></button>
+  <button type="button" class="icon" (click)="fullscreen.emit()" aria-label="Fullscreen"><span class="material-symbols-rounded">fullscreen</span></button>
+  <button type="button" class="primary" (click)="format.emit()">
+    <span class="material-symbols-rounded">auto_fix_high</span>
+    Format
+  </button>
+</div>

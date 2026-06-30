@@ -1,0 +1,77 @@
+:host {
+  display: block;
+}
+
+.option-row {
+  align-items: center;
+  border-radius: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  padding: .66rem .75rem;
+  transition: background .2s ease, transform .2s ease;
+
+  &:hover {
+    background: color-mix(in oklab, var(--px-accent) 50%, transparent);
+    transform: scale(1.005);
+  }
+}
+
+.option-copy {
+  min-width: 0;
+  padding-right: .75rem;
+}
+
+.option-label,
+.option-hint {
+  display: block;
+}
+
+.option-label {
+  color: var(--px-foreground);
+  font-size: .8125rem;
+  font-weight: 650;
+}
+
+.option-hint {
+  color: var(--px-muted-foreground);
+  font-size: .6875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.switch-input {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.switch-track {
+  background: var(--px-muted);
+  border: 1px solid var(--px-border);
+  border-radius: 999px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 1.45rem;
+  padding: .125rem;
+  transition: background .2s ease;
+  width: 2.5rem;
+}
+
+.switch-thumb {
+  background: var(--px-card);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+  height: 1.1rem;
+  transition: transform .22s cubic-bezier(.16, 1, .3, 1);
+  width: 1.1rem;
+}
+
+.switch-input:checked + .switch-track {
+  background: var(--px-brand);
+}
+
+.switch-input:checked + .switch-track .switch-thumb {
+  transform: translateX(1.04rem);
+}

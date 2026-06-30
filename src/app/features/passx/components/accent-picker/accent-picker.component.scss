@@ -1,0 +1,54 @@
+.accent-wrap {
+  align-items: center;
+  background: var(--px-glass);
+  border: 1px solid var(--px-glass-border);
+  border-radius: 999px;
+  display: flex;
+  gap: .25rem;
+  padding: .35rem;
+}
+
+button,
+.custom {
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  height: 1.4rem;
+  padding: .15rem;
+  place-items: center;
+  transition: box-shadow .2s ease, transform .2s ease;
+  width: 1.4rem;
+
+  &:hover {
+    transform: translateY(-1px) scale(1.05);
+  }
+
+  &.active {
+    box-shadow: 0 0 0 2px var(--px-background), 0 0 0 4px var(--px-brand);
+  }
+}
+
+button span,
+.custom::before {
+  background: var(--swatch);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, .45), 0 8px 18px rgba(0, 0, 0, .18);
+  content: '';
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.custom {
+  --swatch: conic-gradient(from 0deg, red, yellow, lime, cyan, blue, magenta, red);
+  overflow: hidden;
+  position: relative;
+}
+
+input {
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+}

@@ -1,0 +1,13 @@
+<div class="theme-segment" aria-label="Theme">
+  @for (theme of themes; track theme.key) {
+    <button
+      type="button"
+      [class.active]="store.theme() === theme.key"
+      (click)="store.setTheme(theme.key)"
+      [attr.aria-label]="theme.label"
+      [title]="theme.label"
+    >
+      <span class="material-symbols-rounded">{{ theme.icon }}</span>
+    </button>
+  }
+</div>

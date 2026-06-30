@@ -1,0 +1,35 @@
+<section class="glass-card">
+  <div class="card-header">
+    <div class="section-title">
+      <span class="material-symbols-rounded">schedule</span>
+      History
+    </div>
+    @if (store.history().length > 0) {
+      <button type="button" class="subtle-action" (click)="clear()">
+        <span class="material-symbols-rounded">delete</span>
+        Clear
+      </button>
+    }
+  </div>
+
+  <div class="history-list">
+    @if (store.history().length === 0) {
+      <div class="empty">No passwords yet</div>
+    }
+
+    @for (entry of store.history(); track entry.id) {
+      <article class="history-item">
+        <button type="button" class="history-main" (click)="restoreSettings.emit(entry.id)" title="Restore settings">
+          <span class="password">{{ entry.password }}</span>
+          <span class="meta">{{ entry.entropy }} bits - {{ entry.at | date:'mediumTime' }}</span>
+        </button>
+        <button type="button" class="icon-action" (click)="copy(entry.password)" aria-label="Copy">
+          <span class="material-symbols-rounded">content_copy</span>
+        </button>
+        <button type="button" class="icon-action" (click)="store.deleteHistory(entry.id)" aria-label="Delete">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </article>
+    }
+  </div>
+</section>

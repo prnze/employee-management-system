@@ -1,0 +1,232 @@
+<section
+  class="fx-page"
+  [class.fullscreen]="fullscreen()"
+  (drop)="onDrop($event)"
+  (dragover)="onDrag($event, true)"
+  (dragleave)="onDrag($event, false)"
+>
+  <app-formatx-ambient-background />
+
+  @if (dragActive()) {
+    <div class="drop-ring" @formatxFadeUp>
+      <span class="material-symbols-rounded">upload_file</span>
+      Drop file to format
+    </div>
+  }
+
+  <header class="fx-header" @formatxFadeUp>
+    <nav class="nav glass-strong">
+      <div class="brand-mark">
+        <span class="material-symbols-rounded">auto_fix_high</span>
+      </div>
+      <strong>FormatX</strong>
+      <span class="pill">AI Beautifier</span>
+      <div class="nav-actions">
+        <button type="button" class="search" (click)="showPalette.set(true)">
+          <span class="material-symbols-rounded">search</span>
+          Search...
+          <kbd>Ctrl K</kbd>
+        </button>
+        <div class="theme-switcher">
+          @for (theme of themes; track theme.id) {
+            <button type="button" [class.active]="store.theme() === theme.id" [attr.aria-label]="theme.label" (click)="setTheme(theme.id)">
+              <span class="material-symbols-rounded">{{ theme.icon }}</span>
+            </button>
+          }
+        </div>
+        <div class="accent-picker">
+          @for (accent of accents; track accent.value) {
+            <button type="button" [class.active]="store.accent() === accent.value" [attr.aria-label]="accent.name" (click)="setAccent(accent.value)">
+              <span [style.background]="accent.value"></span>
+            </button>
+          }
+        </div>
+        <button type="button" class="icon-btn" aria-label="Settings" (click)="showSettings.set(true)">
+          <span class="material-symbols-rounded">settings</span>
+        </button>
+        <button type="button" class="icon-btn" aria-label="About" (click)="showAbout.set(true)">
+          <span class="material-symbols-rounded">info</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="fx-main">
+    @if (!fullscreen()) {
+      <section class="hero" @formatxFadeUp>
+        <div class="eyebrow">
+          <span class="material-symbols-rounded">sparkles</span>
+          AI-powered formatting
+        </div>
+        <h1>Beautiful code, <span>instantly.</span></h1>
+        <p>Paste, drop, or upload. FormatX detects your language, learns your style, and ships polished code in 19 languages.</p>
+      </section>
+    }
+
+    <app-formatx-toolbar
+      [lang]="store.lang()"
+      [confidence]="store.confidence()"
+      [autoLang]="store.autoLang()"
+      [mode]="store.mode()"
+      [indent]="store.indent()"
+      (langChange)="setLang($event, false)"
+      (autoLangChange)="store.setAutoLang($event)"
+      (modeChange)="setMode($event)"
+      (indentChange)="store.setIndent($event)"
+      (undo)="store.undo()"
+      (redo)="store.redo()"
+      (fullscreen)="fullscreen.update(value => !value)"
+      (format)="runFormat()"
+    />
+
+    <section class="editor-grid" @formatxFadeUp>
+      <app-formatx-editor-panel
+        title="Input"
+        icon="code"
+        [stats]="inputStats()"
+        [value]="store.input()"
+        (valueChange)="store.setInput($event)"
+        (upload)="handleFile($event)"
+        (clear)="clearAll()"
+      />
+      <app-formatx-editor-panel
+        title="Output"
+        icon="data_object"
+        [readonly]="true"
+        [stats]="outputStats()"
+        [value]="store.output()"
+        [highlighted]="store.highlightedOutput()"
+        (copy)="copyOutput()"
+        (download)="downloadOutput()"
+      />
+    </section>
+
+    @if (!fullscreen()) {
+      <section class="insights" @formatxFadeUp>
+        <article class="glass">
+          <span>Language</span>
+          <strong>{{ currentLang().label }}</strong>
+          <small>{{ store.autoLang() ? 'Auto-detected' : 'Manual' }} · {{ store.confidence() * 100 | number:'1.0-0' }}%</small>
+        </article>
+        <article class="glass">
+          <span>Style</span>
+          <strong>{{ store.style()?.indentLabel ?? '2 spaces' }}</strong>
+          <small>{{ store.style()?.quotes ?? 'mixed' }} quotes · {{ store.style()?.naming ?? 'mixed' }}</small>
+        </article>
+        <article class="glass">
+          <span>Mode</span>
+          <strong>{{ currentMode().label }}</strong>
+          <small>{{ currentMode().hint }}</small>
+        </article>
+        <article class="glass">
+          <span>History</span>
+          <strong>{{ store.history().length }} states</strong>
+          <small>Undo and redo preserved locally</small>
+        </article>
+      </section>
+    }
+  </main>
+
+  @if (toast(); as message) {
+    <aside class="toast glass-strong" @formatxModal>
+      <span class="material-symbols-rounded">check_circle</span>
+      <div>
+        <strong>{{ message.title }}</strong>
+        @if (message.description) {
+          <small>{{ message.description }}</small>
+        }
+      </div>
+    </aside>
+  }
+
+  @if (showPalette()) {
+    <div class="modal-backdrop" (click)="closeModals()">
+      <section class="modal-card palette glass-strong" @formatxModal (click)="$event.stopPropagation()">
+        <header>
+          <span class="material-symbols-rounded">command</span>
+          <strong>Command Palette</strong>
+          <button type="button" (click)="closeModals()" aria-label="Close"><span class="material-symbols-rounded">close</span></button>
+        </header>
+        <button type="button" (click)="execute('format')"><span class="material-symbols-rounded">auto_fix_high</span> Format code <kbd>Ctrl Shift F</kbd></button>
+        <button type="button" (click)="execute('copy')"><span class="material-symbols-rounded">content_copy</span> Copy output</button>
+        <button type="button" (click)="execute('download')"><span class="material-symbols-rounded">download</span> Download output <kbd>Ctrl S</kbd></button>
+        <button type="button" (click)="execute('language')"><span class="material-symbols-rounded">translate</span> Pick language</button>
+        <button type="button" (click)="execute('settings')"><span class="material-symbols-rounded">settings</span> Open settings</button>
+      </section>
+    </div>
+  }
+
+  @if (showSettings()) {
+    <div class="modal-backdrop" (click)="closeModals()">
+      <section class="modal-card glass-strong" @formatxModal (click)="$event.stopPropagation()">
+        <header>
+          <strong>Settings</strong>
+          <button type="button" (click)="closeModals()" aria-label="Close"><span class="material-symbols-rounded">close</span></button>
+        </header>
+        <div class="setting-block">
+          <span>Theme</span>
+          <div class="segmented">
+            @for (theme of themes; track theme.id) {
+              <button type="button" [class.active]="store.theme() === theme.id" (click)="setTheme(theme.id)">{{ theme.label }}</button>
+            }
+          </div>
+        </div>
+        <div class="setting-block">
+          <span>Accent</span>
+          <div class="swatches">
+            @for (accent of accents; track accent.value) {
+              <button type="button" [class.active]="store.accent() === accent.value" [style.--swatch]="accent.value" (click)="setAccent(accent.value)">
+                <i></i>{{ accent.name }}
+              </button>
+            }
+          </div>
+        </div>
+        <div class="setting-block">
+          <span>History</span>
+          <div class="history-list">
+            @for (entry of historyPreview(); track $index) {
+              <button type="button" (click)="restoreHistory($index)">{{ entry.slice(0, 90) || 'Empty input' }}</button>
+            }
+          </div>
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (showLangPicker()) {
+    <div class="modal-backdrop" (click)="closeModals()">
+      <section class="modal-card language glass-strong" @formatxModal (click)="$event.stopPropagation()">
+        <header>
+          <strong>Choose language</strong>
+          <button type="button" (click)="closeModals()" aria-label="Close"><span class="material-symbols-rounded">close</span></button>
+        </header>
+        <div class="language-grid">
+          @for (language of languages; track language.id) {
+            <button type="button" [class.active]="store.lang() === language.id" (click)="setLang(language.id, false)">
+              {{ language.label }}
+              <small>.{{ language.ext[0] }}</small>
+            </button>
+          }
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (showAbout()) {
+    <div class="modal-backdrop" (click)="closeModals()">
+      <section class="modal-card glass-strong" @formatxModal (click)="$event.stopPropagation()">
+        <header>
+          <strong>About FormatX</strong>
+          <button type="button" (click)="closeModals()" aria-label="Close"><span class="material-symbols-rounded">close</span></button>
+        </header>
+        <p>FormatX is a premium formatter and style analyzer for JavaScript, TypeScript, HTML, CSS, JSON, Python, SQL, Bash and more.</p>
+        <div class="about-grid">
+          <span>19+ languages</span>
+          <span>Style detection</span>
+          <span>Local history</span>
+          <span>Keyboard shortcuts</span>
+        </div>
+      </section>
+    </div>
+  }
+</section>

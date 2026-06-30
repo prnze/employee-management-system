@@ -1,0 +1,17 @@
+<div class="accent-wrap">
+  @for (accent of accentEntries; track accent[0]) {
+    <button
+      type="button"
+      [class.active]="store.accent() === accent[0]"
+      [style.--swatch]="accent[1]"
+      (click)="store.setAccent(accent[0])"
+      [attr.aria-label]="'Accent ' + accent[0]"
+      [title]="accent[0]"
+    >
+      <span></span>
+    </button>
+  }
+  <label class="custom" title="Custom accent">
+    <input type="color" [ngModel]="store.customAccent()" (ngModelChange)="store.setCustomAccent($event)" />
+  </label>
+</div>

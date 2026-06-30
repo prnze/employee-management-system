@@ -1,0 +1,127 @@
+.glass-card {
+  background: var(--px-glass);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--px-glass-border);
+  border-radius: var(--px-radius-2xl);
+  box-shadow: 0 1px 0 color-mix(in oklab, white 10%, transparent) inset, 0 10px 40px -15px rgba(0, 0, 0, .2);
+  padding: 1.25rem;
+}
+
+.card-header,
+.section-title,
+.subtle-action,
+.history-item {
+  align-items: center;
+  display: flex;
+}
+
+.card-header {
+  justify-content: space-between;
+  margin-bottom: .75rem;
+}
+
+.section-title,
+.subtle-action {
+  color: var(--px-muted-foreground);
+  gap: .45rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-size: .6875rem;
+}
+
+.material-symbols-rounded {
+  font-size: .9rem;
+}
+
+.subtle-action,
+.icon-action {
+  background: transparent;
+  border: 0;
+  color: var(--px-muted-foreground);
+  cursor: pointer;
+  font: inherit;
+  transition: color .18s ease, opacity .18s ease;
+
+  &:hover {
+    color: var(--px-foreground);
+  }
+}
+
+.subtle-action {
+  font-size: .6875rem;
+}
+
+.history-list {
+  max-height: 18rem;
+  overflow-y: auto;
+  padding-right: .25rem;
+}
+
+.empty {
+  color: var(--px-muted-foreground);
+  font-size: .75rem;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.history-item {
+  animation: history-in .2s ease-out;
+  border-radius: .7rem;
+  gap: .4rem;
+  justify-content: space-between;
+  padding: .38rem .5rem;
+
+  &:hover {
+    background: color-mix(in oklab, var(--px-accent) 50%, transparent);
+
+    .icon-action {
+      opacity: 1;
+    }
+  }
+}
+
+.history-main {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.password,
+.meta {
+  display: block;
+}
+
+.password {
+  color: var(--px-foreground);
+  font-family: var(--px-font-mono);
+  font-size: .75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  color: var(--px-muted-foreground);
+  font-size: .625rem;
+}
+
+.icon-action {
+  display: grid;
+  height: 1.65rem;
+  opacity: 0;
+  place-items: center;
+  width: 1.65rem;
+}
+
+@keyframes history-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}

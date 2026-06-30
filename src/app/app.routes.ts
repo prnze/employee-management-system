@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { Router, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
 import { guestGuard } from '@core/guards/guest.guard';
 import { roleGuard } from '@core/guards/role.guard';
@@ -78,19 +78,12 @@ export const routes: Routes = [
     loadChildren: () => import('@features/sharex/sharex.routes').then((m) => m.SHAREX_ROUTES)
   },
   {
-    path: 'formatx',
-    loadComponent: () => import('@shared/components/redirect/redirect.component').then((m) => m.RedirectComponent),
-    data: { redirectTo: '/formatx/' }
-  },
-  {
     path: 'passx',
-    loadComponent: () => import('@shared/components/redirect/redirect.component').then((m) => m.RedirectComponent),
-    data: { redirectTo: '/passx/' }
+    loadChildren: () => import('@features/passx/passx.routes').then((m) => m.PASSX_ROUTES)
   },
   {
-    path: 'filex',
-    loadComponent: () => import('@shared/components/redirect/redirect.component').then((m) => m.RedirectComponent),
-    data: { redirectTo: '/filex/' }
+    path: 'formatx',
+    loadChildren: () => import('@features/formatx/formatx.routes').then((m) => m.FORMATX_ROUTES)
   },
   {
     path: 'profile',

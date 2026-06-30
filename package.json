@@ -7,11 +7,7 @@
     "start": "ng serve",
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "build:angular": "ng build --configuration production",
-    "build:react": "npm run build --prefix workspace",
-    "assemble": "node scripts/assemble.js",
-    "build:all": "npm run build:angular && npm run build:react && npm run assemble"
+    "test": "ng test"
   },
   "dependencies": {
     "@angular/animations": "21.2.13",
@@ -28,6 +24,7 @@
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.1",
     "ng2-charts": "^10.0.0",
+    "prismjs": "^1.30.0",
     "qrcode": "^1.5.4",
     "rxjs": "^7.8.2",
     "three": "^0.184.0",
@@ -39,6 +36,7 @@
     "@angular/cli": "21.2.13",
     "@angular/compiler-cli": "21.2.13",
     "@types/jasmine": "^5.1.13",
+    "@types/prismjs": "^1.26.5",
     "@types/three": "^0.184.1",
     "jasmine-core": "^5.13.0",
     "karma": "^6.4.4",

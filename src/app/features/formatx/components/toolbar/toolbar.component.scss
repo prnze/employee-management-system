@@ -1,0 +1,98 @@
+.toolbar {
+  align-items: center;
+  border-radius: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 1rem;
+  padding: .5rem;
+}
+
+.glass {
+  background: var(--fx-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--fx-glass-border);
+  box-shadow: var(--fx-glass-shadow);
+}
+
+select,
+button {
+  border: 1px solid var(--fx-glass-border);
+  border-radius: .75rem;
+  color: var(--fx-foreground);
+  font: inherit;
+  height: 2.25rem;
+}
+
+select {
+  background: color-mix(in oklab, var(--fx-foreground) 4%, transparent);
+  font-size: .75rem;
+  padding: 0 .6rem;
+}
+
+button {
+  background: color-mix(in oklab, var(--fx-foreground) 4%, transparent);
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+
+  &:hover {
+    background: color-mix(in oklab, var(--fx-foreground) 9%, transparent);
+    transform: translateY(-1px);
+  }
+}
+
+.small {
+  font-size: .7rem;
+  padding: 0 .65rem;
+}
+
+.small.active,
+.primary {
+  background: var(--fx-accent);
+  color: var(--fx-accent-foreground);
+}
+
+.indent {
+  background: color-mix(in oklab, var(--fx-foreground) 4%, transparent);
+  border: 1px solid var(--fx-glass-border);
+  border-radius: .75rem;
+  display: flex;
+  padding: .1rem;
+
+  button {
+    background: transparent;
+    border: 0;
+    color: var(--fx-muted-foreground);
+    font-size: .68rem;
+    height: 1.9rem;
+    padding: 0 .55rem;
+
+    &.active {
+      background: color-mix(in oklab, var(--fx-accent) 18%, transparent);
+      color: var(--fx-foreground);
+    }
+  }
+}
+
+.push {
+  flex: 1;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+}
+
+.material-symbols-rounded {
+  font-size: 1rem;
+}
+
+.primary {
+  align-items: center;
+  display: inline-flex;
+  font-size: .8rem;
+  font-weight: 700;
+  gap: .4rem;
+  padding: 0 .85rem;
+}

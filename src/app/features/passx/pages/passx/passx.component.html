@@ -1,0 +1,139 @@
+<div class="passx-shell" [class.theme-light]="store.theme() === 'light'" [class.theme-dark]="store.theme() === 'dark'" [class.theme-black]="store.theme() === 'black'" [style.--px-brand]="store.accentColor()">
+  <app-passx-ambient-background />
+  <app-passx-command-palette
+    (regenerate)="regenerate()"
+    (copyPassword)="copy()"
+    (toggleVisibility)="toggleVisibility()"
+  />
+
+  <header class="topbar glass-panel">
+    <div class="brand">
+      <span class="brand-mark"><span class="material-symbols-rounded">auto_awesome</span></span>
+      <span class="brand-name">PassX</span>
+      <span class="version">v1.0</span>
+    </div>
+    <div class="actions">
+      <button type="button" class="top-action export" (click)="exportSettings()" aria-label="Export settings">
+        <span class="material-symbols-rounded">download</span>
+        <span>Export</span>
+      </button>
+      <button type="button" class="top-action command" aria-label="Open command palette">
+        <span class="material-symbols-rounded">keyboard_command_key</span>
+        <span>Ctrl K</span>
+      </button>
+      <app-passx-accent-picker />
+      <app-passx-theme-switcher />
+    </div>
+  </header>
+
+  <main id="main-content" class="content">
+    <section class="hero" @passxFadeUp>
+      <h1>Passwords, perfected.</h1>
+      <p>Cryptographically random. Beautifully crafted. Engineered for serious security.</p>
+    </section>
+
+    <section class="password-card glass-panel" @passxFadeUp>
+      <div class="card-eyebrow">
+        <span><i></i> Live - {{ strength().label }}</span>
+        <span>{{ entropy() }} bits</span>
+      </div>
+
+      <div class="password-display-wrap">
+        <div class="password-display">
+          <span [class.password-enter]="password()">{{ visible() ? (password() || '-') : maskedPassword() }}</span>
+        </div>
+        <div class="password-actions">
+          <button type="button" class="icon-button" (click)="toggleVisibility()" [attr.aria-label]="visible() ? 'Hide' : 'Show'">
+            <span class="material-symbols-rounded">{{ visible() ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+          <button type="button" class="icon-button refresh" (click)="regenerate()" aria-label="Regenerate">
+            <span class="material-symbols-rounded">refresh</span>
+          </button>
+          <button type="button" class="copy-button" (click)="copy()" aria-label="Copy">
+            <span class="material-symbols-rounded">{{ copied() ? 'check' : 'content_copy' }}</span>
+            <span>{{ copied() ? 'Copied' : 'Copy' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="strength-bars" aria-label="Password strength">
+        @for (bar of [1, 2, 3, 4, 5]; track bar) {
+          <span [style.background]="bar <= strength().score ? strength().color : 'var(--px-muted)'" [style.transform]="'scaleX(' + (bar <= strength().score ? 1 : .15) + ')'"></span>
+        }
+      </div>
+    </section>
+
+    <nav class="mode-tabs" aria-label="Password mode">
+      <div class="tabs glass-panel">
+        @for (mode of modes; track mode) {
+          <button type="button" [class.active]="store.options().mode === mode" (click)="updateOption('mode', mode)">
+            {{ mode }}
+          </button>
+        }
+      </div>
+    </nav>
+
+    <section class="generator-grid">
+      <div class="options-card glass-card">
+        <div class="length-row">
+          <span>Length</span>
+          <input type="number" min="4" max="256" [ngModel]="store.options().length" (ngModelChange)="updateLength($event)" />
+        </div>
+        <input class="range" type="range" min="4" max="256" step="1" [ngModel]="store.options().length" (ngModelChange)="updateLength($event)" />
+        <div class="range-labels"><span>4</span><span>64</span><span>128</span><span>192</span><span>256</span></div>
+
+        <div class="option-grid">
+          @for (row of optionRows; track row.key) {
+            <app-passx-option-row
+              [label]="row.label"
+              [hint]="row.hint"
+              [checked]="$any(store.options())[row.key]"
+              (checkedChange)="updateOption(row.key, $event)"
+            />
+          }
+        </div>
+      </div>
+
+      <aside class="side-stack">
+        <app-passx-history (restoreSettings)="restoreHistorySettings($event)" />
+
+        <section class="favorites glass-card">
+          <div class="favorites-head">
+            <div class="section-title">
+              <span class="material-symbols-rounded">star</span>
+              Favorites
+            </div>
+            <button type="button" (click)="toggleFavoriteForm()">
+              {{ showFavoriteForm() ? 'Cancel' : '+ Save' }}
+            </button>
+          </div>
+
+          @if (showFavoriteForm()) {
+            <div class="favorite-form">
+              <input placeholder="Preset name" [ngModel]="favoriteName()" (ngModelChange)="favoriteName.set($event)" />
+              <button type="button" (click)="saveFavorite()">Save</button>
+            </div>
+          }
+
+          <div class="favorite-list">
+            @if (store.favorites().length === 0) {
+              <div class="empty">No favorites</div>
+            }
+            @for (favorite of store.favorites(); track favorite.id) {
+              <article>
+                <button type="button" class="favorite-main" (click)="store.applyFavorite(favorite.id)">
+                  {{ favorite.name }} <span>- {{ favorite.options.length }}c</span>
+                </button>
+                <button type="button" class="remove" (click)="store.removeFavorite(favorite.id)" aria-label="Remove">x</button>
+              </article>
+            }
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <app-passx-stats [password]="password()" [entropy]="entropy()" [poolSize]="poolSize()" />
+
+    <footer>PassX - Generated entirely on-device using <span>crypto.getRandomValues</span> - Press Ctrl K for commands</footer>
+  </main>
+</div>

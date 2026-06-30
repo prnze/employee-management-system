@@ -1,0 +1,51 @@
+<section class="panel glass">
+  <div class="panel-head">
+    <div class="title">
+      <span class="material-symbols-rounded">{{ icon }}</span>
+      <strong>{{ title }}</strong>
+    </div>
+    <div class="stats">
+      <span>{{ stats.lines }} lines</span>
+      <i></i>
+      <span>{{ stats.chars }} chars</span>
+      <i></i>
+      <span>{{ stats.size }}</span>
+      <div class="actions">
+        @if (!readonly) {
+          <label class="icon-btn" aria-label="Upload">
+            <span class="material-symbols-rounded">upload</span>
+            <input type="file" hidden (change)="onFile($event)" />
+          </label>
+          <button type="button" class="icon-btn" (click)="clear.emit()" aria-label="Clear">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        } @else {
+          <button type="button" class="icon-btn" (click)="copy.emit()" aria-label="Copy">
+            <span class="material-symbols-rounded">content_copy</span>
+          </button>
+          <button type="button" class="icon-btn" (click)="download.emit()" aria-label="Download">
+            <span class="material-symbols-rounded">download</span>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+  <div class="editor-wrap">
+    <div class="line-numbers" aria-hidden="true">
+      @for (line of lineNumbers; track line) {
+        <span>{{ line }}</span>
+      }
+    </div>
+    @if (!readonly) {
+      <textarea
+        class="code-area scroll-thin"
+        spellcheck="false"
+        placeholder="// Paste, drop or upload code here..."
+        [ngModel]="value"
+        (ngModelChange)="valueChange.emit($event)"
+      ></textarea>
+    } @else {
+      <pre class="code-output scroll-thin"><code [innerHTML]="highlighted"></code></pre>
+    }
+  </div>
+</section>

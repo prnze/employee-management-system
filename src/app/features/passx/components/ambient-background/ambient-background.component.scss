@@ -1,0 +1,50 @@
+.ambient {
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: fixed;
+  z-index: -1;
+}
+
+.ambient-orb {
+  background: var(--px-brand);
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: .5;
+  position: absolute;
+}
+
+.orb-one {
+  animation: orb-one 18s ease-in-out infinite;
+  height: 600px;
+  left: -150px;
+  top: -200px;
+  width: 600px;
+}
+
+.orb-two {
+  animation: orb-two 22s ease-in-out infinite;
+  bottom: -180px;
+  height: 500px;
+  opacity: .3;
+  right: -120px;
+  width: 500px;
+}
+
+.doodle {
+  height: 100%;
+  inset: 0;
+  opacity: .06;
+  position: absolute;
+  width: 100%;
+}
+
+@keyframes orb-one {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(80px, 40px); }
+}
+
+@keyframes orb-two {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-60px, -30px); }
+}

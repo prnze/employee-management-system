@@ -1,0 +1,35 @@
+.theme-segment {
+  align-items: center;
+  background: var(--px-glass);
+  border: 1px solid var(--px-glass-border);
+  border-radius: 999px;
+  display: flex;
+  gap: .2rem;
+  padding: .22rem;
+}
+
+button {
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: var(--px-muted-foreground);
+  display: grid;
+  height: 2.1rem;
+  place-items: center;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+  width: 2.1rem;
+
+  &:hover {
+    color: var(--px-foreground);
+    transform: translateY(-1px);
+  }
+
+  &.active {
+    background: var(--px-brand);
+    color: #fff;
+  }
+}
+
+.material-symbols-rounded {
+  font-size: 1rem;
+}
