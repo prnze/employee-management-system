@@ -83,7 +83,7 @@ export const routes: Routes = [
   },
   {
     path: 'formatx',
-    loadChildren: () => import('@features/formatx/formatx.routes').then((m) => m.FORMATX_ROUTES)
+    loadChildren: () => import('./features/formatx/formatx.routes').then((m) => m.FORMATX_ROUTES)
   },
   {
     path: 'profile',

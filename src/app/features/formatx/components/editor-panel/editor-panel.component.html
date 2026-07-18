@@ -45,7 +45,7 @@
         (ngModelChange)="valueChange.emit($event)"
       ></textarea>
     } @else {
-      <pre class="code-output scroll-thin"><code [innerHTML]="highlighted"></code></pre>
+      <pre class="code-output scroll-thin"><code [class]="'language-' + language" [innerHTML]="highlighted"></code></pre>
     }
   </div>
 </section>

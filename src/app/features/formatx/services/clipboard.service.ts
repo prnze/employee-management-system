@@ -8,9 +8,13 @@ export class FormatxClipboardService {
 
   async copy(text: string): Promise<boolean> {
     if (!this.browser) return false;
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return true;
+    if (navigator.clipboard?.writeText && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // Permission denial falls through to the selection-based fallback.
+      }
     }
     const area = this.document.createElement('textarea');
     area.value = text;
@@ -18,9 +22,11 @@ export class FormatxClipboardService {
     area.style.opacity = '0';
     this.document.body.appendChild(area);
     area.select();
-    const copied = this.document.execCommand('copy');
-    area.remove();
-    return copied;
+    try {
+      return this.document.execCommand('copy');
+    } finally {
+      area.remove();
+    }
   }
 
   async paste(): Promise<string> {

@@ -37,7 +37,7 @@ export class FormatxComponent {
   readonly languages = LANGUAGES;
   readonly modes = MODES;
   readonly themes: { id: FormatxTheme; label: string; icon: string }[] = [
-    { id: 'light', label: 'Light', icon: 'light_mode' },
+    { id: 'light', label: 'Light Grey', icon: 'light_mode' },
     { id: 'dark', label: 'Dark Grey', icon: 'dark_mode' },
     { id: 'pitch', label: 'Pitch Black', icon: 'radio_button_unchecked' }
   ];
@@ -49,6 +49,7 @@ export class FormatxComponent {
   readonly showLangPicker = signal(false);
   readonly dragActive = signal(false);
   readonly toast = signal<{ title: string; description?: string } | null>(null);
+  readonly sourceFileName = signal<string | null>(null);
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly currentLang = computed(() => this.languages.find((language) => language.id === this.store.lang()) ?? this.languages[0]);
@@ -91,16 +92,25 @@ export class FormatxComponent {
 
   downloadOutput(): void {
     const ext = this.currentLang().ext[0] ?? 'txt';
-    this.downloadService.download(`formatx.${ext}`, this.store.output());
-    this.notify('Downloaded', `formatx.${ext}`);
+    const sourceName = this.sourceFileName();
+    const stem = sourceName ? sourceName.replace(/\.[^.]+$/, '') : 'formatx';
+    const filename = `${stem || 'formatx'}.${ext}`;
+    this.downloadService.download(filename, this.store.output());
+    this.notify('Downloaded', filename);
   }
 
   async handleFile(file: File): Promise<void> {
-    const text = await this.uploadService.readFile(file);
-    this.store.setInput(text);
-    const lang = this.detector.extToLang(file.name);
-    if (lang) this.store.setLang(lang, false);
-    this.notify('File loaded', file.name);
+    try {
+      const text = await this.uploadService.readFile(file);
+      this.store.setInput(text);
+      this.sourceFileName.set(file.name);
+      const lang = this.detector.extToLang(file.name);
+      if (lang) this.store.setLang(lang, false);
+      else this.store.setAutoLang(true);
+      this.notify('File loaded', file.name);
+    } catch {
+      this.notify('Unable to read file', file.name);
+    }
   }
 
   onDrop(event: DragEvent): void {

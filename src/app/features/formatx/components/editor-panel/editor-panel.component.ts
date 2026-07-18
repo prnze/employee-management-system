@@ -16,6 +16,7 @@ export class EditorPanelComponent {
   @Input({ required: true }) stats: EditorStats = { lines: 0, chars: 0, size: '0 B' };
   @Input() value = '';
   @Input() highlighted = '';
+  @Input() language = 'plaintext';
   @Input() readonly = false;
   @Output() valueChange = new EventEmitter<string>();
   @Output() copy = new EventEmitter<void>();

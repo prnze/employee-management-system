@@ -11,6 +11,7 @@ import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-jsx';
 import 'prismjs/components/prism-markdown';
 import 'prismjs/components/prism-markup';
+import 'prismjs/components/prism-markup-templating';
 import 'prismjs/components/prism-php';
 import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-scss';
@@ -145,11 +146,13 @@ export class FormatterService {
   }
 
   highlight(code: string, lang: Lang): string {
+    // Angular's CommonJS interop can wrap Prism differently than Vite does.
+    const prism = (Prism as unknown as { default?: typeof Prism }).default ?? Prism;
     const grammarId = this.langMap[lang];
-    const grammar = Prism.languages[grammarId];
+    const grammar = prism.languages[grammarId];
     if (!grammar) return this.escapeHtml(code);
     try {
-      return Prism.highlight(code, grammar, grammarId);
+      return prism.highlight(code, grammar, grammarId);
     } catch {
       return this.escapeHtml(code);
     }

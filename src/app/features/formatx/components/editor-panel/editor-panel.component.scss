@@ -1,5 +1,6 @@
 .panel {
   border-radius: 1rem;
+  min-width: 0;
   overflow: hidden;
 }
 
@@ -86,6 +87,7 @@ strong {
 .editor-wrap {
   display: grid;
   grid-template-columns: 3.25rem minmax(0, 1fr);
+  min-width: 0;
 }
 
 .line-numbers {
@@ -120,6 +122,7 @@ strong {
   padding: 1.25rem;
   tab-size: 2;
   width: 100%;
+  min-width: 0;
 }
 
 .code-area {

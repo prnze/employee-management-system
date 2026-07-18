@@ -20,17 +20,12 @@
         <span class="material-symbols-rounded">auto_fix_high</span>
       </div>
       <strong>FormatX</strong>
-      <span class="pill">AI Beautifier</span>
       <div class="nav-actions">
-        <button type="button" class="search" (click)="showPalette.set(true)">
-          <span class="material-symbols-rounded">search</span>
-          Search...
-          <kbd>Ctrl K</kbd>
-        </button>
         <div class="theme-switcher">
           @for (theme of themes; track theme.id) {
-            <button type="button" [class.active]="store.theme() === theme.id" [attr.aria-label]="theme.label" (click)="setTheme(theme.id)">
+            <button type="button" [class.active]="store.theme() === theme.id" [attr.aria-label]="theme.label" [attr.title]="theme.label" (click)="setTheme(theme.id)">
               <span class="material-symbols-rounded">{{ theme.icon }}</span>
+              <span class="theme-label">{{ theme.label }}</span>
             </button>
           }
         </div>
@@ -54,10 +49,6 @@
   <main class="fx-main">
     @if (!fullscreen()) {
       <section class="hero" @formatxFadeUp>
-        <div class="eyebrow">
-          <span class="material-symbols-rounded">sparkles</span>
-          AI-powered formatting
-        </div>
         <h1>Beautiful code, <span>instantly.</span></h1>
         <p>Paste, drop, or upload. FormatX detects your language, learns your style, and ships polished code in 19 languages.</p>
       </section>
@@ -96,6 +87,7 @@
         [stats]="outputStats()"
         [value]="store.output()"
         [highlighted]="store.highlightedOutput()"
+        [language]="store.lang()"
         (copy)="copyOutput()"
         (download)="downloadOutput()"
       />
