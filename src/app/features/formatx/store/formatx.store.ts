@@ -1,5 +1,5 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { FORMATX_HISTORY_KEY, FORMATX_PREFS_KEY, SAMPLE_CODE } from '../constants/formatx.constants';
+import { FORMATX_HISTORY_KEY, FORMATX_PREFS_KEY } from '../constants/formatx.constants';
 import { FormatMode, FormatxPrefs, FormatxState, FormatxTheme, Lang } from '../models/formatx.models';
 import { FormatterService } from '../services/formatter.service';
 import { FormatxHistoryService } from '../services/history.service';
@@ -148,22 +148,22 @@ export class FormatxStore {
   private restore(): FormatxState {
     const prefs = this.storage.read<Partial<FormatxPrefs>>(FORMATX_PREFS_KEY) ?? {};
     const persistedHistory = this.storage.read<{ history?: string[]; histIdx?: number }>(FORMATX_HISTORY_KEY) ?? {};
-    const detected = this.detector.detectLanguage(SAMPLE_CODE);
+    const initialInput = '';
+    const detected = this.detector.detectLanguage(initialInput);
     const state: FormatxState = {
       theme: prefs.theme ?? 'dark',
       accent: prefs.accent ?? 'oklch(0.62 0.2 255)',
       indent: prefs.indent ?? '  ',
       mode: prefs.mode ?? 'majority',
-      input: SAMPLE_CODE,
+      input: initialInput,
       output: '',
       lang: detected.lang,
       autoLang: true,
       confidence: detected.confidence,
-      style: this.formatter.analyzeStyle(SAMPLE_CODE),
-      history: persistedHistory.history?.length ? persistedHistory.history : [SAMPLE_CODE],
+      style: this.formatter.analyzeStyle(initialInput),
+      history: persistedHistory.history ?? [],
       histIdx: persistedHistory.histIdx ?? 0
     };
-    state.output = this.formatter.formatCode(state.input, state.lang, { mode: state.mode, indent: state.indent });
     return state;
   }
 }

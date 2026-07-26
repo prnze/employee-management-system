@@ -146,7 +146,7 @@ export class FormatterService {
   }
 
   highlight(code: string, lang: Lang): string {
-    // Angular's CommonJS interop can wrap Prism differently than Vite does.
+    // CommonJS interop can wrap Prism differently across build environments.
     const prism = (Prism as unknown as { default?: typeof Prism }).default ?? Prism;
     const grammarId = this.langMap[lang];
     const grammar = prism.languages[grammarId];

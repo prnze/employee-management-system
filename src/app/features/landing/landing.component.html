@@ -28,6 +28,20 @@
         @for (item of navItems; track item.href) {
           <a [href]="item.href" (click)="closeMenu()">{{ item.labelKey | translate }}</a>
         }
+        <div class="nav-tools">
+          <button class="nav-tools-toggle" type="button" [attr.aria-expanded]="toolsOpen()" aria-controls="portfolio-tools-menu" (click)="toggleTools($event)">
+            <span aria-hidden="true">🛠</span> {{ 'LANDING.NAV.TOOLS.LABEL' | translate }}
+          </button>
+          <div class="nav-tools-menu" id="portfolio-tools-menu" [class.is-open]="toolsOpen()">
+            @for (tool of toolItems; track tool.href) {
+              <a [href]="tool.href" target="_blank" rel="noopener noreferrer" [title]="tool.labelKey | translate" [attr.aria-label]="(tool.labelKey | translate) + ' (' + ('LANDING.NAV.TOOLS.NEW_TAB' | translate) + ')'" (click)="closeMenu()">
+                <img class="tool-favicon" [src]="tool.faviconUrl" [alt]="''" width="16" height="16" loading="lazy">
+                <span>{{ tool.labelKey | translate }}</span>
+                <span aria-hidden="true">{{ 'LANDING.ICONS.EXTERNAL' | translate }}</span>
+              </a>
+            }
+          </div>
+        </div>
         <a class="nav-cta" href="mailto:prince.lj.dev@gmail.com">{{ 'LANDING.NAV.CTA' | translate }} <span>{{ 'LANDING.ICONS.EXTERNAL' | translate }}</span></a>
       </div>
     </nav>

@@ -909,7 +909,15 @@
       "WORK": "Work",
       "SKILLS": "Skills",
       "CONTACT": "Contact",
-      "CTA": "Let's talk"
+      "CTA": "Let's talk",
+      "TOOLS": {
+        "LABEL": "Tools",
+        "NEW_TAB": "opens in a new tab",
+        "EMS": "EMS",
+        "SHAREX": "ShareX",
+        "PASSX": "PassX",
+        "FORMATX": "FormatX"
+      }
     },
     "CONTROLS": {
       "LANGUAGE_ARIA": "Portfolio language",

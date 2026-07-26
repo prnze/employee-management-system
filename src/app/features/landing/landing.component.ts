@@ -19,6 +19,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { LanguageService } from '@core/services/language.service';
 import { LocalStorageService } from '@core/services/local-storage.service';
 import { SeoService } from '@core/services/seo.service';
+import { ToolNavigationService } from '@core/services/tool-navigation.service';
 
 interface Project {
   titleKey: string;
@@ -81,8 +82,10 @@ export class LandingComponent {
   private readonly seo = inject(SeoService);
   private readonly languageService = inject(LanguageService);
   private readonly storage = inject(LocalStorageService);
+  private readonly toolNavigation = inject(ToolNavigationService);
 
   readonly menuOpen = signal(false);
+  readonly toolsOpen = signal(false);
   readonly scrolled = signal(false);
   readonly settingsOpen = signal(false);
   readonly portfolioTheme = signal<PortfolioTheme>(this.resolveInitialTheme());
@@ -150,6 +153,8 @@ export class LandingComponent {
     { labelKey: 'LANDING.NAV.SKILLS', href: '#skills' },
     { labelKey: 'LANDING.NAV.CONTACT', href: '#contact' }
   ];
+
+  readonly toolItems = this.toolNavigation.tools;
 
   readonly projects: Project[] = [
     {
@@ -255,10 +260,17 @@ export class LandingComponent {
 
   toggleMenu(): void {
     this.menuOpen.update((open) => !open);
+    this.toolsOpen.set(false);
   }
 
   closeMenu(): void {
     this.menuOpen.set(false);
+    this.toolsOpen.set(false);
+  }
+
+  toggleTools(event: Event): void {
+    event.stopPropagation();
+    this.toolsOpen.update((open) => !open);
   }
 
   setPortfolioLanguage(code: string): void {
@@ -318,10 +330,14 @@ export class LandingComponent {
     if (!target?.closest('.settings-dock')) {
       this.closeSettings();
     }
+    if (!target?.closest('.nav-tools')) {
+      this.toolsOpen.set(false);
+    }
   }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.closeSettings();
+    this.closeMenu();
   }
 }

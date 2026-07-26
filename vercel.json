@@ -1,18 +1,8 @@
 {
-  "cleanUrls": true,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/employee-management-system/browser",
   "rewrites": [
-    {
-      "source": "/formatx/(.*)",
-      "destination": "/formatx/index.html"
-    },
-    {
-      "source": "/passx/(.*)",
-      "destination": "/passx/index.html"
-    },
-    {
-      "source": "/filex/(.*)",
-      "destination": "/filex/index.html"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

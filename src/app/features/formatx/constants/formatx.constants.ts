@@ -3,11 +3,6 @@ import { AccentOption, FormatMode, LanguageInfo } from '../models/formatx.models
 export const FORMATX_PREFS_KEY = 'formatx-prefs';
 export const FORMATX_HISTORY_KEY = 'formatx-history';
 
-export const SAMPLE_CODE = `function greet(name){const message='Hello, '+name+'!';
-if(name){console.log(message);return message;}else{return null;}}
-const user={name:'Ada',role:'admin',perms:['read','write']};
-greet(user.name);`;
-
 export const ACCENTS: AccentOption[] = [
   { name: 'Blue', value: 'oklch(0.62 0.2 255)' },
   { name: 'Purple', value: 'oklch(0.6 0.24 295)' },

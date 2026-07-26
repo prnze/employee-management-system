@@ -900,7 +900,15 @@
       "WORK": "Arbeiten",
       "SKILLS": "Skills",
       "CONTACT": "Kontakt",
-      "CTA": "Kontakt aufnehmen"
+      "CTA": "Kontakt aufnehmen",
+      "TOOLS": {
+        "LABEL": "Tools",
+        "NEW_TAB": "öffnet in einem neuen Tab",
+        "EMS": "EMS",
+        "SHAREX": "ShareX",
+        "PASSX": "PassX",
+        "FORMATX": "FormatX"
+      }
     },
     "CONTROLS": {
       "LANGUAGE_ARIA": "Portfolio-Sprache",

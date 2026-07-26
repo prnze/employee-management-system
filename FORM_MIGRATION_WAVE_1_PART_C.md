@@ -58,7 +58,7 @@ Manual verification was performed on the Settings form using a local Dev server 
 ### Console Verification
 * Throughout the verification cycles, the console log showed:
   * **0 runtime errors**.
-  * **0 warning messages** (after Vite/Angular CLI dev server recompiled without cache issues).
+  * **0 warning messages** after the Angular CLI development server recompiled without cache issues.
   * **0 ExpressionChangedAfterItHasBeenCheckedError** logs.
   * **0 ControlValueAccessor registration errors**.
 
