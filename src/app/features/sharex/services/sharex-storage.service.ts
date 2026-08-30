@@ -37,7 +37,26 @@ export class SharexStorageService {
           p_size: file.size
         });
 
-      if (dbError) throw new Error(dbError.message);
+      if (dbError) {
+        if (!this.isMissingRpc(dbError)) throw new Error(dbError.message);
+
+        const { data: legacyRecord, error: legacyError } = await this.supabase.client
+          .from('share_files')
+          .insert({
+            share_id: shareId,
+            file_name: displayPath,
+            storage_path: storagePath,
+            mime_type: file.type || 'application/octet-stream',
+            size: file.size
+          })
+          .select()
+          .single();
+
+        if (legacyError) throw new Error(legacyError.message);
+        results.push(legacyRecord as ShareFile);
+        continue;
+      }
+
       results.push(record as unknown as ShareFile);
     }
 
@@ -81,5 +100,9 @@ export class SharexStorageService {
       .filter(Boolean)
       .map((segment) => segment.replace(/[^a-zA-Z0-9._-]/g, '_'))
       .join('/');
+  }
+
+  private isMissingRpc(error: { code?: string; message?: string }): boolean {
+    return error.code === 'PGRST202' || /could not find (the )?function/i.test(error.message || '');
   }
 }

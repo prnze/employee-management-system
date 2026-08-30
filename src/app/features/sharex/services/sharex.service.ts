@@ -43,6 +43,9 @@ export class SharexService {
       });
 
     if (error) {
+      if (this.isMissingRpc(error)) {
+        return this.createShareWithLegacySchema(payload, code, expiryAt);
+      }
       if (error.code === '23505' && payload.custom_code) {
         throw new Error('This custom URL is already taken. Please choose another.');
       }
@@ -58,6 +61,9 @@ export class SharexService {
       .single();
 
     if (error || !share) {
+      if (error && this.isMissingRpc(error)) {
+        return this.fetchProtectedMetadataWithLegacySchema(code);
+      }
       return { share: null, status: 'not_found' };
     }
 
@@ -75,6 +81,9 @@ export class SharexService {
       });
 
     if (error || !data) {
+      if (error && this.isMissingRpc(error)) {
+        return this.fetchFullShareWithLegacySchema(id, password);
+      }
       throw new Error('Share not found.');
     }
 
@@ -160,5 +169,82 @@ export class SharexService {
     if (share.view_limit && share.view_count >= share.view_limit) return 'view_limit';
     if (share.is_burn_after_read && share.view_count > 0) return 'burned';
     return 'ok';
+  }
+
+  private async createShareWithLegacySchema(
+    payload: CreateSharePayload,
+    code: string,
+    expiryAt: string | null
+  ): Promise<Share> {
+    const passwordHash = payload.password?.trim()
+      ? await this.passwordService.hashPassword(payload.password, code)
+      : null;
+
+    const { data, error } = await this.supabase.client
+      .from('shares')
+      .insert({
+        share_code: code,
+        title: payload.title || null,
+        content: payload.content || null,
+        content_type: payload.content_type || 'text',
+        language: payload.language || null,
+        password_hash: passwordHash,
+        expiry_at: expiryAt,
+        view_limit: payload.view_limit || null,
+        is_burn_after_read: payload.is_burn_after_read || false
+      })
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505' && payload.custom_code) {
+        throw new Error('This custom URL is already taken. Please choose another.');
+      }
+      throw new Error(error.message);
+    }
+
+    return data as Share;
+  }
+
+  private async fetchProtectedMetadataWithLegacySchema(code: string): Promise<{ share: ProtectedShareMetadata | null; status: ShareStatus }> {
+    const { data, error } = await this.supabase.client
+      .from('shares')
+      .select('id, share_code, title, content_type, password_hash, expiry_at, view_limit, view_count, is_burn_after_read')
+      .eq('share_code', code)
+      .maybeSingle();
+
+    if (error || !data) return { share: null, status: 'not_found' };
+
+    const share = data as ProtectedShareMetadata;
+    return { share, status: this.getShareStatus(share) };
+  }
+
+  private async fetchFullShareWithLegacySchema(id: string, password?: string): Promise<{ share: Share; files: ShareFile[] }> {
+    const { data: share, error: shareError } = await this.supabase.client
+      .from('shares')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (shareError || !share) throw new Error('Share not found.');
+
+    const fullShare = share as Share;
+    if (this.getShareStatus(fullShare) !== 'ok') throw new Error('Share not found.');
+    if (fullShare.password_hash && (!password || !(await this.verifyPassword(password, fullShare.share_code, fullShare.password_hash)))) {
+      throw new Error('Share not found.');
+    }
+
+    const { data: files, error: filesError } = await this.supabase.client
+      .from('share_files')
+      .select('*')
+      .eq('share_id', id)
+      .order('created_at');
+
+    if (filesError) throw new Error(filesError.message);
+    return { share: fullShare, files: (files || []) as ShareFile[] };
+  }
+
+  private isMissingRpc(error: { code?: string; message?: string }): boolean {
+    return error.code === 'PGRST202' || /could not find (the )?function/i.test(error.message || '');
   }
 }
